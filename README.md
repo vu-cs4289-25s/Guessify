@@ -10,4 +10,6 @@ Run these in your terminal:
 
 `npm install firebase`
 
+`cd my-app`
+
 `npm start`
