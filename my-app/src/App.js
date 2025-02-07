@@ -1,10 +1,10 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
-import Home from "./pages/Home";
-import HowToPlay from "./pages/HowToPlay";
-import About from "./pages/About";
-import Leaderboard from "./pages/Leaderboard";
-import Profile from "./pages/Profile";
+import Home from "./pages/Home/Home";
+import HowToPlay from "./pages/HowToPlay/HowToPlay";
+import About from "./pages/About/About";
+import Leaderboard from "./pages/Leaderboard/Leaderboard";
+import Profile from "./pages/Profile/Profile";
 import "./App.css";
 
 function App() {
