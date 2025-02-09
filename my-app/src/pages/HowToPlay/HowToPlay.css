@@ -10,7 +10,7 @@
 }
   
 /* Blurred overlay */
-.how-to-blurred-overlay {
+.how-to-overlay {
     background: rgba(255, 255, 255, 0.0);
     backdrop-filter: blur(10px);
     padding: 50px 60px;

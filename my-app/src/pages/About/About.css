@@ -1,0 +1,65 @@
+/* Container for About page */
+.about-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 0 20px;
+    position: relative;
+}
+  
+/* Wrapper for Team and Sources side-by-side */
+.about-overlays-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    height: 70vh;
+    justify-content: center;
+    width: 100%;
+    margin-top: 20px;
+}
+  
+/* Overlay panels */
+.about-overlay-panel {
+    background: rgba(255, 255, 255, 0.0);
+    backdrop-filter: blur(10px);
+    padding: 30px 80px;
+    border-radius: 20px;
+    max-width: 90vw;
+    text-align: left;
+    color: white;
+    border: 0.1px solid rgb(148, 148, 148);
+}
+  
+/* Overlay titles */
+.about-overlay-title {
+    font-family: "Silkscreen", cursive;
+    font-size: 40px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+  
+/* Team panel: 2-column layout for names/roles */
+.about-team-columns {
+    display: grid;
+    grid-template-columns: auto auto;
+    column-gap: 8rem;
+    row-gap: 1.5rem;
+    margin-top: 1rem;
+}
+  
+.about-team-col-left p,
+.about-team-col-right p {
+    font-family: "Silkscreen", cursive;
+    font-size: 23px;
+    margin: 0;
+}
+  
+/* Sources panel */
+.about-sources p {
+    margin: 0.5rem 0;
+    font-family: "Silkscreen", cursive; 
+    font-size: 18px;
+    text-align: center;
+}
