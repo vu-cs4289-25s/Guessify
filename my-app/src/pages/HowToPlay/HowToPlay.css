@@ -1,0 +1,62 @@
+/* Container for the How To Play page */
+.how-to-play-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    padding: 0 20px;
+    position: relative;
+}
+  
+/* Blurred overlay */
+.how-to-blurred-overlay {
+    background: rgba(255, 255, 255, 0.0);
+    backdrop-filter: blur(10px);
+    padding: 50px 60px;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 1000px;
+    text-align: center;
+    color: white;
+    border: 0.1px solid rgb(148, 148, 148);
+}
+  
+/* Title */
+.how-to-title {
+    font-family: "Silkscreen", cursive;
+    font-size: 40px;
+    margin-bottom: 30px;
+}
+  
+/* Icons container */
+.how-to-icons-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 40px;
+}
+
+/* Individual icon box */
+.how-to-icon-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 200px;
+}
+
+/* Icon images */
+.how-to-icon {
+    width: 80px;
+    height: auto;
+}
+
+/* Icon description */
+.how-to-description {
+    font-family: "Silkscreen", cursive;
+    font-size: 23px;
+    text-align: center;
+    line-height: 1.5;
+    min-height: 60px;
+}
