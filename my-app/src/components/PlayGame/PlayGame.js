@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar/Navbar";
 import BackButton from "../BackButton/BackButton";
+import ConfirmationPopup from "../ConfirmationPopup/ConfirmationPopup";
 import "./PlayGame.css";
 
 const PlayGame = () => {
@@ -8,11 +10,31 @@ const PlayGame = () => {
   // Ex, use Link with `state={{ genre: "ROCK" }}`
   // const location = useLocation();
   // const { genre } = location.state || {};
+  const navigate = useNavigate();
+
+  // State to show/hide the confirmation modal
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  // If user tries to “go back,” we intercept and show the modal
+  const handleBack = () => {
+    setShowConfirm(true);
+  };
+
+  // Called when user clicks “BACK TO LOBBY”
+  const confirmLeave = () => {
+    navigate("/");
+  };
+
+  // Called if user cancels or clicks outside
+  const cancelLeave = () => {
+    setShowConfirm(false);
+  };
 
   return (
     <div className="play-game-container">
       <Navbar />
-      <BackButton to="/game/genres" />
+
+      <BackButton to="#" onClick={handleBack} />
 
       <div className="countdown-circle">10</div>
 
@@ -23,7 +45,6 @@ const PlayGame = () => {
 
         {/* TODO - import icon */}
         <div className="question-icon">?</div>
-
         <input type="text" placeholder="Type here..." className="guess-input" />
       </div>
 
@@ -33,6 +54,10 @@ const PlayGame = () => {
         {/* TODO - fix stlying */}
         <input type="range" min="0" max="100" />
       </div>
+
+      {showConfirm && (
+        <ConfirmationPopup onConfirm={confirmLeave} onCancel={cancelLeave} />
+      )}
     </div>
   );
 };
