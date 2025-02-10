@@ -5,6 +5,9 @@ import HowToPlay from "./pages/HowToPlay/HowToPlay";
 import About from "./pages/About/About";
 import Leaderboard from "./pages/Leaderboard/Leaderboard";
 import Profile from "./pages/Profile/Profile";
+import GameModeSelect from "./components/GameModeSelect/GameModeSelect";
+import GenreSelect from "./components/GenreSelect/GenreSelect";
+import PlayGame from "./components/PlayGame/PlayGame";
 import "./App.css";
 
 function App() {
@@ -16,6 +19,9 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/leaderboard" element={<Leaderboard />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/game" element={<GameModeSelect />} />
+        <Route path="/game/genres" element={<GenreSelect />} />
+        <Route path="/game/play" element={<PlayGame />} />
       </Routes>
     </div>
   );
