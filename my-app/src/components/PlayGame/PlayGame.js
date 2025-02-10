@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar/Navbar";
 import WebPlayback from "../../components/WebPlayback/WebPlayback";
 import BackButton from "../BackButton/BackButton";
@@ -11,6 +12,24 @@ const PlayGame = () => {
   // const location = useLocation();
   // const { genre } = location.state || {};
   const [token, setToken] = useState(null);
+  const navigate = useNavigate();
+
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  // If user tries to “go back,” we intercept and show the modal
+  const handleBack = () => {
+    setShowConfirm(true);
+  };
+
+  // Called when user clicks “BACK TO LOBBY”
+  const confirmLeave = () => {
+    navigate("/");
+  };
+
+  // Called if user cancels or clicks outside
+  const cancelLeave = () => {
+    setShowConfirm(false);
+  };
 
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
