@@ -1,6 +1,6 @@
 .back-button {
     position: fixed;
-    top: 14%;
+    top: 16%;
     left: 8%;
     z-index: 9999;
     
@@ -35,3 +35,31 @@
     height: auto;
 }
 
+/* Tooltip appear to the right using ::after */
+.back-button::after {
+    content: "BACK";
+    position: absolute;
+    top: 50%;
+    left: 60px;
+    transform: translateY(-50%);
+  
+    /* Tooltip styling */
+    background: transparent;
+    color: white;
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-size: 23px;
+    font-family: "Silkscreen", cursive;
+    white-space: nowrap;
+  
+    /* Start hidden */
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+  
+  /* Show the tooltip text on hover */
+  .back-button:hover::after {
+    opacity: 1;
+  }
+  

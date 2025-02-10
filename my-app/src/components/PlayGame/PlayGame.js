@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Navbar from "../../components/Navbar/Navbar";
 import WebPlayback from "../../components/WebPlayback/WebPlayback";
 import BackButton from "../BackButton/BackButton";
+import ConfirmationPopup from "../ConfirmationPopup/ConfirmationPopup";
 import "./PlayGame.css";
 
 const PlayGame = () => {
@@ -23,7 +24,8 @@ const PlayGame = () => {
   return (
     <div className="play-game-container">
       <Navbar />
-      <BackButton to="/game/genres" />
+
+      <BackButton to="#" onClick={handleBack} />
 
       <div className="countdown-circle">10</div>
 
@@ -37,7 +39,6 @@ const PlayGame = () => {
 
         {/* TODO - import icon */}
         <div className="question-icon">?</div>
-
         <input type="text" placeholder="Type here..." className="guess-input" />
       </div>
 
@@ -47,6 +48,10 @@ const PlayGame = () => {
         {/* TODO - fix stlying */}
         <input type="range" min="0" max="100" />
       </div>
+
+      {showConfirm && (
+        <ConfirmationPopup onConfirm={confirmLeave} onCancel={cancelLeave} />
+      )}
     </div>
   );
 };

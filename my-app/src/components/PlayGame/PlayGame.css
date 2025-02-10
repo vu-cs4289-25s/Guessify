@@ -12,7 +12,7 @@
   /* Countdown circle */
   .countdown-circle {
     position: relative;
-    top: 120px;
+    top: 10%;
     left: 50%;
     transform: translateX(-50%); /* center horizontally */
     width: 140px;
@@ -35,7 +35,7 @@
   /* Guess Overlay */
   .guess-overlay {
     position: relative;
-    margin: 160px auto 0 auto;
+    margin: 8% auto 0 auto;
     background: rgba(255, 255, 255, 0.0);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.4);
