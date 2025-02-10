@@ -11,8 +11,14 @@ const Home = () => {
     // navigate("/gameType");
     // else
     const clientId = "3c75e5c902f94501ae14000ce64c5053";
-    const redirectUri = "http://localhost:3000/callback"; // Use your redirect URI
-    const scopes = "user-modify-playback-state user-read-playback-state"; // Scopes for playback control
+    const redirectUri = "http://localhost:3000/callback";
+    const scopes = [
+      "streaming",
+      "user-read-email",
+      "user-read-private",
+      "user-modify-playback-state",
+      "user-read-playback-state",
+    ];
 
     // Construct the authorization URL
     const authUrl = `https://accounts.spotify.com/authorize?response_type=code&client_id=${clientId}&scope=${scopes}&redirect_uri=${redirectUri}`;
