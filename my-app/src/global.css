@@ -1,0 +1,25 @@
+.overlay-panel {
+  background: rgba(255, 255, 255, 0);
+  backdrop-filter: blur(10px);
+  padding: 30px 80px;
+  border-radius: 20px;
+  max-width: 90vw;
+  text-align: left;
+  color: white;
+  border: 0.1px solid rgb(148, 148, 148);
+}
+
+.overlay-title {
+  font-family: "Silkscreen", cursive;
+  font-size: 40px;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.label-text {
+  font-family: "Silkscreen", cursive;
+  font-size: 23px;
+  text-align: center;
+  line-height: 1.5;
+  min-height: 60px;
+}

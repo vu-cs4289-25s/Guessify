@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar/Navbar";
+import WebPlayback from "../../components/WebPlayback/WebPlayback";
 import BackButton from "../BackButton/BackButton";
 import ConfirmationPopup from "../ConfirmationPopup/ConfirmationPopup";
 import "./PlayGame.css";
@@ -29,6 +30,16 @@ const PlayGame = () => {
   const cancelLeave = () => {
     setShowConfirm(false);
   };
+  const [token, setToken] = useState(null);
+
+  useEffect(() => {
+    const queryParams = new URLSearchParams(window.location.search);
+    const accessToken = queryParams.get("token");
+
+    if (accessToken) {
+      setToken(accessToken); // Store token in state or context
+    }
+  });
 
   return (
     <div className="play-game-container">
@@ -40,6 +51,10 @@ const PlayGame = () => {
 
       <div className="guess-overlay">
         <h2 className="guess-title">GUESS THE SONG!</h2>
+        <div className="overlay-panel">
+          <h2 className="overlay-title">Game</h2>
+          <WebPlayback token={token} />
+        </div>
         <p className="score-missed">Score: 0</p>
         <p className="score-missed">Missed: 0</p>
 
