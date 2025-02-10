@@ -29,7 +29,7 @@
     max-width: 90vw;
     text-align: left;
     color: white;
-    border: 0.1px solid rgb(148, 148, 148);
+    border: 1px solid rgba(255, 255, 255, 0.4);
 }
   
 /* Overlay titles */
