@@ -4,10 +4,10 @@ import Navbar from "../../components/Navbar/Navbar";
 import "./Home.css";
 
 const Home = () => {
-  const navigate = useNavigate(); // Initialize navigate
+  const navigate = useNavigate();
 
   const handlePlayButtonClick = () => {
-    navigate("/game"); // Navigate to the /game route
+    navigate("/game");
   };
 
   return (
