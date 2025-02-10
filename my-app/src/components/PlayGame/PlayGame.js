@@ -30,7 +30,6 @@ const PlayGame = () => {
       <div className="guess-overlay">
         <h2 className="guess-title">GUESS THE SONG!</h2>
         <div className="overlay-panel">
-          <h2 className="overlay-title">Game</h2>
           <WebPlayback token={token} />
         </div>
         <p className="score-missed">Score: 0</p>
