@@ -11,17 +11,17 @@ const HowToPlay = () => {
         <div className="how-to-icons-container">
           <div className="how-to-icon-box">
             <img
-              src="/icons/listen.png" // TODO
+              src="/icons/listen.png" // TODO - import icon
               alt="Listen to the song"
-              className="icon"
+              className="how-to-icon"
             />
             <p className="how-to-description">LISTEN TO THE SONG</p>
           </div>
           <div className="how-to-icon-box">
             <img
-              src="/icons/guess.png" // TODO
+              src="/icons/guess.png" // TODO - import icon
               alt="Guess the song name"
-              className="icon"
+              className="how-to-icon"
             />
             <p className="how-to-description">
               GUESS THE SONG NAME IN LIMITED TIME
@@ -29,9 +29,9 @@ const HowToPlay = () => {
           </div>
           <div className="how-to-icon-box">
             <img
-              src="/icons/leaderboard.png" // TODO
+              src="/icons/leaderboard.png" // TODO - import icon
               alt="Earn points"
-              className="icon"
+              className="how-to-icon"
             />
             <p className="how-to-description">
               EARN POINTS & LAND ON LEADERBOARD
