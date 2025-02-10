@@ -6,7 +6,6 @@ const Navbar = () => {
   const location = useLocation();
   const isLandingPage = location.pathname === "/";
 
-  // Helper to conditionally apply the border indicating current page
   const isActivePage = (path) => location.pathname === path;
 
   return (

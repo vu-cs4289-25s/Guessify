@@ -76,7 +76,7 @@
 .nav-link-border {
   background: rgba(255, 255, 255, 0.0);
   backdrop-filter: blur(10px);
-  border: 1px solid #fff;
+  border: 1px solid rgba(255, 255, 255, 0.4);
   padding: 6px 10px;
   border-radius: 30px;
 }

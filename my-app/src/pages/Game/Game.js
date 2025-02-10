@@ -1,27 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { Routes, Route } from "react-router-dom";
 import Navbar from "../../components/Navbar/Navbar";
-import WebPlayback from "../../components/WebPlayback/WebPlayback";
-import axios from "axios";
+import GameModeSelect from "../../components/GameModeSelect/GameModeSelect";
+import GenreSelect from "../../components/GenreSelect/GenreSelect";
+import PlayGame from "../../components/PlayGame/PlayGame";
+
+import "./Game.css";
 
 const Game = () => {
-  const [token, setToken] = useState(null);
-
-  useEffect(() => {
-    const queryParams = new URLSearchParams(window.location.search);
-    const accessToken = queryParams.get("token");
-
-    if (accessToken) {
-      setToken(accessToken); // Store token in state or context
-    }
-  });
-
   return (
-    <div>
+    <div className="game-container">
       <Navbar />
-      <div className="overlay-panel">
-        <h2 className="overlay-title">Game</h2>
-        <WebPlayback token={token} />
-      </div>
+      <Routes>
+        <Route index element={<GameModeSelect />} />
+        <Route path="genres" element={<GenreSelect />} />
+        <Route path="play" element={<PlayGame />} />
+      </Routes>
     </div>
   );
 };
