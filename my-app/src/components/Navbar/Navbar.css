@@ -1,74 +1,82 @@
 /* Navbar container */
 .navbar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background-color: transparent;
-    padding: 30px 100px; /* Default padding when the logo is present */
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    box-sizing: border-box;
-    transition: padding 0.3s ease; /* Smooth transition for padding changes */
-  }
-  
-  /* Navbar without the logo */
-  .navbar.no-logo {
-    padding: 58px 100px; /* Adjusted padding when the logo is hidden */
-  }
-  
-  /* Logo link */
-  .nav-logo {
-    margin-right: 20px;
-    text-decoration: none;
-    transition: opacity 0.3s ease, transform 0.3s ease; /* Smoothly fade/slide the logo */
-  }
-  
-  /* Logo image */
-  .logo {
-    height: 80px;
-    width: auto;
-  }
-  
-  /* Container for the links */
-  .nav-links-container {
-    display: flex;
-    align-items: center;
-    transition: margin-left 0.3s ease; /* Smooth transition for sliding */
-  }
-  
-  /* Move links to the left when the logo is hidden */
-  .navbar.no-logo .nav-links-container {
-    margin-left: 0; /* Default when no logo */
-  }
-  
-  .nav-links-container {
-    margin-left: 120px; /* Add space for the logo when it’s present */
-  }
-  
-  /* Navbar links */
-  .nav-link {
-    color: white;
-    text-decoration: none;
-    margin: 0 20px;
-    font-size: 24px;
-    font-family: "Silkscreen", cursive;
-    font-weight: normal;
-    letter-spacing: 1px;
-    transition: color 0.3s ease;
-  }
-  
-  /* Align the Profile link to the right */
-  .profile-link {
-    margin-left: auto;
-    margin-right: 60px;
-  }
-  
-  /* Hover effect */
-  .nav-link:hover {
-    text-shadow: 2px 2px 2px #000;
-    font-weight: bold;
-  }
-  
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: transparent;
+  padding: 30px 100px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  box-sizing: border-box;
+  transition: padding 0.3s ease;
+}
+
+/* Navbar without the logo */
+.navbar.no-logo {
+  padding: 58px 100px;
+}
+
+/* Logo link */
+.nav-logo {
+  margin-right: 20px;
+  text-decoration: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Logo image */
+.logo {
+  height: 80px;
+  width: auto;
+}
+
+/* Container for the links */
+.nav-links-container {
+  display: flex;
+  align-items: center;
+  transition: margin-left 0.3s ease;
+}
+
+/* Move links to the left when the logo is hidden */
+.navbar.no-logo .nav-links-container {
+  margin-left: 0;
+}
+
+.nav-links-container {
+  margin-left: 120px;
+}
+
+/* Navbar links */
+.nav-link {
+  color: white;
+  text-decoration: none;
+  margin: 0 20px;
+  font-size: 24px;
+  font-family: "Silkscreen", cursive;
+  font-weight: normal;
+  letter-spacing: 1px;
+  transition: color 0.3s ease;
+}
+
+/* Align the Profile link to the right */
+.profile-link {
+  margin-left: auto;
+  margin-right: 60px;
+}
+
+/* Hover effect */
+.nav-link:hover {
+  text-shadow: 2px 2px 2px #000;
+  font-weight: bold;
+}
+
+/* Border to indicate current page */
+.nav-link-border {
+  background: rgba(255, 255, 255, 0.0);
+  backdrop-filter: blur(10px);
+  border: 1px solid #fff;
+  padding: 6px 10px;
+  border-radius: 30px;
+}

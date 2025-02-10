@@ -3,8 +3,11 @@ import { Link, useLocation } from "react-router-dom";
 import "./Navbar.css";
 
 const Navbar = () => {
-  const location = useLocation(); // Get the current route
-  const isLandingPage = location.pathname === "/"; // Check if on the landing page
+  const location = useLocation();
+  const isLandingPage = location.pathname === "/";
+
+  // Helper to conditionally apply the border indicating current page
+  const isActivePage = (path) => location.pathname === path;
 
   return (
     <nav className={`navbar ${isLandingPage ? "no-logo" : ""}`}>
@@ -14,15 +17,35 @@ const Navbar = () => {
           <img src="/logo.png" alt="Logo" className="logo" />
         </Link>
       )}
-      <Link to="/how-to-play" className="nav-link">
+
+      <Link
+        to="/how-to-play"
+        className={`nav-link ${
+          isActivePage("/how-to-play") ? "nav-link-border" : ""
+        }`}
+      >
         HOW TO PLAY
       </Link>
-      <Link to="/about" className="nav-link">
+
+      <Link
+        to="/about"
+        className={`nav-link ${
+          isActivePage("/about") ? "nav-link-border" : ""
+        }`}
+      >
         ABOUT
       </Link>
-      <Link to="/leaderboard" className="nav-link">
+
+      <Link
+        to="/leaderboard"
+        className={`nav-link ${
+          isActivePage("/leaderboard") ? "nav-link-border" : ""
+        }`}
+      >
         LEADERBOARD
       </Link>
+
+      {/* TODO - profile picture instead of text */}
       <Link to="/profile" className="nav-link profile-link">
         PROFILE
       </Link>
