@@ -1,9 +1,6 @@
-// Game.js
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import Navbar from "../../components/Navbar/Navbar";
-
-// Import your 3 sub-pages
 import GameModeSelect from "../../components/GameModeSelect/GameModeSelect";
 import GenreSelect from "../../components/GenreSelect/GenreSelect";
 import PlayGame from "../../components/PlayGame/PlayGame";
