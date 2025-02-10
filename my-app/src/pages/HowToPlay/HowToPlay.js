@@ -6,7 +6,7 @@ const HowToPlay = () => {
   return (
     <div className="how-to-play-container">
       <Navbar />
-      <div className="how-to-blurred-overlay">
+      <div className="how-to-overlay">
         <h1 className="how-to-title">HOW TO PLAY</h1>
         <div className="how-to-icons-container">
           <div className="how-to-icon-box">
