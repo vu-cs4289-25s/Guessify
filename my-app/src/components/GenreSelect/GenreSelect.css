@@ -1,0 +1,44 @@
+/* Container for genre select with scroll */
+.genre-select-container {
+    position: relative;
+    min-height: 100vh;
+    overflow-y: auto;
+    padding: 200px 100px 50px 100px;
+    box-sizing: border-box;
+  }
+  
+  /* The 3-column grid for genres */
+  .genre-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 20px;
+    margin-top: 20px;
+  }
+  
+  /* Genre buttons (same sizes for all) */
+  .genre-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  
+    min-height: 200px;
+    min-width: 460px;
+  
+    background: rgba(255, 255, 255, 0.0);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 20px;
+  
+    color: white;
+    text-decoration: none;
+    font-family: "Silkscreen", cursive;
+    font-size: 28px;
+  }
+  
+  /* Hover effect for genre button */
+  .genre-button:hover {
+    text-shadow: 2px 2px 2px #000;
+    font-weight: bold;
+  }
+  
