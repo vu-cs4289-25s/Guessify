@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import "../../global.css";
 
 const Callback = () => {
   const [token, setToken] = useState(null);
@@ -31,7 +32,7 @@ const Callback = () => {
           }
         )
         .then((response) => {
-          setToken(response.data.access_token); // Save the access token
+          setToken(response.data.access_token);
           window.location.href = `/game?token=${response.data.access_token}`;
         })
         .catch((error) => {
@@ -41,8 +42,8 @@ const Callback = () => {
   }, []);
 
   return (
-    <div>
-      <h1>Loading...</h1>
+    <div className="overlay-panel">
+      <h2 className="overlay-title">Loading . . .</h2>
     </div>
   );
 };
