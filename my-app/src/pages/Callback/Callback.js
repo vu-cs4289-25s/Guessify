@@ -33,7 +33,7 @@ const Callback = () => {
         )
         .then((response) => {
           setToken(response.data.access_token);
-          window.location.href = `/game?token=${response.data.access_token}`;
+          window.location.href = `/game/play?token=${response.data.access_token}`;
         })
         .catch((error) => {
           console.error("Error fetching token:", error);
