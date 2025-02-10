@@ -1,0 +1,62 @@
+/* Dark/transparent backdrop covering screen */
+.confirmation-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  
+  /* The actual popup box */
+.confirmation-content {
+    background: rgba(255, 255, 255, 0.0);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 30px;
+    padding: 40px 100px;
+    text-align: center;
+    color: white;
+    cursor: default;
+    
+    font-family: "Silkscreen", cursive;
+  }
+  
+  .confirmation-content h1 {
+    font-size: 40px;
+    margin-bottom: 20px;
+    text-decoration: underline;
+  }
+
+  .confirmation-content h3 {
+    font-size: 23px;
+    margin-bottom: 20px;
+  }
+  
+  .confirmation-content p {
+    font-size: 18px;
+    margin-bottom: 20px;
+  }
+  
+  /* Back to lobby button */
+  .confirmation-button {
+    background-color: #f3d6d6;
+    border: 2px solid #b96565;
+    border-radius: 60px;
+    padding: 10px 20px;
+    color: #b96565;
+    font-size: 16px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  
+  /* On hover */
+  .confirmation-button:hover {
+    filter: brightness(90%);
+  }
+  
