@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar/Navbar";
+import WebPlayback from "../../components/WebPlayback/WebPlayback";
 import BackButton from "../BackButton/BackButton";
 import ConfirmationPopup from "../ConfirmationPopup/ConfirmationPopup";
 import "./PlayGame.css";
@@ -10,9 +11,9 @@ const PlayGame = () => {
   // Ex, use Link with `state={{ genre: "ROCK" }}`
   // const location = useLocation();
   // const { genre } = location.state || {};
+  const [token, setToken] = useState(null);
   const navigate = useNavigate();
 
-  // State to show/hide the confirmation modal
   const [showConfirm, setShowConfirm] = useState(false);
 
   // If user tries to “go back,” we intercept and show the modal
@@ -30,6 +31,15 @@ const PlayGame = () => {
     setShowConfirm(false);
   };
 
+  useEffect(() => {
+    const queryParams = new URLSearchParams(window.location.search);
+    const accessToken = queryParams.get("token");
+
+    if (accessToken) {
+      setToken(accessToken); // Store token in state or context
+    }
+  });
+
   return (
     <div className="play-game-container">
       <Navbar />
@@ -40,6 +50,9 @@ const PlayGame = () => {
 
       <div className="guess-overlay">
         <h2 className="guess-title">GUESS THE SONG!</h2>
+        <div className="overlay-panel">
+          <WebPlayback token={token} />
+        </div>
         <p className="score-missed">Score: 0</p>
         <p className="score-missed">Missed: 0</p>
 
