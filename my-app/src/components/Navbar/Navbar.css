@@ -5,7 +5,7 @@
   left: 0;
   width: 100%;
   background-color: transparent;
-  padding: 30px 100px;
+  padding: 2% 5%;
   z-index: 100;
   display: flex;
   align-items: center;
@@ -16,7 +16,7 @@
 
 /* Navbar without the logo */
 .navbar.no-logo {
-  padding: 58px 100px;
+  padding: 3.63% 5%;
 }
 
 /* Logo link */
