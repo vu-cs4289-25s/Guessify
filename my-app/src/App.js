@@ -5,6 +5,7 @@ import HowToPlay from "./pages/HowToPlay/HowToPlay";
 import About from "./pages/About/About";
 import Leaderboard from "./pages/Leaderboard/Leaderboard";
 import Profile from "./pages/Profile/Profile";
+import Game from "./pages/Game/Game";
 import "./App.css";
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/leaderboard" element={<Leaderboard />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/game/*" element={<Game />} />
       </Routes>
     </div>
   );
