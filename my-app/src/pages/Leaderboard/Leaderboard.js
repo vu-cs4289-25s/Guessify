@@ -43,11 +43,13 @@ const Leaderboard = () => {
             <p className="leaderboard-col-title">NAME</p>
             <br />
             {/* TODO - fetch name in order of highest score */}
+            {/* TODO - yellow text for current user*/}
           </div>
           <div className="leaderboard-col-right">
             <p className="leaderboard-col-title">SCORE</p>
             <br />
             {/* TODO - fetch score in order of highest score */}
+            {/* TODO - yellow text for current user*/}
           </div>
         </div>
       </div>
