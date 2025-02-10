@@ -1,0 +1,115 @@
+/* Container for game play */
+.play-game-container {
+    position: relative;
+    min-height: 100vh;
+    width: 100vw;
+    padding-top: 100px;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  
+  /* Countdown circle */
+  .countdown-circle {
+    position: relative;
+    top: 120px;
+    left: 50%;
+    transform: translateX(-50%); /* center horizontally */
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  
+    font-family: "Silkscreen", cursive;
+    font-weight: bolder;
+    font-size: 80px;
+    color: white;
+    background: rgba(255, 255, 255, 0.0);
+    backdrop-filter: blur(10px);
+  }
+  
+  /* Guess Overlay */
+  .guess-overlay {
+    position: relative;
+    margin: 160px auto 0 auto;
+    background: rgba(255, 255, 255, 0.0);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 20px;
+    
+    width: 40%;
+    max-width: 1600px;
+    padding: 20px 80px;
+    text-align: center;
+    color: white;
+  }
+  
+  /* Title */
+  .guess-title {
+    font-family: "Silkscreen", cursive;
+    font-size: 40px;
+    margin-bottom: 20px;
+  }
+  
+  /* Score / Missed lines */
+  .score-missed {
+    font-family: "Silkscreen", cursive;
+    font-size: 20px;
+    margin: 5px 0;
+  }
+  
+  /* Question icon */
+  .question-icon {
+    margin: 20px auto;
+    font-size: 40px;
+    width: 60px; 
+    height: 60px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    font-family: "Silkscreen", cursive;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Guess input */
+  .guess-input {
+    margin-top: 10px;
+    margin-bottom: 40px;
+    font-family: "Silkscreen", cursive;
+    background-color: transparent;
+    color: white;
+    font-size: 16px;
+    padding: 10px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 4px;
+  }
+  
+  /* Audio Controls */
+  .audio-controls {
+    position: fixed;
+    bottom: 5%;
+    left: 8%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 9999;
+  }
+  
+  .audio-controls button {
+    background: none;
+    border: none;
+    font-size: 50px;
+    cursor: pointer;
+    color: white;
+  }
+  
+  .audio-controls input[type="range"] {
+    width: 160px;
+  }
+  
+  
