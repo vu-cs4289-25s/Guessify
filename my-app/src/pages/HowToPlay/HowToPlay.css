@@ -4,8 +4,8 @@
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    max-height: 80vh;
-    margin-top: 20vh;
+    max-height: var(--page-height);
+    margin-top: var(--page-margin-top);
     padding: 0 20px;
     position: relative;
     overflow-y: auto;
@@ -14,20 +14,20 @@
 /* Blurred overlay */
 .how-to-overlay {
     background: rgba(255, 255, 255, 0.0);
-    backdrop-filter: blur(10px);
+    backdrop-filter: var(--overlay-backdrop);
     padding: 50px 60px;
-    border-radius: 20px;
+    border-radius: var(--overlay-border-radius);
     width: 90%;
     max-width: 80%;
     text-align: center;
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.4);
+    color: var(--color-text);
+    border: var(--color-border);
     margin-bottom: 5vh;
 }
   
 /* Title */
 .how-to-title {
-    font-family: "Silkscreen", cursive;
+    font-family: var(--ff);
     font-size: 40px;
     margin-bottom: 30px;
 }
@@ -57,7 +57,7 @@
 
 /* Icon description */
 .how-to-description {
-    font-family: "Silkscreen", cursive;
+    font-family: var(--ff);
     font-size: 22px;
     text-align: center;
     line-height: 1.5;
