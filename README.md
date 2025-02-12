@@ -4,12 +4,9 @@
 
 # Run Locally
 
-Run these in your terminal:
+Run these commands in your terminal:
 
-`npm install`
-
-`npm install firebase`
-
-`cd my-app`
-
-`npm start`
+1. `cd my-app`
+2. `npm install`
+3. `npm install firebase`
+4. `npm start`

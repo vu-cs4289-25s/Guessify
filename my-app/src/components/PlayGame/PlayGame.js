@@ -30,6 +30,8 @@ const PlayGame = () => {
   const cancelLeave = () => {
     setShowConfirm(false);
   };
+
+  // State for storing user token
   const [token, setToken] = useState(null);
 
   useEffect(() => {
@@ -37,7 +39,7 @@ const PlayGame = () => {
     const accessToken = queryParams.get("token");
 
     if (accessToken) {
-      setToken(accessToken); // Store token in state or context
+      setToken(accessToken);
     }
   });
 
