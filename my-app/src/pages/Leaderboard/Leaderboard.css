@@ -1,103 +1,103 @@
 /* Container for the Leaderboard page */
 .leaderboard-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    max-height: 85vh;
-    margin-top: 15vh;
-    padding: 0 20px;
-    position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  max-height: 85vh;
+  margin-top: 15vh;
+  padding: 0 20px;
+  position: relative;
 }
 
 /* Blurred overlay for leaderboard */
 .leaderboard-overlay {
-    background: rgba(255, 255, 255, 0.0);
-    backdrop-filter: blur(10px);
-    padding: 60px 100px;
-    border-radius: 20px;
-    width: 90%;
-    max-width: 1000px;
-    text-align: center;
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    margin-bottom: 5%;
+  background: rgba(255, 255, 255, 0);
+  backdrop-filter: blur(10px);
+  padding: 60px 100px;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 1000px;
+  text-align: center;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  margin-bottom: 5%;
 }
 
 /* Title */
 .leaderboard-title {
-    font-family: "Silkscreen", cursive;
-    font-size: 40px;
-    margin-top: 10px;
-    margin-bottom: 30px;
+  font-family: "Silkscreen", cursive;
+  font-size: 40px;
+  margin-top: 10px;
+  margin-bottom: 30px;
 }
 
 /* Subtitle */
 .leaderboard-sub-title {
-    font-family: "Silkscreen", cursive;
-    font-size: 28px;
-    margin-bottom: 10px;
+  font-family: "Silkscreen", cursive;
+  font-size: 28px;
+  margin-bottom: 10px;
 }
 
 /* Team panel: 3-column layout for names/roles */
 .leaderboard-columns {
-    display: grid;
-    grid-template-columns: auto auto auto;
-    column-gap: 3rem;
-    row-gap: 1.5rem;
-    margin-top: 1rem;
+  display: grid;
+  grid-template-columns: auto auto auto;
+  column-gap: 3rem;
+  row-gap: 1.5rem;
+  margin-top: 1rem;
 }
-  
+
 .leaderboard-col-left p,
 .leaderboard-col-mid p,
 .leaderboard-col-right p {
-    font-family: "Silkscreen", cursive;
-    font-size: 23px;
-    margin: 0;
+  font-family: "Silkscreen", cursive;
+  font-size: 23px;
+  margin: 0;
 }
 
 .leaderboard-col-title {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 
 /* Rank icons */
 /* TODO - change width after importing icon */
 .rank-one-icon {
-    width: 10px;
-    height: auto;
+  width: 10px;
+  height: auto;
 }
 
 .rank-two-icon {
-    width: 9px;
-    height: auto;
+  width: 9px;
+  height: auto;
 }
 
 .rank-three-icon {
-    width: 8px;
-    height: auto;
+  width: 8px;
+  height: auto;
 }
 
 /* Blurred overlay for points */
 .leaderboard-points-overlay {
-    background: rgba(255, 255, 255, 0.0);
-    backdrop-filter: blur(10px);
-    padding: 0px 40px;
-    border-radius: 20px;
-    width: 90%;
-    max-width: 400px;
-    text-align: center;
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0);
+  backdrop-filter: blur(10px);
+  padding: 0px 40px;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.4);
 
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    min-height: 100px; 
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100px;
 }
 
 /* Text for points */
 .leaderboard-points-text {
-    font-family: "Silkscreen", cursive;
-    font-size: 28px;
+  font-family: "Silkscreen", cursive;
+  font-size: 28px;
 }
