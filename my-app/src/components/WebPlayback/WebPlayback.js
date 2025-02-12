@@ -74,7 +74,7 @@ function WebPlayback({ token }) {
 
   return (
     <div>
-      <h2 className="label-text">Spotify Web Player</h2>
+      <h2 className="label-text">Spotify Web Player Placeholder</h2>
       {currentTrack && (
         <div>
           <img
@@ -87,15 +87,14 @@ function WebPlayback({ token }) {
         </div>
       )}
       <button onClick={playTrack}>Play Song</button>
-      {!isPaused && (
-        <button
-          onClick={() => {
-            player.pause();
-          }}
-        >
-          Pause
-        </button>
-      )}
+
+      <button
+        onClick={() => {
+          player.pause();
+        }}
+      >
+        Pause
+      </button>
     </div>
   );
 }
