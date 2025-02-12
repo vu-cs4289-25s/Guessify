@@ -8,7 +8,7 @@ const About = () => {
       <Navbar />
       <div className="about-overlays-wrapper">
         {/* Team panel */}
-        <div className="about-overlay-panel about-team-panel">
+        <div className="about-overlay-panel">
           <h2 className="about-overlay-title">TEAM</h2>
           <div className="about-team-columns">
             <div className="about-team-col-left">
@@ -32,7 +32,7 @@ const About = () => {
           </div>
         </div>
         {/* Sources panel */}
-        <div className="about-overlay-panel about-sources-panel">
+        <div className="about-overlay-panel">
           <h2 className="about-overlay-title">SOURCES</h2>
           <div className="about-sources">
             <p>1,300 Free Pixel Icons</p>
