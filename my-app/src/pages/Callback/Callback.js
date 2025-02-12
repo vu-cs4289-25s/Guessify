@@ -43,7 +43,7 @@ const Callback = () => {
 
   return (
     <div className="overlay-panel">
-      <h2 className="overlay-title">Loading . . .</h2>
+      <h2 className="overlay-title">Connecting to Spotify . . .</h2>
     </div>
   );
 };
