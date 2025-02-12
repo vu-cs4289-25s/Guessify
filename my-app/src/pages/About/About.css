@@ -57,9 +57,22 @@
 }
   
 /* Sources panel */
-.about-sources p {
+.about-sources p,
+.about-sources a {
     margin: 0.5rem 0;
     font-family: "Silkscreen", cursive; 
     font-size: 18px;
     text-align: center;
+    color: #f3f3f3;
 }
+
+/* Sources list */
+.about-sources ul {
+    list-style-type: none; /* Removes bullet points */
+    padding: 0; /* Removes default padding */
+    margin: 0; /* Removes default margin */
+  }
+  
+  .about-sources li {
+    margin-bottom: 8px; /* Adds spacing between links */
+  }
