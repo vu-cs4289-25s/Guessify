@@ -30,21 +30,74 @@
   }
   
   /* Play button styles */
+  .play-button-container {
+    display: flex;
+    justify-content: center;  /* Center horizontally */
+    align-items: center;  /* Center vertically */
+ 
+}
+
   .play-button {
-    background-color: white;
-    color: black;
+    background: none;
     border: none;
-    font-family: "Silkscreen", cursive;
-    font-size: 30px;
-    padding: 15px 40px;
-    border-radius: 35px;
+    padding: 0;
     cursor: pointer;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+  .play-button img {
+    image-rendering: pixelated;
+    position: absolute;
+    bottom: 120px;
+    width: 200px; 
+    height: auto;
+    display: block;
   }
-  
-  .play-button:hover {
-    transform: scale(1.1);
-    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3);
-  }
+
+/* Default state */
+.play-button img.default {
+    opacity: 1;
+}
+
+/* Hover state: overlay new PNG */
+.play-button img.hover {
+    opacity: 0;
+}
+
+.play-button:hover img.default {
+    opacity: 0;
+}
+
+.play-button:hover img.hover {
+    opacity: 1;
+}
+
+/* Clicked effect */
+.play-button.clicked img.default,
+.play-button.clicked img.hover {
+    opacity: 0;
+}
+
+.play-button.clicked img.clicked {
+    opacity: 1;
+}
+
+.play-button span {
+  position: absolute;
+  bottom: 152px;
+  font-family: "Silkscreen", cursive;
+  font-size: 34px;
+  color: black;
+}
+
+.play-button:hover span {
+  color: white; /* Change this to your desired hover color */
+}
+
+.play-button .clicked-text {
+  bottom: 130px;
+  color: white; /* Change this to any color you want */
+}
   
