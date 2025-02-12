@@ -51,11 +51,11 @@
 
 /* Navbar links */
 .nav-link {
-  color: white;
+  color: var(--color-text);
   text-decoration: none;
   margin: 0 20px;
   font-size: 24px;
-  font-family: "Silkscreen", cursive;
+  font-family: var(--ff);
   font-weight: normal;
   letter-spacing: 1px;
   transition: color 0.3s ease;
@@ -76,8 +76,8 @@
 /* Border to indicate current page */
 .nav-link-border {
   background: rgba(255, 255, 255, 0.0);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  backdrop-filter: var(--overlay-backdrop);
+  border: var(--color-border);
   padding: 6px 10px;
   border-radius: 30px;
 }

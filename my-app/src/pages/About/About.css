@@ -4,8 +4,8 @@
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    max-height: 80vh;
-    margin-top: 20vh;
+    max-height: var(--page-height);
+    margin-top: var(--page-margin-top);
     padding: 0 20px;
     position: relative;
     overflow-y: auto;
@@ -24,20 +24,20 @@
   
 /* Overlay panels */
 .about-overlay-panel {
-    background: rgba(255, 255, 255, 0.0);
-    backdrop-filter: blur(10px);
+    background: var(--overlay-background);
+    backdrop-filter: var(--overlay-backdrop);
     padding: 30px 80px;
-    border-radius: 20px;
+    border-radius: var(--overlay-border-radius);
     max-width: 90vw;
     text-align: left;
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.4);
+    color: var(--color-text);
+    border: var(--color-border);
 }
   
 /* Overlay titles */
-.about-overlay-title {
-    font-family: "Silkscreen", cursive;
-    font-size: 40px;
+.about-overlay-title{
+    font-size: var(--h1-size);
+    font-family: var(--ff);
     margin-bottom: 30px;
     text-align: center;
 }
@@ -53,7 +53,7 @@
   
 .about-team-col-left p,
 .about-team-col-right p {
-    font-family: "Silkscreen", cursive;
+    font-family: var(--ff);
     font-size: 23px;
     margin: 0;
 }
@@ -62,19 +62,19 @@
 .about-sources p,
 .about-sources a {
     margin: 0.5rem 0;
-    font-family: "Silkscreen", cursive; 
+    font-family: var(--ff); 
     font-size: 18px;
     text-align: center;
-    color: #f3f3f3;
+    color: var(--color-text);
 }
 
 /* Sources list */
 .about-sources ul {
-    list-style-type: none; /* Removes bullet points */
-    padding: 0; /* Removes default padding */
-    margin: 0; /* Removes default margin */
-  }
-  
-  .about-sources li {
-    margin-bottom: 8px; /* Adds spacing between links */
-  }
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.about-sources li {
+margin-bottom: 8px;
+}

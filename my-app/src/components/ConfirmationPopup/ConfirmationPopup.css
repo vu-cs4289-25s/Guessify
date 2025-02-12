@@ -16,15 +16,15 @@
   /* The actual popup box */
 .confirmation-content {
     background: rgba(255, 255, 255, 0.0);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.4);
+    backdrop-filter: var(--overlay-backdrop);
+    border: var(--color-border);
     border-radius: 30px;
     padding: 40px 100px;
     text-align: center;
-    color: white;
+    color: var(--color-text);
     cursor: default;
     
-    font-family: "Silkscreen", cursive;
+    font-family: var(--ff);
   }
   
   .confirmation-content h1 {

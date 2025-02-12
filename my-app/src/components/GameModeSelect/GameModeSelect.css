@@ -13,12 +13,12 @@
 /* Game mode overlay */
 .game-mode-overlay {
     background: rgba(255, 255, 255, 0.0);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    border-radius: 20px;
+    backdrop-filter: var(--overlay-backdrop);
+    border: var(--color-border);
+    border-radius: var(--overlay-border-radius);
     padding: 60px 100px 30px 100px;  
     text-align: center;
-    color: white;
+    color: var(--color-text);
     max-width: 1000px;
     width: 100%;
 }
@@ -29,12 +29,12 @@
     border: none;
     outline: none;
     appearance: none;
-    color: white;
+    color: var(--color-text);
     text-decoration: none;
     padding: 12px 20px;
     margin: 10px;
     border-radius: 10px;
-    font-family: "Silkscreen", cursive;
+    font-family: var(--ff);
     font-size: 28px;
 }
 
