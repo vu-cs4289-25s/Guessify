@@ -1,9 +1,9 @@
 /* Container for game play */
 .play-game-container {
     position: relative;
-    min-height: 100vh;
+    max-height: 85vh;
+    margin-top: 15vh;
     width: 100vw;
-    padding-top: 100px;
     box-sizing: border-box;
     overflow-x: hidden;
     overflow-y: auto;
@@ -12,7 +12,6 @@
   /* Countdown circle */
   .countdown-circle {
     position: relative;
-    top: 10%;
     left: 50%;
     transform: translateX(-50%); /* center horizontally */
     width: 140px;
@@ -35,7 +34,7 @@
   /* Guess Overlay */
   .guess-overlay {
     position: relative;
-    margin: 8% auto 0 auto;
+    margin: 2% auto 0 auto;
     background: rgba(255, 255, 255, 0.0);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.4);

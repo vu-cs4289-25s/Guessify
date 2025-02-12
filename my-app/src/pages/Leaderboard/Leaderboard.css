@@ -4,7 +4,8 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100vh;
+    max-height: 85vh;
+    margin-top: 15vh;
     padding: 0 20px;
     position: relative;
 }
@@ -20,6 +21,7 @@
     text-align: center;
     color: white;
     border: 1px solid rgba(255, 255, 255, 0.4);
+    margin-bottom: 5%;
 }
 
 /* Title */
