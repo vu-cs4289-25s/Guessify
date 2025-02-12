@@ -11,9 +11,9 @@ const PlayGame = () => {
   // Ex, use Link with `state={{ genre: "ROCK" }}`
   // const location = useLocation();
   // const { genre } = location.state || {};
+  const [token, setToken] = useState(null);
   const navigate = useNavigate();
 
-  // State to show/hide the confirmation modal
   const [showConfirm, setShowConfirm] = useState(false);
 
   // If user tries to “go back,” we intercept and show the modal
@@ -31,15 +31,21 @@ const PlayGame = () => {
     setShowConfirm(false);
   };
 
-  // State for storing user token
-  const [token, setToken] = useState(null);
+  useEffect(() => {
+    const queryParams = new URLSearchParams(window.location.search);
+    const accessToken = queryParams.get("token");
+
+    if (accessToken) {
+      setToken(accessToken); // Store token in state or context
+    }
+  });
 
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
     const accessToken = queryParams.get("token");
 
     if (accessToken) {
-      setToken(accessToken);
+      setToken(accessToken); // Store token in state or context
     }
   });
 
