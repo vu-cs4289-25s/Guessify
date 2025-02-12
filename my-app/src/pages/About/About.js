@@ -9,48 +9,56 @@ const About = () => {
       <div className="about-overlays-wrapper">
         {/* Team panel */}
         <div className="about-overlay-panel">
-          <h2 className="about-overlay-title">TEAM</h2>
+          <h1 className="about-overlay-title">TEAM</h1>
           <div className="about-team-columns">
             <div className="about-team-col-left">
-              <p>Haley Park</p>
-              <br />
-              <p>Joanna Hsieh</p>
-              <br />
-              <p>Jocelyn Ni</p>
-              <br />
-              <p>Winnie Teng</p>
+              <h3>Haley Park</h3>
+              {/* <br /> */}
+              <h3>Joanna Hsieh</h3>
+              {/* <br /> */}
+              <h3>Jocelyn Ni</h3>
+              {/* <br /> */}
+              <h3>Winnie Teng</h3>
             </div>
             <div className="about-team-col-right">
-              <p>Graphic Designer</p>
-              <br />
-              <p>Web Developer</p>
-              <br />
-              <p>Project Manager</p>
-              <br />
-              <p>UI / UX Designer</p>
+              <h3>Graphic Designer</h3>
+              {/* <br /> */}
+              <h3>Web Developer</h3>
+              {/* <br /> */}
+              <h3>Project Manager</h3>
+              {/* <br /> */}
+              <h3>UI / UX Designer</h3>
             </div>
           </div>
         </div>
         {/* Sources panel */}
         <div className="about-overlay-panel">
-          <h2 className="about-overlay-title">SOURCES</h2>
+          <h1 className="about-overlay-title">SOURCES</h1>
           <div className="about-sources">
-            <p>Figma Resources:</p>
+            <h3>Figma Resources:</h3>
             <ul>
               <li>
-                <a href="https://www.figma.com/community/file/1196864707579677521">1,300 Free Pixel Icons</a>
+                <a href="https://www.figma.com/community/file/1196864707579677521">
+                  1,300 Free Pixel Icons
+                </a>
               </li>
               <li>
-                <a href="https://www.figma.com/community/file/1131802942360219778">Pixel Icons</a>
+                <a href="https://www.figma.com/community/file/1131802942360219778">
+                  Pixel Icons
+                </a>
               </li>
               <li>
-                <a href="https://www.figma.com/community/file/1327351869279090015">Interactive Text Input</a>
+                <a href="https://www.figma.com/community/file/1327351869279090015">
+                  Interactive Text Input
+                </a>
               </li>
             </ul>
-            <p>API & Data Sources:</p>
+            <h3>API & Data Sources:</h3>
             <ul>
               <li>
-                <a href="https://developer.spotify.com/documentation/web-api/concepts/authorization">Spotify API</a>
+                <a href="https://developer.spotify.com/documentation/web-api/concepts/authorization">
+                  Spotify API
+                </a>
               </li>
             </ul>
           </div>
