@@ -27,13 +27,13 @@
     min-width: 460px;
   
     background: rgba(255, 255, 255, 0.0);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.4);
+    backdrop-filter: var(--overlay-backdrop);
+    border: var(--color-border);
     border-radius: 20px;
   
-    color: white;
+    color: var(--color-text);
     text-decoration: none;
-    font-family: "Silkscreen", cursive;
+    font-family: var(--ff);
     font-size: 28px;
   }
   
