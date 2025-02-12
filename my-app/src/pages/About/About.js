@@ -35,10 +35,24 @@ const About = () => {
         <div className="about-overlay-panel about-sources-panel">
           <h2 className="about-overlay-title">SOURCES</h2>
           <div className="about-sources">
-            <p>1,300 Free Pixel Icons</p>
-            <p>Pixel Icons</p>
-            <p>Spotify API</p>
-            <p>More External Sources</p>
+            <p>Figma Resources:</p>
+            <ul>
+              <li>
+                <a href="https://www.figma.com/community/file/1196864707579677521">1,300 Free Pixel Icons</a>
+              </li>
+              <li>
+                <a href="https://www.figma.com/community/file/1131802942360219778">Pixel Icons</a>
+              </li>
+              <li>
+                <a href="https://www.figma.com/community/file/1327351869279090015">Interactive Text Input</a>
+              </li>
+            </ul>
+            <p>API & Data Sources:</p>
+            <ul>
+              <li>
+                <a href="https://developer.spotify.com/documentation/web-api/concepts/authorization">Spotify API</a>
+              </li>
+            </ul>
           </div>
         </div>
       </div>
