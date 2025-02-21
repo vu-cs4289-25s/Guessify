@@ -1,35 +1,24 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar/Navbar";
 import "./Home.css";
 
-const Home = () => {
-  const navigate = useNavigate();
+const Home = (props) => {
   const [isClicked, setIsClicked] = useState(false);
+  const [error, setError] = useState("");
 
   const handlePlayClick = async () => {
     setIsClicked(true); // Set clicked state to true
-    setTimeout(() => {
+    setTimeout(async () => {
       setIsClicked(false);
 
-      // if logged in
-      // navigate("/gameType");
-      // else
-      const clientId = "3c75e5c902f94501ae14000ce64c5053";
-      const redirectUri = "http://localhost:3000/callback";
-      const scopes = [
-        "streaming",
-        "user-read-email",
-        "user-read-private",
-        "user-modify-playback-state",
-        "user-read-playback-state",
-      ];
+      let res = await fetch("/auth/login");
 
-      // Construct the authorization URL
-      const authUrl = `https://accounts.spotify.com/authorize?response_type=code&client_id=${clientId}&scope=${scopes}&redirect_uri=${redirectUri}`;
+      const data = await res.json();
 
-      // Redirect the user to the authorization URL
-      window.location.href = authUrl;
+      if (!res.ok) {
+        console.log(data);
+        setError(`Error: ${data.error}`); //FIXME: error message
+      }
     }, 120);
   };
   return (
@@ -43,7 +32,7 @@ const Home = () => {
             {!isClicked ? (
               <>
                 <img
-                  classname="default"
+                  className="default"
                   src="/buttons/button_rectangle_default.png"
                   alt="Play"
                 />
