@@ -1,30 +1,17 @@
 import React, { useState } from "react";
 import Navbar from "../../components/Navbar/Navbar";
+import authenticate from "../../components/Login";
 import "./Home.css";
 
 const Home = () => {
   const [isClicked, setIsClicked] = useState(false);
 
   const handlePlayClick = async () => {
-    setIsClicked(true); // Set clicked state to true
-    setTimeout(() => {
+    setIsClicked(true);
+    setTimeout(async () => {
       setIsClicked(false);
 
-      const clientId = "3c75e5c902f94501ae14000ce64c5053";
-      const redirectUri = "http://localhost:3000/callback";
-      const scopes = [
-        "streaming",
-        "user-read-email",
-        "user-read-private",
-        "user-modify-playback-state",
-        "user-read-playback-state",
-      ];
-
-      // Construct the authorization URL
-      const authUrl = `https://accounts.spotify.com/authorize?response_type=code&client_id=${clientId}&scope=${scopes}&redirect_uri=${redirectUri}`;
-
-      // Redirect the user to the authorization URL
-      window.location.href = authUrl;
+      authenticate();
     }, 120);
   };
   return (

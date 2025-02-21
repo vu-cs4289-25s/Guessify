@@ -10,8 +10,8 @@ const GenreSelect = () => {
 
   // Handle genre selection
   const handleClick = (genre) => {
-    setGameGenre("Genre: ", genre); // Set the selected genre in context
-    console.log(genre); // For debugging
+    setGameGenre(genre); // Set the selected genre in context
+    console.log("Genre: ", genre); // For debugging
   };
 
   return (
@@ -23,84 +23,84 @@ const GenreSelect = () => {
         <Link
           to="/game/play"
           className="genre-button"
-          onClick={() => handleClick("Today's Top Hits")}
+          onClick={() => handleClick("TODAY'S TOP HITS")}
         >
           TODAY'S TOP HITS
         </Link>
         <Link
           to="/game/play"
           className="genre-button"
-          onClick={() => handleClick("Pop")}
+          onClick={() => handleClick("POP")}
         >
           POP
         </Link>
         <Link
           to="/game/play"
           className="genre-button"
-          onClick={() => handleClick("Folk")}
+          onClick={() => handleClick("FOLK")}
         >
           FOLK
         </Link>
         <Link
           to="/game/play"
           className="genre-button"
-          onClick={() => handleClick("Hip-Hop/Rap")}
+          onClick={() => handleClick("HIP-HOP / RAP")}
         >
           HIP-HOP / RAP
         </Link>
         <Link
           to="/game/play"
           className="genre-button"
-          onClick={() => handleClick("Jazz")}
+          onClick={() => handleClick("JAZZ")}
         >
           JAZZ
         </Link>
         <Link
           to="/game/play"
           className="genre-button"
-          onClick={() => handleClick("Metal")}
+          onClick={() => handleClick("METAL")}
         >
           METAL
         </Link>
         <Link
           to="/game/play"
           className="genre-button"
-          onClick={() => handleClick("Rock")}
+          onClick={() => handleClick("ROCK")}
         >
           ROCK
         </Link>
         <Link
           to="/game/play"
           className="genre-button"
-          onClick={() => handleClick("Classical")}
+          onClick={() => handleClick("CLASSICAL")}
         >
           CLASSICAL
         </Link>
         <Link
           to="/game/play"
           className="genre-button"
-          onClick={() => handleClick("Indie")}
+          onClick={() => handleClick("INDIE")}
         >
           INDIE
         </Link>
         <Link
           to="/game/play"
           className="genre-button"
-          onClick={() => handleClick("Country")}
+          onClick={() => handleClick("COUNTRY")}
         >
           COUNTRY
         </Link>
         <Link
           to="/game/play"
           className="genre-button"
-          onClick={() => handleClick("Blues")}
+          onClick={() => handleClick("BLUES")}
         >
           BLUES
         </Link>
         <Link
           to="/game/play"
           className="genre-button"
-          onClick={() => handleClick("K-Pop")}
+          onClick={() => handleClick("K-POP")}
         >
           K-POP
         </Link>

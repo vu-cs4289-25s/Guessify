@@ -5,12 +5,13 @@ import Navbar from "../../components/Navbar/Navbar";
 import WebPlayback from "../../components/WebPlayback/WebPlayback";
 import BackButton from "../BackButton/BackButton";
 import ConfirmationPopup from "../ConfirmationPopup/ConfirmationPopup";
+import { useGameContext } from "../../components/GameContext";
 import "./PlayGame.css";
 
 const PlayGame = () => {
+  const { gameMode, gameGenre } = useGameContext();
   const [token, setToken] = useState(null);
   const [volume, setVolume] = useState(50); // Volume state (0-100)
-  const device_id = localStorage.getItem("device_id");
   const navigate = useNavigate();
   const [showConfirm, setShowConfirm] = useState(false);
 
@@ -69,8 +70,9 @@ const PlayGame = () => {
 
       <div className="guess-overlay">
         <h2 className="guess-title">GUESS THE SONG!</h2>
+        <h2 className="subtitle">{gameGenre}</h2>
         <div className="overlay-panel">
-          <WebPlayback token={token} />
+          <WebPlayback />
         </div>
         <p className="score-missed">Score: 0</p>
         <p className="score-missed">Missed: 0</p>

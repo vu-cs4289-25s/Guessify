@@ -1,12 +1,17 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import "./Navbar.css";
+import authenticate from "../../components/Login";
 
 const Navbar = () => {
   const location = useLocation();
   const isLandingPage = location.pathname === "/";
-
   const isActivePage = (path) => location.pathname === path;
+
+  const accessToken = localStorage.getItem("spotify_access_token");
+  const handleLoginClick = async () => {
+    authenticate();
+  };
 
   return (
     <nav className={`navbar ${isLandingPage ? "no-logo" : ""}`}>
@@ -45,9 +50,15 @@ const Navbar = () => {
       </Link>
 
       {/* TODO - profile picture instead of text */}
-      <Link to="/profile" className="nav-link profile-link">
-        PROFILE
-      </Link>
+      {accessToken ? (
+        <Link to="/profile" className="nav-link profile-link">
+          PROFILE
+        </Link>
+      ) : (
+        <Link onClick={handleLoginClick} className="nav-link profile-link">
+          LOGIN
+        </Link>
+      )}
     </nav>
   );
 };
