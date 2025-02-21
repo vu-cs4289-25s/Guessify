@@ -1,11 +1,12 @@
 /* Container for the home page */
 .home-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  max-height: 80vh;
-  margin-top: 20vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    max-height: var(--page-height);
+    margin-top: var(--page-margin-top);
+    overflow-y: auto;
 }
 
 /* Content wrapper */
@@ -35,6 +36,35 @@
   display: flex;
   justify-content: center; /* Center horizontally */
   align-items: center; /* Center vertically */
+  
+  /* Content wrapper */
+  .content {
+    text-align: center;
+  }
+  
+  /* Logo styles */
+  .big-logo {
+    width: 80%;
+    max-width: 1000px;
+    height: auto;
+    margin-bottom: 20px;
+  }
+  
+  /* Subtitle styles */
+  .subtitle {
+    font-family: var(--ff);
+    font-size: 24px;
+    color: var(--color-text);
+    margin-bottom: 30px;
+    letter-spacing: 2px;
+  }
+  
+  /* Play button styles */
+  .play-button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+ 
 }
 
 .play-button {
@@ -87,16 +117,16 @@
 .play-button span {
   position: absolute;
   bottom: 152px;
-  font-family: "Silkscreen", cursive;
+  font-family: var(--ff);
   font-size: 34px;
   color: black;
 }
 
 .play-button:hover span {
-  color: white; /* Change this to your desired hover color */
+  color: var(--color-text);
 }
 
 .play-button .clicked-text {
   bottom: 130px;
-  color: white; /* Change this to any color you want */
+  color: var(--color-text);
 }

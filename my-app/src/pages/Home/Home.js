@@ -30,7 +30,6 @@ const Home = () => {
 
       // Redirect the user to the authorization URL
       window.location.href = authUrl;
-
     }, 120);
   };
   return (
@@ -41,15 +40,27 @@ const Home = () => {
         <h2 className="subtitle">A Song Recognition Game!</h2>
         <div className="play-button-container">
           <button className="play-button" onClick={handlePlayClick}>
-          {!isClicked ? (
-            <>
-            <img classname="default" src="/buttons/button_rectangle_default.png" alt="Play"/>
-            <img className="hover" src="/buttons/button_rectangle_hover.png" alt="Play Hover"/>
-            </>
+            {!isClicked ? (
+              <>
+                <img
+                  classname="default"
+                  src="/buttons/button_rectangle_default.png"
+                  alt="Play"
+                />
+                <img
+                  className="hover"
+                  src="/buttons/button_rectangle_hover.png"
+                  alt="Play Hover"
+                />
+              </>
             ) : (
-            <img className="clicked" src="/buttons/button_rectangle_onClick.png" alt="Play Click"/>
-          )}
-          <span className={isClicked ? "clicked-text" : ""}>PLAY</span> 
+              <img
+                className="clicked"
+                src="/buttons/button_rectangle_onClick.png"
+                alt="Play Click"
+              />
+            )}
+            <span className={isClicked ? "clicked-text" : ""}>PLAY</span>
           </button>
         </div>
       </div>
