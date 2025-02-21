@@ -1,22 +1,28 @@
 import React from "react";
 import Navbar from "../../components/Navbar/Navbar";
+import { Link } from "react-router-dom";
 import "./Profile.css";
 
 const Profile = () => {
+  const handleLogout = () => {
+    localStorage.removeItem("spotify_access_token");
+    window.location.href = "/"; // Redirect to home
+  };
+
   return (
     <div className="profile-container">
       <Navbar />
       <div className="profile-overlays-wrapper">
-        {/* Team panel */}
         <div className="profile-overlay-panel">
           <h2 className="profile-title">PROFILE</h2>
           {/* TODO - spotify profile pic */}
           {/* TODO - spotify user */}
           <div className="profile-content">
-            <p>1,300 Free Pixel Icons</p>
-            <p>Pixel Icons</p>
-            <p>Spotify API</p>
-            <p>More External Sources</p>
+            <p>Profile Info</p>
+            <p>Coming Soon</p>
+            <Link className="nav-link profile-link" onClick={handleLogout}>
+              LOGOUT
+            </Link>
           </div>
         </div>
         {/* TODO - logout button centered */}
