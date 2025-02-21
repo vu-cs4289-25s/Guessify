@@ -11,7 +11,7 @@ const HowToPlay = () => {
         <div className="how-to-icons-container">
           <div className="how-to-icon-box">
             <img
-              src="/icons/listen.png" // TODO - import icon
+              src="/HTPIcons/HTP_listen.png" // TODO - import icon
               alt="Listen to the song"
               className="how-to-icon"
             />
@@ -19,7 +19,7 @@ const HowToPlay = () => {
           </div>
           <div className="how-to-icon-box">
             <img
-              src="/icons/guess.png" // TODO - import icon
+              src="/HTPIcons/HTP_guess.png" // TODO - import icon
               alt="Guess the song name"
               className="how-to-icon"
             />
@@ -29,7 +29,7 @@ const HowToPlay = () => {
           </div>
           <div className="how-to-icon-box">
             <img
-              src="/icons/leaderboard.png" // TODO - import icon
+              src="/HTPIcons/HTP_point.png" // TODO - import icon
               alt="Earn points"
               className="how-to-icon"
             />

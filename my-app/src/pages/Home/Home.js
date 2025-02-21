@@ -1,10 +1,8 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar/Navbar";
 import "./Home.css";
 
 const Home = () => {
-  const navigate = useNavigate();
   const [isClicked, setIsClicked] = useState(false);
 
   const handlePlayClick = async () => {
@@ -12,9 +10,6 @@ const Home = () => {
     setTimeout(() => {
       setIsClicked(false);
 
-      // if logged in
-      // navigate("/gameType");
-      // else
       const clientId = "3c75e5c902f94501ae14000ce64c5053";
       const redirectUri = "http://localhost:3000/callback";
       const scopes = [
@@ -30,7 +25,6 @@ const Home = () => {
 
       // Redirect the user to the authorization URL
       window.location.href = authUrl;
-
     }, 120);
   };
   return (
@@ -41,15 +35,27 @@ const Home = () => {
         <h2 className="subtitle">A Song Recognition Game!</h2>
         <div className="play-button-container">
           <button className="play-button" onClick={handlePlayClick}>
-          {!isClicked ? (
-            <>
-            <img classname="default" src="/buttons/button_rectangle_default.png" alt="Play"/>
-            <img className="hover" src="/buttons/button_rectangle_hover.png" alt="Play Hover"/>
-            </>
+            {!isClicked ? (
+              <>
+                <img
+                  className="default"
+                  src="/buttons/button_rectangle_default.png"
+                  alt="Play"
+                />
+                <img
+                  className="hover"
+                  src="/buttons/button_rectangle_hover.png"
+                  alt="Play Hover"
+                />
+              </>
             ) : (
-            <img className="clicked" src="/buttons/button_rectangle_onClick.png" alt="Play Click"/>
-          )}
-          <span className={isClicked ? "clicked-text" : ""}>PLAY</span> 
+              <img
+                className="clicked"
+                src="/buttons/button_rectangle_onClick.png"
+                alt="Play Click"
+              />
+            )}
+            <span className={isClicked ? "clicked-text" : ""}>PLAY</span>
           </button>
         </div>
       </div>

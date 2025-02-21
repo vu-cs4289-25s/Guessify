@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 
 function WebPlayback({ token }) {
   const [player, setPlayer] = useState(null);
-  const [deviceId, setDeviceId] = useState(null);
+  const [deviceId, setDeviceId] = useState(localStorage.getItem("device_id"));
   const [isPaused, setPaused] = useState(true);
   const [currentTrack, setCurrentTrack] = useState(null);
 
@@ -33,6 +33,8 @@ function WebPlayback({ token }) {
       newPlayer.addListener("ready", ({ device_id }) => {
         console.log("Ready with Device ID:", device_id);
         setDeviceId(device_id);
+        localStorage.setItem("device_id", device_id); // Store device_id in localStorage
+        console.log(localStorage.getItem("device_id"));
       });
 
       newPlayer.addListener("not_ready", ({ device_id }) => {
@@ -50,7 +52,7 @@ function WebPlayback({ token }) {
 
       newPlayer.connect();
     };
-  }, [token]);
+  }, [token, deviceId]);
 
   const playTrack = async () => {
     const trackUri = "spotify:track:07UFnnK3uPIuKv5Rs9TmXl"; // Example track URI
@@ -74,7 +76,6 @@ function WebPlayback({ token }) {
 
   return (
     <div>
-      <h2 className="label-text">Spotify Web Player Placeholder</h2>
       {currentTrack && (
         <div>
           <img
@@ -87,14 +88,6 @@ function WebPlayback({ token }) {
         </div>
       )}
       <button onClick={playTrack}>Play Song</button>
-
-      <button
-        onClick={() => {
-          player.pause();
-        }}
-      >
-        Pause
-      </button>
     </div>
   );
 }

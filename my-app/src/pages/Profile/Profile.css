@@ -3,11 +3,12 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    max-height: 80vh;
-    margin-top: 20vh;
+    justify-content: flex-start;
+    max-height: var(--page-height);
+    margin-top: var(--page-margin-top);
     padding: 0 20px;
     position: relative;
+    overflow-y: auto;
 }
   
 /* Wrapper for Team and Sources side-by-side */
@@ -18,24 +19,24 @@
     height: 70vh;
     justify-content: center;
     width: 100%;
-    margin-bottom: 5%;
+    margin-bottom: 5vh;
 }
   
 /* Overlay panels */
 .profile-overlay-panel {
     background: rgba(255, 255, 255, 0.0);
-    backdrop-filter: blur(10px);
+    backdrop-filter: var(--overlay-backdrop);
     padding: 30px 80px;
-    border-radius: 20px;
+    border-radius: var(--overlay-border-radius);
     max-width: 90vw;
     text-align: left;
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.4);
+    color: var(--color-text);
+    border: var(--color-border);
 }
   
 /* Overlay titles */
 .profile-title {
-    font-family: "Silkscreen", cursive;
+    font-family: var(--ff);
     font-size: 40px;
     margin-bottom: 30px;
     text-align: center;
@@ -44,13 +45,13 @@
 /* Sources panel */
 .profile-content p {
     margin: 0.5rem 0;
-    font-family: "Silkscreen", cursive; 
+    font-family: var(--ff); 
     font-size: 18px;
     text-align: left;
 }
 
 .profile-generate-poster {
-    font-family: "Silkscreen", cursive;
+    font-family: var(--ff);
     font-size: 40px;
     text-align: center;
     justify-content: center;
