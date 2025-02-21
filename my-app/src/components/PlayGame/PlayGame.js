@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar/Navbar";
 import WebPlayback from "../../components/WebPlayback/WebPlayback";
@@ -7,47 +8,56 @@ import ConfirmationPopup from "../ConfirmationPopup/ConfirmationPopup";
 import "./PlayGame.css";
 
 const PlayGame = () => {
-  // Pass genre via state or query param, and grab it here
-  // Ex, use Link with `state={{ genre: "ROCK" }}`
-  // const location = useLocation();
-  // const { genre } = location.state || {};
   const [token, setToken] = useState(null);
+  const [volume, setVolume] = useState(50); // Volume state (0-100)
+  const device_id = localStorage.getItem("device_id");
   const navigate = useNavigate();
-
   const [showConfirm, setShowConfirm] = useState(false);
 
-  // If user tries to “go back,” we intercept and show the modal
   const handleBack = () => {
     setShowConfirm(true);
   };
 
-  // Called when user clicks “BACK TO LOBBY”
   const confirmLeave = () => {
     navigate("/");
   };
 
-  // Called if user cancels or clicks outside
   const cancelLeave = () => {
     setShowConfirm(false);
   };
 
+  const handleVolumeChange = (event) => {
+    const newVolume = event.target.value; // New volume level (0-100)
+    setVolume(newVolume);
+
+    const deviceId = localStorage.getItem("device_id");
+    if (!deviceId) {
+      console.error("No device ID found!");
+      return;
+    }
+
+    axios
+      .put(
+        `https://api.spotify.com/v1/me/player/volume?volume_percent=${newVolume}&device_id=${deviceId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      .catch((error) => {
+        console.error("Error adjusting volume:", error);
+      });
+  };
+
   useEffect(() => {
-    const queryParams = new URLSearchParams(window.location.search);
-    const accessToken = queryParams.get("token");
+    const accessToken = localStorage.getItem("spotify_access_token");
 
     if (accessToken) {
-      setToken(accessToken); // Store token in state or context
+      setToken(accessToken); // Store token in state
     }
-  });
-
-  useEffect(() => {
-    const queryParams = new URLSearchParams(window.location.search);
-    const accessToken = queryParams.get("token");
-
-    if (accessToken) {
-      setToken(accessToken); // Store token in state or context
-    }
-  });
+  }, []);
 
   return (
     <div className="play-game-container">
@@ -60,22 +70,24 @@ const PlayGame = () => {
       <div className="guess-overlay">
         <h2 className="guess-title">GUESS THE SONG!</h2>
         <div className="overlay-panel">
-          <h2 className="overlay-title">Game</h2>
           <WebPlayback token={token} />
         </div>
         <p className="score-missed">Score: 0</p>
         <p className="score-missed">Missed: 0</p>
 
-        {/* TODO - import icon */}
         <div className="question-icon">?</div>
         <input type="text" placeholder="Type here..." className="guess-input" />
       </div>
 
       <div className="audio-controls">
-        {/* TODO - import icon */}
         <button>🔈</button>
-        {/* TODO - fix stlying */}
-        <input type="range" min="0" max="100" />
+        <input
+          type="range"
+          min="0"
+          max="100"
+          value={volume}
+          onChange={handleVolumeChange}
+        />
       </div>
 
       {showConfirm && (

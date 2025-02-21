@@ -3,7 +3,7 @@ import axios from "axios";
 import "../../global.css";
 
 const Callback = () => {
-  const [token, setToken] = useState(null);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
@@ -32,18 +32,26 @@ const Callback = () => {
           }
         )
         .then((response) => {
-          setToken(response.data.access_token);
-          window.location.href = `/game/play?token=${response.data.access_token}`;
+          localStorage.setItem(
+            "spotify_access_token",
+            response.data.access_token
+          );
+          console.log("Token: ", response.data.access_token);
+          window.location.href = `/game`;
         })
         .catch((error) => {
-          console.error("Error fetching token:", error);
+          setError("Failed to authenticate with Spotify");
         });
     }
   }, []);
 
   return (
     <div className="overlay-panel">
-      <h2 className="overlay-title">Connecting to Spotify . . .</h2>
+      {error ? (
+        <h2 className="overlay-title">{error}</h2>
+      ) : (
+        <h2 className="overlay-title">Connecting to Spotify . . .</h2>
+      )}
     </div>
   );
 };
