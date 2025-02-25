@@ -7,6 +7,7 @@ const authenticate = (nextPage = "game") => {
     "user-read-private",
     "user-modify-playback-state",
     "user-read-playback-state",
+    "user-top-read",
   ];
 
   const authUrl = new URL("https://accounts.spotify.com/authorize");
