@@ -1,13 +1,30 @@
-import React, { createContext, useContext, useState } from "react";
+// src/context/UserContext.js
+import React, { createContext, useContext, useState, useEffect } from "react";
 
-// Create the context
 const UserContext = createContext(null);
 
-// Provide the context to your app
 export const UserProvider = ({ children }) => {
-  // userId and userProfile kept in memory
-  const [userId, setUserId] = useState(null);
-  const [userProfile, setUserProfile] = useState(null);
+  const [userId, setUserId] = useState(() => localStorage.getItem("userId"));
+  const [userProfile, setUserProfile] = useState(() => {
+    const savedProfile = localStorage.getItem("userProfile");
+    return savedProfile ? JSON.parse(savedProfile) : null;
+  });
+
+  useEffect(() => {
+    if (userId) {
+      localStorage.setItem("userId", userId);
+    } else {
+      localStorage.removeItem("userId");
+    }
+  }, [userId]);
+
+  useEffect(() => {
+    if (userProfile) {
+      localStorage.setItem("userProfile", JSON.stringify(userProfile));
+    } else {
+      localStorage.removeItem("userProfile");
+    }
+  }, [userProfile]);
 
   return (
     <UserContext.Provider

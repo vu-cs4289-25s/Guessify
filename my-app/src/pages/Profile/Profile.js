@@ -4,6 +4,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase";
 import Navbar from "../../components/Navbar/Navbar";
 import { Link } from "react-router-dom";
+import { useUser } from "../../components/userContext";
 import "./Profile.css";
 
 const Profile = () => {
@@ -12,6 +13,7 @@ const Profile = () => {
   const currentYear = new Date().getFullYear();
   const [profile, setProfile] = useState(null);
   const [daysSinceJoined, setDaysSinceJoined] = useState(null);
+  const { setUserId, setUserProfile } = useUser();
 
   useEffect(() => {
     if (!userId) {
@@ -36,6 +38,15 @@ const Profile = () => {
   }, [userId]);
 
   const handleLogout = () => {
+    // Clear user session
+    setUserId(null);
+    setUserProfile(null);
+
+    // Remove from localStorage
+    localStorage.removeItem("userId");
+    localStorage.removeItem("userProfile");
+
+    // Redirect to home
     window.location.href = "/";
   };
 
