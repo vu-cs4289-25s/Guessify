@@ -73,13 +73,9 @@ const Callback = () => {
             }
           );
           const topTracksData = await topTracksRes.json();
-          if (
-            topTracksRes.ok &&
-            topTracksData.items &&
-            topTracksData.items.length > 0
-          ) {
-            const topTrack = topTracksData.items[0];
-            profileImage = topTrack.album?.images?.[0]?.url || null;
+          if (topTracksRes.ok && topTracksData.items.length > 0) {
+            profileImage =
+              topTracksData.items[0].album?.images?.[0]?.url || null;
           }
         }
 
@@ -98,7 +94,7 @@ const Callback = () => {
           }
         }
 
-        // top artists => pick genre + compute obscurity
+        // Get top artists => pick genre + compute obscurity
         const topArtistsRes = await fetch(
           "https://api.spotify.com/v1/me/top/artists?limit=5",
           {
@@ -106,17 +102,14 @@ const Callback = () => {
           }
         );
         const topArtistsData = await topArtistsRes.json();
-        if (
-          topArtistsRes.ok &&
-          topArtistsData.items &&
-          topArtistsData.items.length > 0
-        ) {
+        if (topArtistsRes.ok && topArtistsData.items.length > 0) {
           const allGenres = [];
           let totalPop = 0;
           topArtistsData.items.forEach((artist) => {
             allGenres.push(...artist.genres);
             totalPop += artist.popularity;
           });
+
           if (allGenres.length > 0) {
             const freqMap = {};
             allGenres.forEach((g) => {
@@ -126,9 +119,12 @@ const Callback = () => {
               freqMap[a] > freqMap[b] ? a : b
             );
           }
+
           const avgPop = totalPop / topArtistsData.items.length;
           obscurity = Math.round(100 - avgPop);
         }
+
+        // Randomized placeholder for songs listened this year
         songCount = Math.floor(Math.random() * 3000 + 200);
 
         // Store in Firestore
@@ -151,7 +147,7 @@ const Callback = () => {
           { merge: true }
         );
 
-        // Set in context => no flicker
+        // Store in Context & LocalStorage to persist session
         setUserId(userData.id);
         setUserProfile({
           profileImage,
@@ -161,7 +157,19 @@ const Callback = () => {
           songCount,
         });
 
-        // Instead of window.location.href => use navigate for in-app route (no flicker)
+        localStorage.setItem("userId", userData.id);
+        localStorage.setItem(
+          "userProfile",
+          JSON.stringify({
+            profileImage,
+            displayName: userData.display_name,
+            topGenre,
+            obscurity,
+            songCount,
+          })
+        );
+
+        // Navigate in-app (instead of full page reload)
         navigate(`/${nextPage}?userId=${userData.id}`, { replace: true });
       } catch (err) {
         console.error("Error in Callback:", err);
@@ -177,7 +185,7 @@ const Callback = () => {
       {error ? (
         <h2 className="overlay-title">{error}</h2>
       ) : (
-        <h2 className="overlay-title">Connecting to Spotify . . .</h2>
+        <h2 className="overlay-title">Connecting to Spotify...</h2>
       )}
     </div>
   );

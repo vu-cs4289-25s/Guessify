@@ -18,7 +18,7 @@
     margin-top: 0;
     display: flex;
     flex-wrap: wrap;
-    row-gap: 0;       /* No vertical gap */
+    row-gap: 0;
     column-gap: 2rem;    
     /* height: 70vh; */
     justify-content: center;
@@ -47,10 +47,10 @@
 }
 
 .profile-pic {
-    width: 220px;          /* or 120px, your choice */
+    width: 220px;
     height: 220px;
     object-fit: cover;
-    border-radius: 45px;    /* for a circular avatar */
+    border-radius: 45px;
 }  
 
 /* Sources panel */
