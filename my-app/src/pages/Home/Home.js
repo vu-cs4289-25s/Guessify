@@ -1,19 +1,29 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "../../components/Navbar/Navbar";
 import authenticate from "../../components/Login";
+import { useSearchParams } from "react-router-dom";
 import "./Home.css";
 
 const Home = () => {
   const [isClicked, setIsClicked] = useState(false);
+  const [searchParams] = useSearchParams();
+  const userId = searchParams.get("userId");
 
-  const handlePlayClick = async () => {
+  const handlePlayClick = () => {
     setIsClicked(true);
-    setTimeout(async () => {
+    setTimeout(() => {
       setIsClicked(false);
 
-      authenticate();
+      // If we have userId, skip login
+      if (userId) {
+        window.location.href = `/game?userId=${userId}`;
+      } else {
+        // Otherwise call authenticate, pass nextPage='game'
+        authenticate("game");
+      }
     }, 120);
   };
+
   return (
     <div className="home-container">
       <Navbar />
