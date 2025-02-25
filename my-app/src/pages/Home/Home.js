@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import Navbar from "../../components/Navbar/Navbar";
 import authenticate from "../../components/Login";
-import { useSearchParams } from "react-router-dom";
 import "./Home.css";
 
 const Home = () => {
   const [isClicked, setIsClicked] = useState(false);
   const [searchParams] = useSearchParams();
   const userId = searchParams.get("userId");
+  const navigate = useNavigate();
 
   const handlePlayClick = () => {
     setIsClicked(true);
@@ -16,7 +17,8 @@ const Home = () => {
 
       // If we have userId, skip login
       if (userId) {
-        window.location.href = `/game?userId=${userId}`;
+        // Internal route => no full reload => preserves context
+        navigate(`/game?userId=${userId}`);
       } else {
         // Otherwise call authenticate, pass nextPage='game'
         authenticate("game");
