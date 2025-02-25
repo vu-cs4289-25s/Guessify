@@ -1,27 +1,22 @@
-// src/components/Navbar/Navbar.js
-
 import React from "react";
-import { Link, useSearchParams, useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import "./Navbar.css";
 import authenticate from "../../components/Login";
+import { useUser } from "../../components/userContext";
 
 const Navbar = () => {
   const location = useLocation();
   const isLandingPage = location.pathname === "/";
   const isActivePage = (path) => location.pathname === path;
 
-  // parse userId from ?userId=xxx in the URL
-  const [searchParams] = useSearchParams();
-  const userId = searchParams.get("userId");
+  const { userId, userProfile } = useUser();
 
   const handleLoginClick = () => {
-    // If not logged in, do the Spotify OAuth with state='profile'
     authenticate("profile");
   };
 
   return (
     <nav className={`navbar ${isLandingPage ? "no-logo" : ""}`}>
-      {/* If not on landing page, show home link */}
       {!isLandingPage && (
         <Link to={userId ? `/?userId=${userId}` : "/"} className="nav-link">
           <img src="/logo.png" alt="Logo" className="logo" />
@@ -55,15 +50,22 @@ const Navbar = () => {
         LEADERBOARD
       </Link>
 
-      {/* If userId => show PROFILE link => /profile?userId=..., else show LOGIN */}
       {userId ? (
         <Link
           to={`/profile?userId=${userId}`}
           className={`nav-link profile-link ${
-            isActivePage("/profile") ? "nav-link-border" : ""
+            isActivePage("/profile") ? "" : ""
           }`}
         >
-          PROFILE
+          {userProfile?.profileImage ? (
+            <img
+              src={userProfile.profileImage}
+              alt="User"
+              className="nav-profile-pic"
+            />
+          ) : (
+            <img src="/defaultPic.png" alt="User" className="nav-profile-pic" />
+          )}
         </Link>
       ) : (
         <Link onClick={handleLoginClick} className="nav-link profile-link">
