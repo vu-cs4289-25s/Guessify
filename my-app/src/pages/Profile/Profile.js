@@ -9,8 +9,9 @@ import "./Profile.css";
 const Profile = () => {
   const [searchParams] = useSearchParams();
   const userId = searchParams.get("userId");
-
+  const currentYear = new Date().getFullYear();
   const [profile, setProfile] = useState(null);
+  const [daysSinceJoined, setDaysSinceJoined] = useState(null);
 
   useEffect(() => {
     if (!userId) {
@@ -21,14 +22,22 @@ const Profile = () => {
       const userRef = doc(db, "users", userId);
       const snapshot = await getDoc(userRef);
       if (snapshot.exists()) {
-        setProfile(snapshot.data());
+        const data = snapshot.data();
+        setProfile(data);
+
+        // DAYS SINCE JOINED => if doc has 'createdAt'
+        if (data.createdAt) {
+          const diffMs = Date.now() - data.createdAt;
+          const dayCount = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+          setDaysSinceJoined(dayCount);
+        }
       }
     };
     fetchProfile();
   }, [userId]);
 
   const handleLogout = () => {
-    // TODO: If you truly want to “log out”, you might redirect to home with no userId
+    // If you truly want to “log out”, you might redirect to home with no userId
     window.location.href = "/";
   };
 
@@ -36,31 +45,62 @@ const Profile = () => {
     <div className="profile-container">
       <Navbar />
       <div className="profile-overlays-wrapper">
-        <div className="profile-overlay-panel">
-          <h2 className="profile-title">PROFILE</h2>
-          <div className="profile-content">
-            {profile ? (
-              <>
-                {profile.profileImage && (
-                  <img
-                    src={profile.profileImage}
-                    alt="Profile"
-                    className="profile-pic"
-                  />
-                )}
-                <p>Display Name: {profile.displayName}</p>
-                <p>Email: {profile.email}</p>
-              </>
-            ) : (
-              <p>Loading...</p>
-            )}
-            <Link className="nav-link profile-link" onClick={handleLogout}>
-              LOGOUT
+        {/* Profile Panel */}
+        <div className="profile-panel">
+          <div className="profile-overlay-panel">
+            <h2 className="profile-title">PROFILE</h2>
+            <div className="profile-content">
+              {profile ? (
+                <>
+                  {profile.profileImage && (
+                    <img
+                      src={profile.profileImage}
+                      alt="Profile"
+                      className="profile-pic"
+                    />
+                  )}
+                  <h3>{profile.displayName}</h3>
+
+                  <p className="info-title">TOP GENRES:</p>
+                  <p>{profile.topGenre}</p>
+
+                  <p className="info-title">OBSCURITY RATING:</p>
+                  <p>{profile.obscurity}%</p>
+
+                  <p className="info-title">
+                    # SONGS LISTENED TO {currentYear}:
+                  </p>
+                  <p>{profile.songCount}</p>
+
+                  <p className="info-title">DAYS SINCE JOINED:</p>
+                  <p>
+                    {daysSinceJoined !== null
+                      ? daysSinceJoined.toString()
+                      : "N/A"}
+                  </p>
+                </>
+              ) : (
+                <p>Loading...</p>
+              )}
+            </div>
+          </div>
+          {/* Centered Logout Button */}
+          <div className="profile-button-wrapper">
+            <Link className="logout-link" onClick={handleLogout}>
+              LOG OUT
             </Link>
           </div>
         </div>
-        <div className="profile-overlay-panel">
-          <h2 className="profile-generate-poster">GENERATE POSTER</h2>
+
+        {/* Generate Poster Panel */}
+        <div className="profile-panel">
+          <div className="profile-overlay-panel">
+            <h2 className="profile-generate-poster">GENERATE POSTER</h2>
+          </div>
+          {/* Centered Download/Share Button */}
+          <div className="profile-button-wrapper">
+            <button className="download-button">DOWNLOAD AND SHARE</button>
+          </div>
         </div>
       </div>
     </div>

@@ -5,7 +5,9 @@
     align-items: center;
     justify-content: flex-start;
     max-height: var(--page-height);
-    margin-top: var(--page-margin-top);
+    margin-top: 16vh;
+    /* margin-top: var(--page-margin-top); */
+    width: 100vw;
     padding: 0 20px;
     position: relative;
     overflow-y: auto;
@@ -13,10 +15,12 @@
   
 /* Wrapper for Team and Sources side-by-side */
 .profile-overlays-wrapper {
+    margin-top: 0;
     display: flex;
     flex-wrap: wrap;
-    gap: 2rem;
-    height: 70vh;
+    row-gap: 0;       /* No vertical gap */
+    column-gap: 2rem;    
+    /* height: 70vh; */
     justify-content: center;
     width: 100%;
     margin-bottom: 5vh;
@@ -26,10 +30,10 @@
 .profile-overlay-panel {
     background: rgba(255, 255, 255, 0.0);
     backdrop-filter: var(--overlay-backdrop);
-    padding: 30px 80px;
+    padding: 30px 80px 60px;
     border-radius: var(--overlay-border-radius);
     max-width: 90vw;
-    text-align: left;
+    text-align: center;
     color: var(--color-text);
     border: var(--color-border);
 }
@@ -42,13 +46,69 @@
     text-align: center;
 }
 
+.profile-pic {
+    width: 220px;          /* or 120px, your choice */
+    height: 220px;
+    object-fit: cover;
+    border-radius: 45px;    /* for a circular avatar */
+}  
+
 /* Sources panel */
 .profile-content p {
     margin: 0.5rem 0;
     font-family: var(--ff); 
     font-size: 18px;
-    text-align: left;
+    text-align: center;
+    /* margin bottom: /; */
 }
+
+.info-title {
+    font-weight: bold;
+}
+
+.profile-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Wrapper to center the buttons below their respective panels */
+.profile-button-wrapper {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: 2vh;
+}
+
+.logout-link,
+.download-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: fit-content;
+    padding: 12px 30px;
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--color-text);
+    text-decoration: none;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid var(--color-border);
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+
+.logout-link:hover,
+.download-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    text-shadow: 3px 3px 3px #000;
+}
+
+.download-button {
+    border: none;
+    cursor: pointer;
+}
+
 
 .profile-generate-poster {
     font-family: var(--ff);
