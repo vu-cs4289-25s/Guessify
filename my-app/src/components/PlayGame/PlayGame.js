@@ -11,24 +11,33 @@ import "./PlayGame.css";
 const PlayGame = () => {
   const { gameMode, gameGenre } = useGameContext();
   const [token, setToken] = useState(null);
-  const [volume, setVolume] = useState(50); // Volume state (0-100)
+  const [volume, setVolume] = useState(50);
   const navigate = useNavigate();
   const [showConfirm, setShowConfirm] = useState(false);
+  const [pendingNavigation, setPendingNavigation] = useState(null);
 
-  const handleBack = () => {
+  // Function to handle ANY attempt to leave the game
+  const handleNavigationAttempt = (event, path) => {
+    if (event) event.preventDefault(); // Prevent immediate navigation
+    setPendingNavigation(path);
     setShowConfirm(true);
   };
 
   const confirmLeave = () => {
-    navigate("/");
+    if (pendingNavigation) {
+      navigate(pendingNavigation); // Navigate to stored destination
+    } else {
+      navigate("/"); // Default to home
+    }
   };
 
   const cancelLeave = () => {
     setShowConfirm(false);
+    setPendingNavigation(null);
   };
 
   const handleVolumeChange = (event) => {
-    const newVolume = event.target.value; // New volume level (0-100)
+    const newVolume = event.target.value;
     setVolume(newVolume);
 
     const deviceId = localStorage.getItem("device_id");
@@ -54,17 +63,18 @@ const PlayGame = () => {
 
   useEffect(() => {
     const accessToken = localStorage.getItem("spotify_access_token");
-
     if (accessToken) {
-      setToken(accessToken); // Store token in state
+      setToken(accessToken);
     }
   }, []);
 
   return (
     <div className="play-game-container">
-      <Navbar />
+      {/* Wrap Navbar to detect navigation attempts */}
+      <Navbar onNavClick={handleNavigationAttempt} />
 
-      <BackButton to="#" onClick={handleBack} />
+      {/* Back Button -> Triggers confirmation popup */}
+      <BackButton onClick={(event) => handleNavigationAttempt(event, "/")} />
 
       <div className="countdown-circle">10</div>
 
@@ -92,6 +102,7 @@ const PlayGame = () => {
         />
       </div>
 
+      {/* Show Confirmation Popup if user tries to leave */}
       {showConfirm && (
         <ConfirmationPopup onConfirm={confirmLeave} onCancel={cancelLeave} />
       )}

@@ -2,11 +2,12 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import "./Navbar.css";
 import authenticate from "../../components/Login";
-import { useUser } from "../../components/userContext";
+import { useUser } from "../userContext";
 
-const Navbar = () => {
+const Navbar = ({ onNavClick }) => {
   const location = useLocation();
   const isLandingPage = location.pathname === "/";
+  const isGamePage = location.pathname.startsWith("/game");
   const isActivePage = (path) => location.pathname === path;
 
   const { userId, userProfile } = useUser();
@@ -18,34 +19,41 @@ const Navbar = () => {
   return (
     <nav className={`navbar ${isLandingPage ? "no-logo" : ""}`}>
       {!isLandingPage && (
-        <Link to={userId ? `/?userId=${userId}` : "/"} className="nav-link">
+        <Link
+          to={`/?userId=${userId}`}
+          className="nav-link"
+          onClick={(e) => isGamePage && onNavClick(e, "/")}
+        >
           <img src="/logo.png" alt="Logo" className="logo" />
         </Link>
       )}
 
       <Link
-        to={userId ? `/how-to-play?userId=${userId}` : "/how-to-play"}
+        to={`/how-to-play?userId=${userId}`}
         className={`nav-link ${
           isActivePage("/how-to-play") ? "nav-link-border" : ""
         }`}
+        onClick={(e) => isGamePage && onNavClick(e, "/how-to-play")}
       >
         HOW TO PLAY
       </Link>
 
       <Link
-        to={userId ? `/about?userId=${userId}` : "/about"}
+        to={`/about?userId=${userId}`}
         className={`nav-link ${
           isActivePage("/about") ? "nav-link-border" : ""
         }`}
+        onClick={(e) => isGamePage && onNavClick(e, "/about")}
       >
         ABOUT
       </Link>
 
       <Link
-        to={userId ? `/leaderboard?userId=${userId}` : "/leaderboard"}
+        to={`/leaderboard?userId=${userId}`}
         className={`nav-link ${
           isActivePage("/leaderboard") ? "nav-link-border" : ""
         }`}
+        onClick={(e) => isGamePage && onNavClick(e, "/leaderboard")}
       >
         LEADERBOARD
       </Link>
@@ -53,19 +61,16 @@ const Navbar = () => {
       {userId ? (
         <Link
           to={`/profile?userId=${userId}`}
-          className={`nav-link profile-link ${
-            isActivePage("/profile") ? "" : ""
-          }`}
+          className="nav-link profile-link"
+          onClick={(e) =>
+            isGamePage && onNavClick(e, `/profile?userId=${userId}`)
+          }
         >
-          {userProfile?.profileImage ? (
-            <img
-              src={userProfile.profileImage}
-              alt="User"
-              className="nav-profile-pic"
-            />
-          ) : (
-            <img src="/defaultPic.png" alt="User" className="nav-profile-pic" />
-          )}
+          <img
+            src={userProfile?.profileImage || "/defaultPic.png"}
+            alt="User"
+            className="nav-profile-pic"
+          />
         </Link>
       ) : (
         <Link onClick={handleLoginClick} className="nav-link profile-link">

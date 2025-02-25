@@ -1,26 +1,25 @@
 import React, { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar/Navbar";
 import authenticate from "../../components/Login";
+import { useUser } from "../../components/userContext";
 import "./Home.css";
 
 const Home = () => {
   const [isClicked, setIsClicked] = useState(false);
-  const [searchParams] = useSearchParams();
-  const userId = searchParams.get("userId");
   const navigate = useNavigate();
+  const { userId } = useUser();
 
   const handlePlayClick = () => {
     setIsClicked(true);
     setTimeout(() => {
       setIsClicked(false);
 
-      // If we have userId, skip login
+      // If userId exists in context, navigate directly to game
       if (userId) {
-        // Internal route => no full reload => preserves context
         navigate(`/game?userId=${userId}`);
       } else {
-        // Otherwise call authenticate, pass nextPage='game'
+        // Otherwise, authenticate user (login)
         authenticate("game");
       }
     }, 120);
