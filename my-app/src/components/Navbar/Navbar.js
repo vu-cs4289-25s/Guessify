@@ -4,7 +4,7 @@ import "./Navbar.css";
 import authenticate from "../../components/Login";
 import { useUser } from "../userContext";
 
-const Navbar = ({ onNavClick }) => {
+const Navbar = ({ onNavClick = () => {} }) => {
   const location = useLocation();
   const isLandingPage = location.pathname === "/";
   const isGamePage = location.pathname.startsWith("/game");
