@@ -40,8 +40,7 @@
 
 /* Hover effects for button */
 .game-mode-button:hover {
-    text-shadow: 2px 2px 2px #000;
-    font-weight: bold;
+    color: var(--color-highlight-text);
 }
 
 /* Disabled button styling */
