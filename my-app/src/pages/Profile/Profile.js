@@ -25,7 +25,6 @@ const Profile = () => {
         const data = snapshot.data();
         setProfile(data);
 
-        // DAYS SINCE JOINED => if doc has 'createdAt'
         if (data.createdAt) {
           const diffMs = Date.now() - data.createdAt;
           const dayCount = Math.floor(diffMs / (1000 * 60 * 60 * 24));
@@ -37,7 +36,6 @@ const Profile = () => {
   }, [userId]);
 
   const handleLogout = () => {
-    // If you truly want to “log out”, you might redirect to home with no userId
     window.location.href = "/";
   };
 
@@ -75,7 +73,7 @@ const Profile = () => {
                   <p className="info-title">DAYS SINCE JOINED:</p>
                   <p>
                     {daysSinceJoined !== null
-                      ? daysSinceJoined.toString()
+                      ? `${daysSinceJoined} days`
                       : "N/A"}
                   </p>
                 </>

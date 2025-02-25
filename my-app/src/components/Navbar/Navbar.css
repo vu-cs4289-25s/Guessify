@@ -81,3 +81,11 @@
   padding: 6px 10px;
   border-radius: 30px;
 }
+
+/* For the user's profile pic in the navbar */
+.nav-profile-pic {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 50%;
+}
