@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../../firebase";
 import "../../global.css";
+import { useUser } from "../../components/userContext";
 
 const Callback = () => {
   const [error, setError] = useState("");
+  const { setUserId, setUserProfile } = useUser();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const doAuth = async () => {
@@ -21,7 +25,7 @@ const Callback = () => {
         const clientId = "3c75e5c902f94501ae14000ce64c5053";
         const redirectUri = "http://localhost:3000/callback";
 
-        // 1) Exchange the code for tokens
+        // Exchange code for tokens
         const tokenRes = await fetch(
           "http://localhost:5001/api/spotify/token",
           {
@@ -36,8 +40,6 @@ const Callback = () => {
         );
 
         const tokenData = await tokenRes.json();
-        console.log("Token Response:", tokenData);
-
         if (!tokenRes.ok || !tokenData.access_token) {
           setError(
             `Failed to retrieve access token: ${
@@ -47,24 +49,21 @@ const Callback = () => {
           return;
         }
 
-        // 2) Fetch user profile
+        // Fetch user profile from Spotify
         const userRes = await fetch("https://api.spotify.com/v1/me", {
           headers: {
             Authorization: `Bearer ${tokenData.access_token}`,
           },
         });
         const userData = await userRes.json();
-
         if (!userRes.ok || !userData.id) {
           setError("Failed to fetch Spotify user profile");
           return;
         }
 
-        // 3) Decide on profileImage using fallback album
+        // Fallback profile image from top track album if none
         let profileImage = userData.images?.[0]?.url || null;
         if (!profileImage) {
-          // user-top-read scope must be granted in your Spotify login flow
-          // e.g. in login.js: scopes.push("user-top-read");
           const topTracksRes = await fetch(
             "https://api.spotify.com/v1/me/top/tracks?limit=1",
             {
@@ -74,7 +73,6 @@ const Callback = () => {
             }
           );
           const topTracksData = await topTracksRes.json();
-
           if (
             topTracksRes.ok &&
             topTracksData.items &&
@@ -85,29 +83,26 @@ const Callback = () => {
           }
         }
 
-        // 4) Additional data: topGenre, obscurity, songCount, createdAt
+        // Additional data
         let topGenre = "Unknown";
         let obscurity = 0;
         let songCount = 0;
         let createdAt = Date.now(); // default if new user
 
-        // Check if doc already exists, so we keep old createdAt
         const userRef = doc(db, "users", userData.id);
         const existingSnap = await getDoc(userRef);
         if (existingSnap.exists()) {
           const oldData = existingSnap.data();
           if (oldData.createdAt) {
-            createdAt = oldData.createdAt; // preserve old join date
+            createdAt = oldData.createdAt;
           }
         }
 
-        // 4a) top artists => pick a genre & compute an obscurity rating
+        // top artists => pick genre + compute obscurity
         const topArtistsRes = await fetch(
           "https://api.spotify.com/v1/me/top/artists?limit=5",
           {
-            headers: {
-              Authorization: `Bearer ${tokenData.access_token}`,
-            },
+            headers: { Authorization: `Bearer ${tokenData.access_token}` },
           }
         );
         const topArtistsData = await topArtistsRes.json();
@@ -116,15 +111,12 @@ const Callback = () => {
           topArtistsData.items &&
           topArtistsData.items.length > 0
         ) {
-          // gather all genres
           const allGenres = [];
-          let totalPopularity = 0;
+          let totalPop = 0;
           topArtistsData.items.forEach((artist) => {
             allGenres.push(...artist.genres);
-            totalPopularity += artist.popularity;
+            totalPop += artist.popularity;
           });
-
-          // pick the most frequent genre
           if (allGenres.length > 0) {
             const freqMap = {};
             allGenres.forEach((g) => {
@@ -134,17 +126,12 @@ const Callback = () => {
               freqMap[a] > freqMap[b] ? a : b
             );
           }
-
-          // e.g. 100 - average popularity => 'obscurity'
-          const avgPop = totalPopularity / topArtistsData.items.length;
+          const avgPop = totalPop / topArtistsData.items.length;
           obscurity = Math.round(100 - avgPop);
         }
+        songCount = Math.floor(Math.random() * 3000 + 200);
 
-        // 4b) random or placeholder for # songs listened this year
-        // (Spotify doesn't provide a direct metric)
-        songCount = Math.floor(Math.random() * 3000 + 200); // e.g. random 200-3200
-
-        // 5) Store in Firestore
+        // Store in Firestore
         await setDoc(
           userRef,
           {
@@ -152,21 +139,30 @@ const Callback = () => {
             displayName: userData.display_name,
             email: userData.email,
             profileImage,
-            accessToken: tokenData.access_token,
-            refreshToken: tokenData.refresh_token,
-            expiresAt: Date.now() + tokenData.expires_in * 1000,
-
-            // new fields
             topGenre,
             obscurity,
             songCount,
             createdAt,
+            // store tokens
+            accessToken: tokenData.access_token,
+            refreshToken: tokenData.refresh_token,
+            expiresAt: Date.now() + tokenData.expires_in * 1000,
           },
           { merge: true }
         );
 
-        // 6) redirect => e.g. /game?userId=abc123 or /profile?userId=abc123
-        window.location.href = `/${nextPage}?userId=${userData.id}`;
+        // Set in context => no flicker
+        setUserId(userData.id);
+        setUserProfile({
+          profileImage,
+          displayName: userData.display_name,
+          topGenre,
+          obscurity,
+          songCount,
+        });
+
+        // Instead of window.location.href => use navigate for in-app route (no flicker)
+        navigate(`/${nextPage}?userId=${userData.id}`, { replace: true });
       } catch (err) {
         console.error("Error in Callback:", err);
         setError("Failed to authenticate with Spotify");
@@ -174,7 +170,7 @@ const Callback = () => {
     };
 
     doAuth();
-  }, []);
+  }, [setUserId, setUserProfile, navigate]);
 
   return (
     <div className="overlay-panel">
