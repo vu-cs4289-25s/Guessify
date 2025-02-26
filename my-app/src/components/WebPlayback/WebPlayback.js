@@ -67,7 +67,7 @@ function WebPlayback({ nextSongTrigger, onSongStarted, onTrackChange, showAnswer
 
   const getPlaylistId = (genre) => {
     const playlists = {
-      "TODAY'S TOP HITS": "774kUuKDzLa8ieaSmi8IfS",
+      "TODAY'S TOP HITS": "6q4q9SfMy2w3ae4YROBncd",
       "POP": "34NbomaTu7YuOYnky8nLXL",
       "FOLK": "1WXXO8g0zyY9f2OIRsL96X",
       "HIP-HOP / RAP": "7xjtqlGL5HuIdVF9rj1ADs", 
@@ -78,7 +78,7 @@ function WebPlayback({ nextSongTrigger, onSongStarted, onTrackChange, showAnswer
       "INDIE": "22VR7ZV8z45dnbPWj19HHL",
       "COUNTRY": "7APcM0pDgeFCZi1HlrsWCM",
       "BLUES": "2uGtHlsrXprWFdIf7jqYsV",
-      "K-POP": "2EoheVFjqIxgJMb8VnDRtZ"
+      "K-POP": "6tQDMnj0qImEl6AKA1Uv74"
     };
     return playlists[genre] || playlists["TODAY'S TOP HITS"];
   };
