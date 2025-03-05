@@ -17,21 +17,21 @@ const Leaderboard = () => {
             <br />
             <p>
               <img
-                src="/LeaderboardIcons/first_leaderboard_medals.png" // TODO - import icon
+                src="/icons/rank1.png" // TODO - import icon
                 alt="1"
                 className="rank-one-icon"
               />
             </p>
             <p>
               <img
-                src="/LeaderboardIcons/second_leaderboard_medals.png" // TODO - import icon
+                src="/icons/rank2.png" // TODO - import icon
                 alt="2"
                 className="rank-two-icon"
               />
             </p>
             <p>
               <img
-                src="/LeaderboardIcons/third_leaderboard_medals.png" // TODO - import icon
+                src="/icons/rank3.png" // TODO - import icon
                 alt="3"
                 className="rank-three-icon"
               />
