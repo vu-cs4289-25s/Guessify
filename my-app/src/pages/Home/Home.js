@@ -1,19 +1,30 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar/Navbar";
 import authenticate from "../../components/Login";
+import { useUser } from "../../components/userContext";
 import "./Home.css";
 
 const Home = () => {
   const [isClicked, setIsClicked] = useState(false);
+  const navigate = useNavigate();
+  const { userId } = useUser();
 
-  const handlePlayClick = async () => {
+  const handlePlayClick = () => {
     setIsClicked(true);
-    setTimeout(async () => {
+    setTimeout(() => {
       setIsClicked(false);
 
-      authenticate();
+      // If userId exists in context, navigate directly to game
+      if (userId) {
+        navigate(`/game?userId=${userId}`);
+      } else {
+        // Otherwise, authenticate user (login)
+        authenticate("game");
+      }
     }, 120);
   };
+
   return (
     <div className="home-container">
       <Navbar />

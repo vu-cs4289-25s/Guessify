@@ -15,6 +15,7 @@ const PlayGame = () => {
   const [volume, setVolume] = useState(50);
   const navigate = useNavigate();
   const [showConfirm, setShowConfirm] = useState(false);
+  const [pendingNavigation, setPendingNavigation] = useState(null);
 
   // Hold the current correct song title.
   const [songTitle, setSongTitle] = useState("");
@@ -94,16 +95,24 @@ const PlayGame = () => {
     setUserInput("");
   };
 
-  const handleBack = () => {
+  // Function to handle ANY attempt to leave the game
+  const handleNavigationAttempt = (event, path) => {
+    if (event) event.preventDefault(); // Prevent immediate navigation
+    setPendingNavigation(path);
     setShowConfirm(true);
   };
 
   const confirmLeave = () => {
-    navigate("/");
+    if (pendingNavigation) {
+      navigate(pendingNavigation); // Navigate to stored destination
+    } else {
+      navigate("/"); // Default to home
+    }
   };
 
   const cancelLeave = () => {
     setShowConfirm(false);
+    setPendingNavigation(null);
   };
 
   const handleVolumeChange = (event) => {
@@ -151,9 +160,15 @@ const PlayGame = () => {
 
   return (
     <div className="play-game-container">
-      <Navbar />
-      <BackButton to="#" onClick={handleBack} />
+
+      {/* Wrap Navbar to detect navigation attempts */}
+      <Navbar onNavClick={handleNavigationAttempt} />
+
+      {/* Back Button -> Triggers confirmation popup */}
+      <BackButton onClick={(event) => handleNavigationAttempt(event, "/")} />
+
       <div className="countdown-circle">{timeRemaining}</div>
+
       <div className="guess-overlay">
         <h2 className="guess-title">GUESS THE SONG!</h2>
         <h2 className="subtitle">{gameGenre}</h2>
@@ -207,6 +222,9 @@ const PlayGame = () => {
           onChange={handleVolumeChange}
         />
       </div>
+
+      {/* Show Confirmation Popup if user tries to leave */}
+
       {showConfirm && (
         <ConfirmationPopup onConfirm={confirmLeave} onCancel={cancelLeave} />
       )}

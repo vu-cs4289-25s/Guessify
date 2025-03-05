@@ -25,6 +25,7 @@
 } */
 :root {
   --color-text: #f3f3f3;
+  --color-highlight-text: #FAC5C5;
   --color-border: 1px solid rgba(255, 255, 255, 0.4);
   --overlay-background: transparent;
   --overlay-backdrop: blur(10px);
