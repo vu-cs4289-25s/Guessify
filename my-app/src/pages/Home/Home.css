@@ -60,7 +60,7 @@
 .play-button img {
   image-rendering: pixelated;
   position: absolute;
-  bottom: 240px;
+  bottom: 120px;
   width: 200px;
   height: auto;
   display: block;
@@ -96,7 +96,7 @@
 
 .play-button span {
   position: absolute;
-  bottom: 270px;
+  bottom: 152px;
   font-family: var(--ff);
   font-size: 34px;
   color: black;
@@ -107,6 +107,6 @@
 }
 
 .play-button .clicked-text {
-  bottom: 260px;
+  bottom: 130px;
   color: var(--color-text);
 }
