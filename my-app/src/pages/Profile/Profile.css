@@ -1,4 +1,4 @@
-/* Container for About page */
+/* Container for Profile Section */
 .profile-container {
     display: flex;
     flex-direction: column;
@@ -13,7 +13,7 @@
     overflow-y: auto;
 }
   
-/* Wrapper for Team and Sources side-by-side */
+/* Wrapper for Profile Overlays */
 .profile-overlays-wrapper {
     margin-top: 0;
     display: flex;
@@ -53,13 +53,12 @@
     border-radius: 45px;
 }  
 
-/* Sources panel */
+/* Profile panel paragraph element */
 .profile-content p {
     margin: 0.5rem 0;
     font-family: var(--ff); 
     font-size: 18px;
     text-align: center;
-    /* margin bottom: /; */
 }
 
 .info-title {
@@ -77,39 +76,95 @@
 .profile-button-wrapper {
     display: flex;
     justify-content: center;
+    align-items:center;
     width: 100%;
     margin-top: 2vh;
 }
 
-.logout-link,
-.download-button {
+/* Universal button container for Logout & Download */
+.profile-button-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: fit-content;
-    padding: 12px 30px;
-    font-size: 20px;
-    font-weight: bold;
-    color: var(--color-text);
-    text-decoration: none;
-    background: rgba(255, 255, 255, 0.1);
-    border: 2px solid var(--color-border);
-    border-radius: 20px;
-    transition: all 0.3s ease;
+    width: 100%;
+    margin-top: 20px;
+    position: relative;
 }
 
-.logout-link:hover,
-.download-button:hover {
-    background: rgba(255, 255, 255, 0.2);
-    text-shadow: 3px 3px 3px #000;
-}
-
+/* Button style matching the home page play button */
+.profile-button,
 .download-button {
+    background: none;
     border: none;
+    padding: 0;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    min-width: 220px; /* Adjusted for longer text */
+    height: auto;
 }
 
+/* Button images */
+.profile-button img {
+    image-rendering: pixelated;
+    width: 100%;
+    height: auto;
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
 
+/* Default state */
+.profile-button img.default {
+    opacity: 1;
+}
+
+/* Hover state */
+.profile-button img.hover {
+    opacity: 0;
+}
+
+.profile-button:hover img.default {
+    opacity: 0;
+}
+
+.profile-button:hover img.hover {
+    opacity: 1;
+}
+
+/* Clicked effect */
+.profile-button.clicked img.default,
+.profile-button.clicked img.hover {
+    opacity: 0;
+}
+
+.profile-button.clicked img.clicked {
+    opacity: 1;
+}
+
+/* Button text */
+.profile-button span {
+    position: absolute;
+    font-family: var(--ff);
+    font-size: 28px;
+    top: 18px;
+    color: black;
+    white-space: nowrap; /* Prevent text from wrapping */
+}
+
+.profile-button:hover span {
+    color: var(--color-text);
+}
+
+.profile-button .clicked-text {
+    color: var(--color-text);
+    top: 40px;
+}
+
+/* Update Generate Poster title */
 .profile-generate-poster {
     font-family: var(--ff);
     font-size: 40px;

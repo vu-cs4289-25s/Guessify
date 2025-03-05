@@ -3,9 +3,8 @@ import { useSearchParams } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase";
 import Navbar from "../../components/Navbar/Navbar";
-import { Link } from "react-router-dom";
-import { useUser } from "../../components/userContext";
 import "./Profile.css";
+import { useUser } from "../../components/userContext";
 
 const Profile = () => {
   const [searchParams] = useSearchParams();
@@ -14,6 +13,8 @@ const Profile = () => {
   const [profile, setProfile] = useState(null);
   const [daysSinceJoined, setDaysSinceJoined] = useState(null);
   const { setUserId, setUserProfile } = useUser();
+  const [isClicked, setIsClicked] = useState(false);
+  const [isDownloadClicked, setIsDownloadClicked] = useState(false);
 
   useEffect(() => {
     if (!userId) {
@@ -38,16 +39,24 @@ const Profile = () => {
   }, [userId]);
 
   const handleLogout = () => {
-    // Clear user session
-    setUserId(null);
-    setUserProfile(null);
+    setIsClicked(true);
+    setTimeout(() => {
+      setIsClicked(false);
+      setUserId(null);
+      setUserProfile(null);
+      localStorage.removeItem("userId");
+      localStorage.removeItem("userProfile");
+      window.location.href = "/";
+    }, 120);
+  };
 
-    // Remove from localStorage
-    localStorage.removeItem("userId");
-    localStorage.removeItem("userProfile");
-
-    // Redirect to home
-    window.location.href = "/";
+  const handleDownload = () => {
+    setIsDownloadClicked(true);
+    setTimeout(() => {
+      setIsDownloadClicked(false);
+      alert("Downloading Poster...");
+      // TODO: Implement actual download logic here
+    }, 120);
   };
 
   return (
@@ -95,9 +104,34 @@ const Profile = () => {
           </div>
           {/* Centered Logout Button */}
           <div className="profile-button-wrapper">
-            <Link className="logout-link" onClick={handleLogout}>
-              LOG OUT
-            </Link>
+            <div className="profile-button-container">
+              <button
+                className={`profile-button ${isClicked ? "clicked" : ""}`}
+                onClick={handleLogout}
+              >
+                {!isClicked ? (
+                  <>
+                    <img
+                      className="default"
+                      src="/buttons/button_rectangle_default.png"
+                      alt="Logout"
+                    />
+                    <img
+                      className="hover"
+                      src="/buttons/button_rectangle_hover.png"
+                      alt="Logout Hover"
+                    />
+                  </>
+                ) : (
+                  <img
+                    className="clicked"
+                    src="/buttons/button_rectangle_onClick.png"
+                    alt="Logout Click"
+                  />
+                )}
+                <span className={isClicked ? "clicked-text" : ""}>LOGOUT</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -106,9 +140,40 @@ const Profile = () => {
           <div className="profile-overlay-panel">
             <h2 className="profile-generate-poster">GENERATE POSTER</h2>
           </div>
-          {/* Centered Download/Share Button */}
+          {/* Centered Download Button */}
           <div className="profile-button-wrapper">
-            <button className="download-button">DOWNLOAD AND SHARE</button>
+            <div className="profile-button-container">
+              <button
+                className={`profile-button ${
+                  isDownloadClicked ? "clicked" : ""
+                }`}
+                onClick={handleDownload}
+              >
+                {!isDownloadClicked ? (
+                  <>
+                    <img
+                      className="default"
+                      src="/buttons/button_rectangle_default.png"
+                      alt="Download"
+                    />
+                    <img
+                      className="hover"
+                      src="/buttons/button_rectangle_hover.png"
+                      alt="Download Hover"
+                    />
+                  </>
+                ) : (
+                  <img
+                    className="clicked"
+                    src="/buttons/button_rectangle_onClick.png"
+                    alt="Download Click"
+                  />
+                )}
+                <span className={isDownloadClicked ? "clicked-text" : ""}>
+                  DOWNLOAD
+                </span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -117,43 +182,3 @@ const Profile = () => {
 };
 
 export default Profile;
-
-// import React from "react";
-// import Navbar from "../../components/Navbar/Navbar";
-// import { Link } from "react-router-dom";
-// import "./Profile.css";
-
-// const Profile = () => {
-//   const handleLogout = () => {
-//     localStorage.removeItem("spotify_access_token");
-//     window.location.href = "/"; // Redirect to home
-//   };
-
-//   return (
-//     <div className="profile-container">
-//       <Navbar />
-//       <div className="profile-overlays-wrapper">
-//         <div className="profile-overlay-panel">
-//           <h2 className="profile-title">PROFILE</h2>
-//           {/* TODO - spotify profile pic */}
-//           {/* TODO - spotify user */}
-//           <div className="profile-content">
-//             <p>Profile Info</p>
-//             <p>Coming Soon</p>
-//             <Link className="nav-link profile-link" onClick={handleLogout}>
-//               LOGOUT
-//             </Link>
-//           </div>
-//         </div>
-//         {/* TODO - logout button centered */}
-//         {/* Sources panel */}
-//         <div className="profile-overlay-panel">
-//           <h2 className="profile-generate-poster">GENERATE POSTER</h2>
-//         </div>
-//         {/* TODO - share button centered */}
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Profile;
