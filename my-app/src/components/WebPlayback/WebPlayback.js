@@ -2,13 +2,15 @@ import React, { useEffect, useState } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase";
 import { useGameContext } from "../../components/GameContext";
+import { useUser } from "../../components/userContext";
 
-function WebPlayback({ userId }) {
+function WebPlayback() {
   const [token, setToken] = useState(null);
   const [player, setPlayer] = useState(null);
   const [deviceId, setDeviceId] = useState(null);
   const [currentTrack, setCurrentTrack] = useState(null);
   const { gameGenre } = useGameContext();
+  const { userId } = useUser();
 
   // Fetch token from Firestore
   useEffect(() => {
@@ -74,8 +76,13 @@ function WebPlayback({ userId }) {
 
   // TODO: fix Plays a random track from the specified playlist
   const playRandomTrackFromPlaylist = async () => {
-    if (!token || !deviceId) {
-      console.error("Missing token or deviceId, cannot play track.");
+    if (!token) {
+      console.error("Missing token, cannot play track.");
+      return;
+    }
+
+    if (!deviceId) {
+      console.error("Missing deviceId, cannot play track.");
       return;
     }
 
