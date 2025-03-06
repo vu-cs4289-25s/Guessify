@@ -50,6 +50,8 @@ const Profile = () => {
     window.location.href = "/";
   };
 
+  const generatePoster = () => {};
+
   return (
     <div className="profile-container">
       <Navbar />
@@ -108,7 +110,9 @@ const Profile = () => {
           </div>
           {/* Centered Download/Share Button */}
           <div className="profile-button-wrapper">
-            <button className="download-button">DOWNLOAD AND SHARE</button>
+            <Link className="download-button" onClick={generatePoster}>
+              DOWNLOAD AND SHARE
+            </Link>
           </div>
         </div>
       </div>
