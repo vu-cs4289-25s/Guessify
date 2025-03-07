@@ -36,7 +36,7 @@
 .how-to-icons-container {
     display: flex;
     justify-content: center;
-    align-items: baseline;
+    align-items: flex-start;
     gap: 40px;
 }
 
@@ -53,8 +53,8 @@
 .how-to-icon {
     image-rendering: pixelated;
     width: 120px;
-    height: auto;
-
+    height: 150px;
+    object-fit: contain;
 }
 
 /* Icon description */
