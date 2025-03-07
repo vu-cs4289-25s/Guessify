@@ -130,6 +130,7 @@ const PlayGame = () => {
     const newVolume = event.target.value;
     setVolume(newVolume);
     const deviceId = localStorage.getItem("device_id");
+    console.log(deviceId);
     if (!deviceId) {
       console.error("No device ID found!");
       return;
@@ -149,12 +150,19 @@ const PlayGame = () => {
       });
   };
 
+  // Fetch token from Firestore
   useEffect(() => {
-    const accessToken = localStorage.getItem("spotify_access_token");
-    if (accessToken) {
-      setToken(accessToken);
-    }
-  }, []);
+    if (!userId) return;
+    const fetchSpotifyToken = async () => {
+      const userRef = doc(db, "users", userId);
+      const snapshot = await getDoc(userRef);
+      if (snapshot.exists()) {
+        const userData = snapshot.data();
+        setToken(userData.accessToken); // store in state
+      }
+    };
+    fetchSpotifyToken();
+  }, [userId]);
 
   const saveGameData = async (score, correctCount) => {
     try {
