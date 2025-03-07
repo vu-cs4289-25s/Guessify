@@ -45,6 +45,9 @@ const PlayGame = () => {
   // Trigger for new song.
   const [nextSongTrigger, setNextSongTrigger] = useState(0);
 
+  // Track when to show the skip button
+  const [showSkipButton, setShowSkipButton] = useState(false);
+
   // Compute showAnswer flag: true if the player answered correctly OR time ran out.
   const showAnswer = guessedCorrectly || timeRemaining === 0;
 
@@ -189,6 +192,35 @@ const PlayGame = () => {
     }
   };
 
+  const handleSkipSong = () => {
+    setShowSkipButton(false); // Hide skip button after skipping
+
+    if (gameOver || !musicStarted || guessedCorrectly) return; // Prevent skipping if game is over or song is guessed
+
+    setTimeoutCount((prevCount) => {
+      const updatedCount = prevCount + 1; // Increase missed count
+
+      if (updatedCount >= 3) {
+        setFeedback(
+          `Game Over! You missed 3 songs. The correct answer was: ${songTitle}`
+        );
+        setGuessedCorrectly(true); // Show the answer even if game ends
+        setGameOver(true); // End the game
+      } else {
+        setFeedback(`Skipped! The correct answer was: ${songTitle}`);
+        setGuessedCorrectly(true); // Show the answer
+        setTimeout(() => {
+          setNextSongTrigger((prev) => prev + 1); // Trigger next song
+          setGuessedCorrectly(false); // Reset for next song
+          setFeedback(""); // Clear feedback
+          setTimeRemaining(15); // Reset timer for next song
+        }, 3000);
+      }
+
+      return updatedCount; // Return the updated count
+    });
+  };
+
   useEffect(() => {
     if (gameOver) {
       const saveAndShowPopup = async () => {
@@ -203,6 +235,12 @@ const PlayGame = () => {
       saveAndShowPopup();
     }
   }, [gameOver, score, correctCount]);
+
+  useEffect(() => {
+    if (showAnswer) {
+      setShowSkipButton(false); // Hide the skip button when the answer is displayed
+    }
+  }, [showAnswer]);
 
   return (
     <div className="play-game-container">
@@ -225,6 +263,7 @@ const PlayGame = () => {
               setGuessedCorrectly(false);
               setMusicStarted(true);
               setFeedback("");
+              setShowSkipButton(true);
             }}
             onTrackChange={(trackInfo) => {
               // If trackInfo is an object, update both songTitle and albumCover.
@@ -237,11 +276,18 @@ const PlayGame = () => {
             showAnswer={showAnswer}
           />
         </div>
-        {feedback && (
+        {(feedback || showAnswer) && (
           <div className="feedback-message">
-            <p>{feedback}</p>
+            <p>{feedback || `The correct answer was: ${songTitle}`}</p>
           </div>
         )}
+
+        {showSkipButton && !showAnswer && (
+          <button className="skip-song-button" onClick={handleSkipSong}>
+            Skip Song
+          </button>
+        )}
+
         <p className="score-missed">Score: {score}</p>
         <p className="score-missed">Missed: {timeoutCount}</p>
         <div className="question-icon">?</div>

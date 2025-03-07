@@ -111,4 +111,19 @@
     width: 160px;
   }
   
+  .skip-song-button {
+    background-color: var(--color-warning-secondary);
+    border: 2px solid var(--color-warning-primary);
+    border-radius: 30px;
+    padding: 5px 15px;
+    color: var(--color-warning-primary);
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .skip-song-button:hover {
+    filter: brightness(90%);
+  }
   
