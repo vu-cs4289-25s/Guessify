@@ -1,0 +1,97 @@
+/* Container for the Game Over page */
+.game-over-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  max-height: var(--page-height);
+  margin-top: var(--page-margin-top);
+  width: 100vw;
+  padding: 0 20px;
+  position: relative;
+  overflow-y: auto;
+}
+
+/* Blurred overlay for all game-over content */
+.game-over-points-overlay {
+  background: rgba(255, 255, 255, 0);
+  backdrop-filter: var(--overlay-backdrop);
+  padding: 40px 60px;
+  border-radius: var(--overlay-border-radius);
+  width: 90%;
+  max-width: 50vw;
+  text-align: center;
+  color: var(--color-text);
+  border: var(--color-border);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100px;
+  margin-bottom: 5vh;
+}
+
+/* Title */
+.game-over-title {
+  font-family: var(--ff);
+  font-size: 40px;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
+/* Subtitle */
+.game-over-sub-title {
+  font-family: var(--ff);
+  font-size: 28px;
+  margin-bottom: 0px;
+  text-decoration: underline;
+
+}
+
+/* Columns for game over details */
+.game-over-columns {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  column-gap: 3rem;
+  row-gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.game-over-col-left p,
+.game-over-col-mid p,
+.game-over-col-right p {
+  font-family: var(--ff);
+  font-size: 23px;
+  margin: 0;
+}
+
+.game-over-col-title {
+  text-decoration: underline;
+}
+
+/* Text for points */
+.game-over-points-text {
+  font-family: var(--ff);
+  font-size: 28px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+/* Return Home button */
+.play-again-button {
+  background-color: var(--color-error-secondary);
+  border: 2px solid var(--color-error-primary);
+  border-radius: 60px;
+  padding: 10px 20px;
+  color: var(--color-error-primary);
+  font-size: 16px;
+  cursor: pointer;
+  font-family: inherit;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.play-again-button:hover {
+  filter: brightness(90%);
+}
