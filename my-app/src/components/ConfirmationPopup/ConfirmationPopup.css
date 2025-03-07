@@ -45,11 +45,11 @@
   
   /* Back to lobby button */
   .confirmation-button {
-    background-color: #f3d6d6;
-    border: 2px solid #b96565;
+    background-color: var(--color-error-secondary);
+    border: 2px solid var(--color-error-primary);
     border-radius: 60px;
     padding: 10px 20px;
-    color: #b96565;
+    color: var(--color-error-primary);
     font-size: 16px;
     cursor: pointer;
     font-family: inherit;

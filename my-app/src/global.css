@@ -32,6 +32,8 @@
   --overlay-border-radius: 20px;
   --page-height: 80vh;
   --page-margin-top: 20vh;
+  --color-error-primary: #8A3D45;
+  --color-error-secondary: #F8D7DA;
 
   --ff: "Silkscreen", cursive;
   --h1-size: 40px;
