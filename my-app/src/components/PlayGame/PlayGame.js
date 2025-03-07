@@ -118,9 +118,9 @@ const PlayGame = () => {
 
   const confirmLeave = () => {
     if (pendingNavigation) {
-      navigate(pendingNavigation); // Navigate to stored destination
+      window.location.href = pendingNavigation; // Full page reload to stop music
     } else {
-      navigate("/"); // Default to home
+      window.location.href = "/"; // Reload to home
     }
   };
 
