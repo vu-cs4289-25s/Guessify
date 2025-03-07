@@ -5,6 +5,7 @@ import Navbar from "../../components/Navbar/Navbar";
 import WebPlayback from "../../components/WebPlayback/WebPlayback";
 import BackButton from "../BackButton/BackButton";
 import ConfirmationPopup from "../ConfirmationPopup/ConfirmationPopup";
+import GameOverPopup from "../GameOverPopup/GameOverPopup";
 import { useGameContext } from "../../components/GameContext";
 import { useUser } from "../userContext";
 import { isSongTitleCorrect } from "./SongMatching";
@@ -21,6 +22,7 @@ const PlayGame = () => {
   const navigate = useNavigate();
   const [showConfirm, setShowConfirm] = useState(false);
   const [pendingNavigation, setPendingNavigation] = useState(null);
+  const [showGameOverPopup, setShowGameOverPopup] = useState(false);
 
   // Hold the current correct song title.
   const [songTitle, setSongTitle] = useState("");
@@ -62,23 +64,24 @@ const PlayGame = () => {
   // Effect: if time runs out without a correct answer.
   useEffect(() => {
     if (timeRemaining === 0 && !guessedCorrectly && musicStarted) {
-      const newTimeoutCount = timeoutCount + 1;
-      setTimeoutCount(newTimeoutCount);
-      if (newTimeoutCount >= 3) {
-        setFeedback(
-          `Game Over! You timed out 3 times. The correct answer was: ${songTitle}`
-        );
-        setGameOver(true);
-      } else {
-        setFeedback(`Time's up! The correct answer was: ${songTitle}`);
-        setGuessedCorrectly(true);
-        // Wait 3 seconds then trigger the next song.
-        setTimeout(() => {
-          setNextSongTrigger((prev) => prev + 1);
-        }, 3000);
-      }
+      setTimeoutCount((prevCount) => {
+        const updatedCount = prevCount + 1; // Define inside the functional update
+        if (updatedCount >= 3) {
+          setFeedback(
+            `Game Over! You timed out 3 times. The correct answer was: ${songTitle}`
+          );
+          setGameOver(true);
+        } else {
+          setFeedback(`Time's up! The correct answer was: ${songTitle}`);
+          setGuessedCorrectly(true);
+          setTimeout(() => {
+            setNextSongTrigger((prev) => prev + 1);
+          }, 3000);
+        }
+        return updatedCount; // Return the updated count
+      });
     }
-  }, [timeRemaining, guessedCorrectly, musicStarted, songTitle, timeoutCount]);
+  }, [timeRemaining, guessedCorrectly, musicStarted, songTitle]); // Keep dependencies clean
 
   // Handler for user guess submission.
   const handleSubmit = (e) => {
@@ -158,41 +161,40 @@ const PlayGame = () => {
 
   const saveGameData = async (score, correctCount) => {
     try {
-      // Generate a unique game ID (using UUID or timestamp)
-      const gameId = uuidv4(); // You can use other methods to generate a unique ID
+      const gameId = uuidv4(); // Generate a unique game ID
+      const gameDataRef = doc(db, "games", gameId); // Reference to "games" collection
 
-      // Reference to the general "games" collection with a unique game ID
-      const gameDataRef = doc(db, "games", gameId);
-
-      // Data to be saved for this game session
       const gameData = {
         userId: userId,
         score: score,
         correctCount: correctCount,
-        timestamp: new Date().toISOString(), // Timestamp for when the game ended
-        gameId: gameId, // Include the generated gameId for reference
+        timestamp: new Date().toISOString(),
+        gameId: gameId,
       };
 
-      // Set or create the document with the generated gameId
-      await setDoc(gameDataRef, gameData);
+      await setDoc(gameDataRef, gameData); // Save game data to Firestore
       console.log("Game data saved successfully with ID:", gameId);
-      return gameId; // Return the generated game ID for reference
+      return gameId; // Return the generated game ID
     } catch (error) {
       console.error("Error saving game data:", error);
+      return null; // Return null if saving fails
     }
   };
 
   useEffect(() => {
-    console.log("gameOver state:", gameOver); // Debugging log
     if (gameOver) {
-      const saveAndNavigate = async () => {
-        await saveGameData(score, correctCount); // Make sure to wait for game data saving
-        console.log("Navigating");
-        navigate("/game-over"); // Navigate to game over page after saving
+      const saveAndShowPopup = async () => {
+        const gameId = await saveGameData(score, correctCount);
+        if (gameId) {
+          localStorage.setItem("gameId", gameId); // Save gameId to localStorage
+        }
+        setTimeout(() => {
+          setShowGameOverPopup(true); // Show Game Over popup after 3 seconds
+        }, 3000);
       };
-      saveAndNavigate();
+      saveAndShowPopup();
     }
-  }, [gameOver, score, correctCount, navigate]); // Dependencies include gameOver, score, and correctCount
+  }, [gameOver, score, correctCount]);
 
   return (
     <div className="play-game-container">
@@ -262,6 +264,10 @@ const PlayGame = () => {
 
       {showConfirm && (
         <ConfirmationPopup onConfirm={confirmLeave} onCancel={cancelLeave} />
+      )}
+
+      {showGameOverPopup && (
+        <GameOverPopup onClose={() => setShowGameOverPopup(false)} />
       )}
     </div>
   );
