@@ -33,6 +33,11 @@ const PlayGame = () => {
   const [correctCount, setCorrectCount] = useState(0);
   const [score, setScore] = useState(0);
 
+  const [totalTimeSurvived, setTotalTimeSurvived] = useState(0);
+  const [fastestGuessTime, setFastestGuessTime] = useState(null);
+  const [fastestGuessedSong, setFastestGuessedSong] = useState(null);
+  const [roundStartTime, setRoundStartTime] = useState(null);
+
   // Only start timer once music has started.
   const [musicStarted, setMusicStarted] = useState(false);
 
@@ -44,6 +49,9 @@ const PlayGame = () => {
 
   // Trigger for new song.
   const [nextSongTrigger, setNextSongTrigger] = useState(0);
+
+  // Track when to show the skip button
+  const [showSkipButton, setShowSkipButton] = useState(false);
 
   // Compute showAnswer flag: true if the player answered correctly OR time ran out.
   const showAnswer = guessedCorrectly || timeRemaining === 0;
@@ -60,6 +68,12 @@ const PlayGame = () => {
 
     return () => clearInterval(timer); // Cleanup timer when component is unmounted or dependencies change
   }, [musicStarted, timeRemaining, guessedCorrectly, gameOver]); // Add gameOver to the dependency array
+
+  useEffect(() => {
+    if (musicStarted && !roundStartTime) {
+      setRoundStartTime(Date.now());
+    }
+  }, [musicStarted]);
 
   // Effect: if time runs out without a correct answer.
   useEffect(() => {
@@ -83,11 +97,11 @@ const PlayGame = () => {
     }
   }, [timeRemaining, guessedCorrectly, musicStarted, songTitle]); // Keep dependencies clean
 
-  // Handler for user guess submission.
   const handleSubmit = (e) => {
     e.preventDefault();
     if (timeRemaining <= 0 || guessedCorrectly) return;
 
+    const timeTaken = 15 - timeRemaining; // Calculate time taken to guess
     if (isSongTitleCorrect(userInput, songTitle)) {
       let pointsToAdd = 0;
       if (timeRemaining > 10) {
@@ -97,11 +111,20 @@ const PlayGame = () => {
       } else {
         pointsToAdd = 400;
       }
+
       setScore((prevScore) => prevScore + pointsToAdd);
       setFeedback("Correct!");
       setGuessedCorrectly(true);
       setCorrectCount(correctCount + 1);
-      // Trigger next song automatically.
+
+      setTotalTimeSurvived((prevTime) => prevTime + timeTaken);
+
+      // Check and update the fastest guess time and song
+      if (fastestGuessTime === null || timeTaken < fastestGuessTime) {
+        setFastestGuessTime(timeTaken);
+        setFastestGuessedSong(songTitle); // Update fastest guessed song
+      }
+
       setNextSongTrigger((prev) => prev + 1);
     } else {
       setFeedback("");
@@ -169,24 +192,56 @@ const PlayGame = () => {
 
   const saveGameData = async (score, correctCount) => {
     try {
-      const gameId = uuidv4(); // Generate a unique game ID
-      const gameDataRef = doc(db, "games", gameId); // Reference to "games" collection
+      const gameId = uuidv4();
+      const gameDataRef = doc(db, "games", gameId);
 
       const gameData = {
         userId: userId,
         score: score,
         correctCount: correctCount,
+        totalTimeSurvived: totalTimeSurvived,
+        fastestGuessTime: fastestGuessTime,
+        fastestGuessedSong: fastestGuessedSong, // Save fastest guessed song
         timestamp: new Date().toISOString(),
         gameId: gameId,
       };
 
-      await setDoc(gameDataRef, gameData); // Save game data to Firestore
+      await setDoc(gameDataRef, gameData);
       console.log("Game data saved successfully with ID:", gameId);
-      return gameId; // Return the generated game ID
+      return gameId;
     } catch (error) {
       console.error("Error saving game data:", error);
-      return null; // Return null if saving fails
+      return null;
     }
+  };
+
+  const handleSkipSong = () => {
+    setShowSkipButton(false); // Hide skip button after skipping
+
+    if (gameOver || !musicStarted || guessedCorrectly) return; // Prevent skipping if game is over or song is guessed
+
+    setTimeoutCount((prevCount) => {
+      const updatedCount = prevCount + 1; // Increase missed count
+
+      if (updatedCount >= 3) {
+        setFeedback(
+          `Game Over! You missed 3 songs. The correct answer was: ${songTitle}`
+        );
+        setGuessedCorrectly(true); // Show the answer even if game ends
+        setGameOver(true); // End the game
+      } else {
+        setFeedback(`Skipped! The correct answer was: ${songTitle}`);
+        setGuessedCorrectly(true); // Show the answer
+        setTimeout(() => {
+          setNextSongTrigger((prev) => prev + 1); // Trigger next song
+          setGuessedCorrectly(false); // Reset for next song
+          setFeedback(""); // Clear feedback
+          setTimeRemaining(15); // Reset timer for next song
+        }, 3000);
+      }
+
+      return updatedCount; // Return the updated count
+    });
   };
 
   useEffect(() => {
@@ -203,6 +258,12 @@ const PlayGame = () => {
       saveAndShowPopup();
     }
   }, [gameOver, score, correctCount]);
+
+  useEffect(() => {
+    if (showAnswer) {
+      setShowSkipButton(false); // Hide the skip button when the answer is displayed
+    }
+  }, [showAnswer]);
 
   return (
     <div className="play-game-container">
@@ -225,6 +286,7 @@ const PlayGame = () => {
               setGuessedCorrectly(false);
               setMusicStarted(true);
               setFeedback("");
+              setShowSkipButton(true);
             }}
             onTrackChange={(trackInfo) => {
               // If trackInfo is an object, update both songTitle and albumCover.
@@ -237,11 +299,18 @@ const PlayGame = () => {
             showAnswer={showAnswer}
           />
         </div>
-        {feedback && (
+        {(feedback || showAnswer) && (
           <div className="feedback-message">
-            <p>{feedback}</p>
+            <p>{feedback || `The correct answer was: ${songTitle}`}</p>
           </div>
         )}
+
+        {showSkipButton && !showAnswer && (
+          <button className="skip-song-button" onClick={handleSkipSong}>
+            Skip Song
+          </button>
+        )}
+
         <p className="score-missed">Score: {score}</p>
         <p className="score-missed">Missed: {timeoutCount}</p>
         <div className="question-icon">?</div>

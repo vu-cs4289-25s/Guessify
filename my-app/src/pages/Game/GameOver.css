@@ -62,7 +62,7 @@
 .game-over-col-mid p,
 .game-over-col-right p {
   font-family: var(--ff);
-  font-size: 23px;
+  font-size: 18px;
   margin: 0;
 }
 
@@ -88,8 +88,9 @@
   font-size: 16px;
   cursor: pointer;
   font-family: inherit;
-  margin-top: 20px;
+  margin-top: 40px;
   margin-bottom: 20px;
+  text-decoration: none;
 }
 
 .play-again-button:hover {
