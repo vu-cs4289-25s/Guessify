@@ -7,29 +7,35 @@ import "./GameOver.css";
 
 const GameOver = () => {
   const [score, setScore] = useState(null); // State to store the score
+  const [correctCount, setCorrectCount] = useState(null);
+  const [totalTimeSurvived, setTotalTimeSurvived] = useState(null);
+  const [fastestGuessedSong, setFastestGuessedSong] = useState(null); // New state for fastest guessed song
   const [loading, setLoading] = useState(true); // State to handle loading
 
   useEffect(() => {
     const fetchScore = async () => {
-      const gameId = localStorage.getItem("gameId"); // Retrieve gameId from localStorage
+      const gameId = localStorage.getItem("gameId");
 
       if (gameId) {
-        const gameDocRef = doc(db, "games", gameId); // Reference to the game document
-        const gameDoc = await getDoc(gameDocRef); // Fetch the game document
+        const gameDocRef = doc(db, "games", gameId);
+        const gameDoc = await getDoc(gameDocRef);
 
         if (gameDoc.exists()) {
-          const gameData = gameDoc.data(); // Get game data
-          setScore(gameData.score); // Set score in state
+          const gameData = gameDoc.data();
+          setScore(gameData.score);
+          setCorrectCount(gameData.correctCount);
+          setTotalTimeSurvived(gameData.totalTimeSurvived);
+          setFastestGuessedSong(gameData.fastestGuessedSong); // Fetch fastest guessed song
         } else {
           console.error("Game data not found!");
         }
 
-        localStorage.removeItem("gameId"); // Clear gameId from localStorage
+        localStorage.removeItem("gameId");
       }
-      setLoading(false); // Stop loading
+      setLoading(false);
     };
 
-    fetchScore(); // Call the function to fetch score
+    fetchScore();
   }, []);
 
   if (loading) {
@@ -39,32 +45,29 @@ const GameOver = () => {
   return (
     <div className="game-over-container">
       <Navbar />
-
       <div className="game-over-points-overlay">
         <h1 className="game-over-title">GAME OVER</h1>
         <h2 className="game-over-sub-title">SCORE</h2>
-        <h2>{score !== null ? score : "N/A"}</h2>{" "}
+        <h2>{score !== null ? score : "N/A"}</h2>
         <div className="game-over-columns">
           <div className="game-over-col-left">
             <p className="game-over-col-title">SONGS GUESSED</p>
             <br />
-            <p>NUM</p>
+            <p>{correctCount !== null ? correctCount : "N/A"}</p>
           </div>
           <div className="game-over-col-mid">
             <p className="game-over-col-title">TIME SURVIVED</p>
             <br />
-            <p>TIME</p>
+            <p>
+              {totalTimeSurvived !== null ? `${totalTimeSurvived}s` : "N/A"}
+            </p>
           </div>
           <div className="game-over-col-right">
             <p className="game-over-col-title">FASTEST GUESS</p>
             <br />
-            <p>{score !== null ? score : "N/A"}</p>{" "}
-            {/* Display the score here */}
+            <p>{fastestGuessedSong !== null ? fastestGuessedSong : "N/A"}</p>
           </div>
         </div>
-        {/* <h2 className="game-over-points-text">
-          WELL PLAYED! CHECK THE LEADERBOARD FOR MORE.
-        </h2> */}
         <Link to="/" className="play-again-button">
           PLAY AGAIN
         </Link>
