@@ -3,6 +3,7 @@ import Navbar from "../../components/Navbar/Navbar";
 import { Link } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase";
+import { useUser } from "../../components/userContext";
 import "./GameOver.css";
 
 const GameOver = () => {
@@ -11,6 +12,7 @@ const GameOver = () => {
   const [totalTimeSurvived, setTotalTimeSurvived] = useState(null);
   const [fastestGuessedSong, setFastestGuessedSong] = useState(null); // New state for fastest guessed song
   const [loading, setLoading] = useState(true); // State to handle loading
+  const { userId } = useUser(); // Get user ID dynamically
 
   useEffect(() => {
     const fetchScore = async () => {
@@ -59,7 +61,11 @@ const GameOver = () => {
             <p className="game-over-col-title">TIME SURVIVED</p>
             <br />
             <p>
-              {totalTimeSurvived !== null ? `${totalTimeSurvived}s` : "N/A"}
+              {totalTimeSurvived !== null
+                ? `${Math.floor(totalTimeSurvived / 60)}m ${
+                    totalTimeSurvived % 60
+                  }s`
+                : "N/A"}
             </p>
           </div>
           <div className="game-over-col-right">
@@ -68,9 +74,12 @@ const GameOver = () => {
             <p>{fastestGuessedSong !== null ? fastestGuessedSong : "N/A"}</p>
           </div>
         </div>
-        <Link to="/" className="play-again-button">
+        <a
+          href={`http://localhost:3000/game?userId=${userId}`}
+          className="play-again-button"
+        >
           PLAY AGAIN
-        </Link>
+        </a>
       </div>
     </div>
   );
