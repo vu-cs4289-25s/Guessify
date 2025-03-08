@@ -19,7 +19,7 @@
   padding: 60px 100px;
   border-radius: var(--overlay-border-radius);
   width: 90%;
-  max-width: 35vw;
+  max-width: 50vw;
   text-align: center;
   color: var(--color-text);
   border: var(--color-border);
@@ -103,4 +103,14 @@
 .leaderboard-points-text {
   font-family: var(--ff);
   font-size: 28px;
+}
+
+.current-user-name {
+  color: #ffe283;
+  font-weight: bold;
+}
+
+.current-user-score {
+  color: #ffe283;
+  font-weight: bold;
 }
