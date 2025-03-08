@@ -32,11 +32,15 @@ const PlayGame = () => {
   const [guessedCorrectly, setGuessedCorrectly] = useState(false);
   const [correctCount, setCorrectCount] = useState(0);
   const [score, setScore] = useState(0);
+  const [albumCover, setAlbumCover] = useState(null);
+  const [albumCoverReady, setAlbumCoverReady] = useState(false); // New state for tracking album cover readiness
 
   const [totalTimeSurvived, setTotalTimeSurvived] = useState(0);
   const [fastestGuessTime, setFastestGuessTime] = useState(null);
   const [fastestGuessedSong, setFastestGuessedSong] = useState(null);
   const [roundStartTime, setRoundStartTime] = useState(null);
+  const [gameStartTime, setGameStartTime] = useState(null);
+  const [gameEndTime, setGameEndTime] = useState(null);
 
   // Only start timer once music has started.
   const [musicStarted, setMusicStarted] = useState(false);
@@ -190,7 +194,7 @@ const PlayGame = () => {
     fetchSpotifyToken();
   }, [userId]);
 
-  const saveGameData = async (score, correctCount) => {
+  const saveGameData = async (score, correctCount, duration) => {
     try {
       const gameId = uuidv4();
       const gameDataRef = doc(db, "games", gameId);
@@ -199,9 +203,9 @@ const PlayGame = () => {
         userId: userId,
         score: score,
         correctCount: correctCount,
-        totalTimeSurvived: totalTimeSurvived,
+        totalTimeSurvived: duration, // Save the time survived
         fastestGuessTime: fastestGuessTime,
-        fastestGuessedSong: fastestGuessedSong, // Save fastest guessed song
+        fastestGuessedSong: fastestGuessedSong,
         timestamp: new Date().toISOString(),
         gameId: gameId,
       };
@@ -265,6 +269,23 @@ const PlayGame = () => {
     }
   }, [showAnswer]);
 
+  useEffect(() => {
+    if (gameOver) {
+      setGameEndTime(Date.now()); // Record the end time
+      const saveAndShowPopup = async () => {
+        const duration = Math.floor((Date.now() - gameStartTime) / 1000); // Calculate time survived in seconds
+        const gameId = await saveGameData(score, correctCount, duration);
+        if (gameId) {
+          localStorage.setItem("gameId", gameId);
+        }
+        setTimeout(() => {
+          setShowGameOverPopup(true);
+        }, 3000);
+      };
+      saveAndShowPopup();
+    }
+  }, [gameOver, score, correctCount, gameStartTime]);
+
   return (
     <div className="play-game-container">
       {/* Wrap Navbar to detect navigation attempts */}
@@ -287,16 +308,32 @@ const PlayGame = () => {
               setMusicStarted(true);
               setFeedback("");
               setShowSkipButton(true);
+
+              if (!gameStartTime) {
+                setGameStartTime(Date.now()); // Record the start time
+              }
             }}
             onTrackChange={(trackInfo) => {
-              // If trackInfo is an object, update both songTitle and albumCover.
               if (typeof trackInfo === "object") {
                 setSongTitle(trackInfo.name);
+
+                if (trackInfo.albumCover) {
+                  const img = new Image();
+                  img.src = trackInfo.albumCover;
+                  img.onload = () => setAlbumCoverReady(true); // Set ready when loaded
+                  setAlbumCover(trackInfo.albumCover);
+                } else {
+                  setAlbumCover(null);
+                  setAlbumCoverReady(false);
+                }
               } else {
                 setSongTitle(trackInfo);
+                setAlbumCover(null);
+                setAlbumCoverReady(false);
               }
             }}
             showAnswer={showAnswer}
+            onGameOver={showGameOverPopup}
           />
         </div>
         {(feedback || showAnswer) && (
