@@ -6,6 +6,7 @@ import WebPlayback from "../../components/WebPlayback/WebPlayback";
 import BackButton from "../BackButton/BackButton";
 import ConfirmationPopup from "../ConfirmationPopup/ConfirmationPopup";
 import GameOverPopup from "../GameOverPopup/GameOverPopup";
+import HowToPlayOverlay from "../HowToPlayOverlay/HowToPlayOverlay";
 import { useGameContext } from "../../components/GameContext";
 import { useUser } from "../userContext";
 import { isSongTitleCorrect } from "./SongMatching";
@@ -56,6 +57,7 @@ const PlayGame = () => {
 
   // Track when to show the skip button
   const [showSkipButton, setShowSkipButton] = useState(false);
+  const [showHowToPlay, setShowHowToPlay] = useState(false);
 
   // Compute showAnswer flag: true if the player answered correctly OR time ran out.
   const showAnswer = guessedCorrectly || timeRemaining === 0;
@@ -353,7 +355,14 @@ const PlayGame = () => {
 
         <p className="score-missed">Score: {score}</p>
         <p className="score-missed">Missed: {timeoutCount}</p>
-        <div className="question-icon">?</div>
+        <div
+          className="question-icon"
+          onClick={() => setShowHowToPlay((prev) => !prev)} // Toggle overlay
+          style={{ cursor: "pointer" }}
+        >
+          ?
+        </div>
+
         <input
           type="text"
           value={userInput}
@@ -386,6 +395,11 @@ const PlayGame = () => {
       {showGameOverPopup && (
         <GameOverPopup onClose={() => setShowGameOverPopup(false)} />
       )}
+
+      <HowToPlayOverlay
+        isOpen={showHowToPlay}
+        onClose={() => setShowHowToPlay(false)}
+      />
     </div>
   );
 };
