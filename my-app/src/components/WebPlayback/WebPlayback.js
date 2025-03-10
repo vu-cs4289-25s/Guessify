@@ -90,6 +90,9 @@ function WebPlayback({
         if (onTrackChange && state.track_window.current_track) {
           const trackInfo = {
             name: state.track_window.current_track.name,
+            artist: state.track_window.current_track.artists
+              .map((artist) => artist.name)
+              .join(", "),
             albumCover: state.track_window.current_track.album.images[0].url,
           };
           onTrackChange(trackInfo);
