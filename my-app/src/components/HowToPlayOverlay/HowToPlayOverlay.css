@@ -1,4 +1,4 @@
-.how-to-play-overlay-container {
+.overlay-how-to-play-overlay-container {
     position: fixed;
     top: 20%;
     right: 5%;
@@ -15,13 +15,13 @@
     transition: transform 0.3s ease-in-out;
   }
   
-  .how-to-play-overlay {
+  .overlay-how-to-play-overlay {
     padding: 20px;
     text-align: center;
     color: #fff;
   }
   
-  .close-button {
+  .overlay-close-button {
     position: absolute;
     top: 20px;
     right: 20px;
@@ -32,29 +32,29 @@
     cursor: pointer;
   }
   
-  .how-to-title {
+  .overlay-how-to-title {
     font-size: 24px;
     margin-bottom: 20px;
   }
   
-  .how-to-icons-container {
+  .overlay-how-to-icons-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 20px;
   }
   
-  .how-to-icon-box {
+  .overlay-how-to-icon-box {
     text-align: center;
   }
   
-  .how-to-icon {
+  .overlay-how-to-icon {
     width: 50px;
     height: 50px;
     margin-bottom: 10px;
   }
   
-  .how-to-description {
+  .overlay-how-to-description {
     font-size: 16px;
   }
   
