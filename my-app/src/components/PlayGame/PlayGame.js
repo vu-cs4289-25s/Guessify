@@ -94,12 +94,12 @@ const PlayGame = () => {
 
         if (updatedCount >= 3) {
           setFeedback(
-            `Game Over! You timed out 3 times. The correct answer was: ${songTitle} by ${songArtist}.`
+            `Game Over! You timed out 3 times. The correct answer was: "${songTitle}" by ${songArtist}.`
           );
           setGameOver(true);
         } else {
           setFeedback(
-            `Time's up! The correct answer was: ${songTitle} by ${songArtist}.`
+            `Time's up! The correct answer was: "${songTitle}" by ${songArtist}.`
           );
           setGuessedCorrectly(true); // Mark as guessed correctly to trigger the next song
           setTimeout(() => {
@@ -128,16 +128,18 @@ const PlayGame = () => {
 
     if (isCorrect) {
       let pointsToAdd = 0;
-      if (timeRemaining > 10) {
+      if (timeRemaining > 12) {
         pointsToAdd = 1000;
-      } else if (timeRemaining > 5) {
-        pointsToAdd = 700;
+      } else if (timeRemaining > 9) {
+        pointsToAdd = 800;
+      } else if (timeRemaining > 6) {
+        pointsToAdd = 600;
       } else {
         pointsToAdd = 400;
       }
 
       setScore((prevScore) => prevScore + pointsToAdd);
-      setFeedback("Correct!");
+      setFeedback(`Correct! The song was: "${songTitle}" by ${songArtist}.`); // 🟢 Display title and artist
       setGuessedCorrectly(true);
       setCorrectCount(correctCount + 1);
 
@@ -261,13 +263,13 @@ const PlayGame = () => {
 
       if (updatedCount >= 3) {
         setFeedback(
-          `Game Over! You missed 3 songs. The correct answer was: ${songTitle} by ${songArtist}.`
+          `Game Over! You missed 3 songs. The correct answer was: "${songTitle}" by ${songArtist}.`
         );
         setGuessedCorrectly(true); // Show the answer even if game ends
         setGameOver(true); // End the game
       } else {
         setFeedback(
-          `Skipped! The correct answer was: ${songTitle} by ${songArtist}.`
+          `Skipped! The correct answer was: "${songTitle}" by ${songArtist}.`
         );
         setGuessedCorrectly(true); // Show the answer
         setTimeout(() => {
@@ -366,7 +368,7 @@ const PlayGame = () => {
           <div className="feedback-message">
             <p>
               {feedback ||
-                `The correct answer was: ${songTitle} by ${songArtist}.`}
+                `The correct answer was: "${songTitle}" by ${songArtist}.`}
             </p>
           </div>
         )}
