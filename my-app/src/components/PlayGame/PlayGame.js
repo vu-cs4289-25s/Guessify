@@ -86,10 +86,12 @@ const PlayGame = () => {
   }, [musicStarted]);
 
   // Effect: if time runs out without a correct answer.
+  // Effect: if time runs out without a correct answer.
   useEffect(() => {
     if (timeRemaining === 0 && !guessedCorrectly && musicStarted) {
       setTimeoutCount((prevCount) => {
-        const updatedCount = prevCount + 1; // Define inside the functional update
+        const updatedCount = prevCount + 1;
+
         if (updatedCount >= 3) {
           setFeedback(
             `Game Over! You timed out 3 times. The correct answer was: ${songTitle} by ${songArtist}.`
@@ -99,22 +101,32 @@ const PlayGame = () => {
           setFeedback(
             `Time's up! The correct answer was: ${songTitle} by ${songArtist}.`
           );
-          setGuessedCorrectly(true);
+          setGuessedCorrectly(true); // Mark as guessed correctly to trigger the next song
           setTimeout(() => {
-            setNextSongTrigger((prev) => prev + 1);
-          }, 3000);
+            setNextSongTrigger((prev) => prev + 1); // Trigger next song
+            setGuessedCorrectly(false); // Reset for next song
+            setFeedback(""); // Clear feedback
+            setTimeRemaining(15); // Reset timer for next song
+          }, 3000); // Wait 3 seconds before moving to the next song
         }
+
         return updatedCount; // Return the updated count
       });
     }
-  }, [timeRemaining, guessedCorrectly, musicStarted, songTitle]); // Keep dependencies clean
+  }, [timeRemaining, guessedCorrectly, musicStarted, songTitle, songArtist]); // Keep dependencies clean
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (timeRemaining <= 0 || guessedCorrectly) return;
 
     const timeTaken = 15 - timeRemaining; // Calculate time taken to guess
-    if (isSongTitleCorrect(userInput, songTitle)) {
+    const { isCorrect, isClose } = isSongTitleCorrect(
+      userInput,
+      songTitle,
+      gameGenre
+    );
+
+    if (isCorrect) {
       let pointsToAdd = 0;
       if (timeRemaining > 10) {
         pointsToAdd = 1000;
@@ -138,9 +150,12 @@ const PlayGame = () => {
       }
 
       setNextSongTrigger((prev) => prev + 1);
+    } else if (isClose) {
+      setFeedback("Close, try again!");
     } else {
-      setFeedback("");
+      setFeedback("Try again!");
     }
+
     setUserInput("");
   };
 
