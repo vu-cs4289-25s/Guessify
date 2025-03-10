@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import Navbar from "../../components/Navbar/Navbar";
@@ -7,6 +7,7 @@ import BackButton from "../BackButton/BackButton";
 import ConfirmationPopup from "../ConfirmationPopup/ConfirmationPopup";
 import GameOverPopup from "../GameOverPopup/GameOverPopup";
 import HowToPlayOverlay from "../HowToPlayOverlay/HowToPlayOverlay";
+import BonusPointsPopup from "../BonusPointsPopup/BonusPointsPopup";
 import { useGameContext } from "../../components/GameContext";
 import { useUser } from "../userContext";
 import { isSongTitleCorrect } from "./SongMatching";
@@ -14,7 +15,6 @@ import "./PlayGame.css";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../../firebase";
 import { v4 as uuidv4 } from "uuid";
-import { useRef } from "react";
 
 const PlayGame = () => {
   const { userId } = useUser();
@@ -43,6 +43,11 @@ const PlayGame = () => {
   const [roundStartTime, setRoundStartTime] = useState(null);
   const [gameStartTime, setGameStartTime] = useState(null);
   const [gameEndTime, setGameEndTime] = useState(null);
+  const [bonusPopups, setBonusPopups] = useState([]);
+  const [bonusAwarded, setBonusAwarded] = useState(false);
+  const [currentSongId, setCurrentSongId] = useState(null);
+  const bonusAwardedRef = useRef(false);
+  const [isSwitchingSong, setIsSwitchingSong] = useState(false);
 
   // Only start timer once music has started.
   const [musicStarted, setMusicStarted] = useState(false);
@@ -123,11 +128,17 @@ const PlayGame = () => {
     }
   }, [timeRemaining, guessedCorrectly, musicStarted, songTitle, songArtist]); // Keep dependencies clean
 
+  useEffect(() => {
+    const newSongId = uuidv4();
+    setCurrentSongId(newSongId);
+    bonusAwardedRef.current = false; // Reset bonus ref for new song
+  }, [nextSongTrigger]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (timeRemaining <= 0 || guessedCorrectly) return;
 
-    const timeTaken = 15 - timeRemaining; // Calculate time taken to guess
+    const timeTaken = 15 - timeRemaining;
     const { isCorrect, isClose } = isSongTitleCorrect(
       userInput,
       songTitle,
@@ -136,27 +147,37 @@ const PlayGame = () => {
 
     if (isCorrect) {
       let pointsToAdd = 0;
+      let bonusPoints = 0;
+
       if (timeRemaining > 12) {
         pointsToAdd = 1000;
+        bonusPoints = 600;
       } else if (timeRemaining > 9) {
         pointsToAdd = 800;
+        bonusPoints = 400;
       } else if (timeRemaining > 6) {
         pointsToAdd = 600;
+        bonusPoints = 200;
       } else {
         pointsToAdd = 400;
+        bonusPoints = 0;
       }
 
       setScore((prevScore) => prevScore + pointsToAdd);
-      setFeedback(`Correct! The song was: "${songTitle}" by ${songArtist}.`); // 🟢 Display title and artist
+      setFeedback(`Correct! The song was: "${songTitle}" by ${songArtist}.`);
       setGuessedCorrectly(true);
       setCorrectCount(correctCount + 1);
-
       setTotalTimeSurvived((prevTime) => prevTime + timeTaken);
 
-      // Check and update the fastest guess time and song
       if (fastestGuessTime === null || timeTaken < fastestGuessTime) {
         setFastestGuessTime(timeTaken);
-        setFastestGuessedSong(songTitle); // Update fastest guessed song
+        setFastestGuessedSong(songTitle);
+      }
+
+      // Show bonus points popup only if not already awarded for this song
+      if (bonusPoints > 0 && !bonusAwardedRef.current) {
+        addBonusPopup(bonusPoints);
+        bonusAwardedRef.current = true; // Mark bonus as awarded for this song
       }
 
       setNextSongTrigger((prev) => prev + 1);
@@ -320,6 +341,23 @@ const PlayGame = () => {
     }
   }, [gameOver, score, correctCount, gameStartTime]);
 
+  const addBonusPopup = (points) => {
+    if (isSwitchingSong) return; // Prevent popups during song switch
+
+    const id = Math.random().toString(36).substring(2, 9);
+    setBonusPopups((prev) => [...prev, { id, points }]);
+
+    // Use a longer timeout to avoid flashing during transitions
+    setTimeout(() => {
+      setBonusPopups((prev) => prev.filter((popup) => popup.id !== id));
+    }, 5000); // Increase duration for smoother removal
+  };
+
+  // Generate a new unique ID for each new song
+  useEffect(() => {
+    setCurrentSongId(uuidv4());
+  }, [nextSongTrigger]);
+
   return (
     <div className="play-game-container">
       {/* Wrap Navbar to detect navigation attempts */}
@@ -348,25 +386,32 @@ const PlayGame = () => {
               }
             }}
             onTrackChange={(trackInfo) => {
-              if (typeof trackInfo === "object") {
-                setSongTitle(trackInfo.name);
-                setSongArtist(trackInfo.artist);
+              setIsSwitchingSong(true); // Pause popups when song is switching
+              setBonusPopups([]); // Clear all bonus popups immediately
 
-                if (trackInfo.albumCover) {
-                  const img = new Image();
-                  img.src = trackInfo.albumCover;
-                  img.onload = () => setAlbumCoverReady(true); // Set ready when loaded
-                  setAlbumCover(trackInfo.albumCover);
+              setTimeout(() => {
+                if (typeof trackInfo === "object") {
+                  setSongTitle(trackInfo.name);
+                  setSongArtist(trackInfo.artist);
+
+                  if (trackInfo.albumCover) {
+                    const img = new Image();
+                    img.src = trackInfo.albumCover;
+                    img.onload = () => setAlbumCoverReady(true);
+                    setAlbumCover(trackInfo.albumCover);
+                  } else {
+                    setAlbumCover(null);
+                    setAlbumCoverReady(false);
+                  }
                 } else {
+                  setSongTitle(trackInfo.name);
+                  setSongArtist(trackInfo.artist);
                   setAlbumCover(null);
                   setAlbumCoverReady(false);
                 }
-              } else {
-                setSongTitle(trackInfo.name);
-                setSongArtist(trackInfo.artist);
-                setAlbumCover(null);
-                setAlbumCoverReady(false);
-              }
+
+                setIsSwitchingSong(false); // Resume popups after switching
+              }, 500); // Delay to ensure smooth transition
             }}
             showAnswer={showAnswer}
             onGameOver={showGameOverPopup}
@@ -420,6 +465,17 @@ const PlayGame = () => {
           onChange={handleVolumeChange}
         />
       </div>
+
+      {!isSwitchingSong &&
+        bonusPopups.map((popup) => (
+          <BonusPointsPopup
+            key={popup.id}
+            points={popup.points}
+            onRemove={() =>
+              setBonusPopups((prev) => prev.filter((p) => p.id !== popup.id))
+            }
+          />
+        ))}
 
       {/* Show Confirmation Popup if user tries to leave */}
 
