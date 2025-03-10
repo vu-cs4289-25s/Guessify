@@ -24,8 +24,8 @@ const PlayGame = () => {
   const [pendingNavigation, setPendingNavigation] = useState(null);
   const [showGameOverPopup, setShowGameOverPopup] = useState(false);
 
-  // Hold the current correct song title.
   const [songTitle, setSongTitle] = useState("");
+  const [songArtist, setSongArtist] = useState("");
   const [userInput, setUserInput] = useState("");
   const [feedback, setFeedback] = useState("");
   const [timeRemaining, setTimeRemaining] = useState(15);
@@ -86,11 +86,13 @@ const PlayGame = () => {
         const updatedCount = prevCount + 1; // Define inside the functional update
         if (updatedCount >= 3) {
           setFeedback(
-            `Game Over! You timed out 3 times. The correct answer was: ${songTitle}`
+            `Game Over! You timed out 3 times. The correct answer was: ${songTitle} by ${songArtist}.`
           );
           setGameOver(true);
         } else {
-          setFeedback(`Time's up! The correct answer was: ${songTitle}`);
+          setFeedback(
+            `Time's up! The correct answer was: ${songTitle} by ${songArtist}.`
+          );
           setGuessedCorrectly(true);
           setTimeout(() => {
             setNextSongTrigger((prev) => prev + 1);
@@ -229,12 +231,14 @@ const PlayGame = () => {
 
       if (updatedCount >= 3) {
         setFeedback(
-          `Game Over! You missed 3 songs. The correct answer was: ${songTitle}`
+          `Game Over! You missed 3 songs. The correct answer was: ${songTitle} by ${songArtist}.`
         );
         setGuessedCorrectly(true); // Show the answer even if game ends
         setGameOver(true); // End the game
       } else {
-        setFeedback(`Skipped! The correct answer was: ${songTitle}`);
+        setFeedback(
+          `Skipped! The correct answer was: ${songTitle} by ${songArtist}.`
+        );
         setGuessedCorrectly(true); // Show the answer
         setTimeout(() => {
           setNextSongTrigger((prev) => prev + 1); // Trigger next song
@@ -316,6 +320,7 @@ const PlayGame = () => {
             onTrackChange={(trackInfo) => {
               if (typeof trackInfo === "object") {
                 setSongTitle(trackInfo.name);
+                setSongArtist(trackInfo.artist);
 
                 if (trackInfo.albumCover) {
                   const img = new Image();
@@ -327,7 +332,8 @@ const PlayGame = () => {
                   setAlbumCoverReady(false);
                 }
               } else {
-                setSongTitle(trackInfo);
+                setSongTitle(trackInfo.name);
+                setSongArtist(trackInfo.artist);
                 setAlbumCover(null);
                 setAlbumCoverReady(false);
               }
@@ -338,7 +344,10 @@ const PlayGame = () => {
         </div>
         {(feedback || showAnswer) && (
           <div className="feedback-message">
-            <p>{feedback || `The correct answer was: ${songTitle}`}</p>
+            <p>
+              {feedback ||
+                `The correct answer was: ${songTitle} by ${songArtist}.`}
+            </p>
           </div>
         )}
 
