@@ -1,10 +1,14 @@
 import React from "react";
+import { useParams } from "react-router-dom";
 import "./GameOverPopup.css";
 
-const GameOverPopup = () => {
-  // Function to handle button click and reload the page
+const GameOverPopup = ({ mode = "single" }) => {
+  const { roomCode } = useParams();
+
   const handleViewResults = () => {
-    window.location.href = "/game-over"; // Reload the page to stop the music and navigate
+    const path =
+      mode === "multi" ? `/game/gameover-multi/${roomCode}` : "/game-over";
+    window.location.href = path;
   };
 
   return (

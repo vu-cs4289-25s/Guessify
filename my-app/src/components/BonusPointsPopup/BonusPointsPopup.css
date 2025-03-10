@@ -1,0 +1,53 @@
+.bonus-points-popup {
+    position: absolute;
+    color: var(--color-text);
+    width: 20vh;
+    max-height: 10vh;
+    background: rgba(255, 255, 255, 0.0);
+    backdrop-filter: var(--overlay-backdrop);
+    border: var(--color-border);
+    border-radius: var(--overlay-border-radius);
+    padding: 10px 20px; /* Reduced padding */
+    text-align: center;
+    z-index: 2000;
+    font-family: var(--ff);
+    font-size: 23px;
+    opacity: 0;
+    transform: translateY(-20px);
+    animation: fadeIn 0.5s forwards, fadeOut 3s forwards 2s;
+}
+
+.bonus-points-popup p {
+    margin: 0;
+    line-height: 1.2;
+}
+
+.bonus-points {
+    font-size: 23px;
+    font-weight: bold;
+    color: #ffe283;
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Fade-out animation */
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+}

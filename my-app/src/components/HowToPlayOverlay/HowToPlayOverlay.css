@@ -4,7 +4,8 @@
     right: 5%;
     width: 300px;
     height: 70vh;
-    background-color: rgba(0, 0, 0, 0.9);
+    background-color: rgba(255, 255, 255, 0);
+    backdrop-filter: var(--overlay-backdrop);
     z-index: 1000;
     display: flex;
     align-items: center;

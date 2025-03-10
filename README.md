@@ -6,6 +6,8 @@
 
 Run these commands in your terminal:
 
+1. `npm install socket.io-client`
+
 Frontend:
 1. `cd my-app`
 2. `npm install`

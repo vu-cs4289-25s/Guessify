@@ -1,6 +1,6 @@
-// server.js - Express Backend to Handle Spotify Token Exchange
-
 const express = require("express");
+const http = require("http");
+const { Server } = require("socket.io");
 const cors = require("cors");
 const fetch = require("node-fetch");
 const dotenv = require("dotenv");
@@ -11,6 +11,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Spotify Token Exchange
 app.post("/api/spotify/token", async (req, res) => {
   try {
     const { code, redirect_uri, client_id } = req.body;
@@ -80,4 +81,4 @@ app.post("/api/spotify/refresh-token", async (req, res) => {
 });
 
 const PORT = 5001;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
