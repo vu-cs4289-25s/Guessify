@@ -14,6 +14,7 @@ import "./PlayGame.css";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../../firebase";
 import { v4 as uuidv4 } from "uuid";
+import { useRef } from "react";
 
 const PlayGame = () => {
   const { userId } = useUser();
@@ -62,6 +63,13 @@ const PlayGame = () => {
   // Compute showAnswer flag: true if the player answered correctly OR time ran out.
   const showAnswer = guessedCorrectly || timeRemaining === 0;
 
+  const inputRef = useRef(null);
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, []);
+
   useEffect(() => {
     console.log("Game Genre in PlayGame:", gameGenre); // 🔄 Check if gameGenre is set
   }, [gameGenre]);
@@ -92,12 +100,12 @@ const PlayGame = () => {
         const updatedCount = prevCount + 1; // Define inside the functional update
         if (updatedCount >= 3) {
           setFeedback(
-            `Game Over! You timed out 3 times. The correct answer was: ${songTitle} by ${songArtist}.`
+            `Game Over! You timed out 3 times. The correct answer was:"${songTitle}" by ${songArtist}.`
           );
           setGameOver(true);
         } else {
           setFeedback(
-            `Time's up! The correct answer was: ${songTitle} by ${songArtist}.`
+            `Time's up! The correct answer was: "${songTitle}" by ${songArtist}.`
           );
           setGuessedCorrectly(true);
           setTimeout(() => {
@@ -246,13 +254,13 @@ const PlayGame = () => {
 
       if (updatedCount >= 3) {
         setFeedback(
-          `Game Over! You missed 3 songs. The correct answer was: ${songTitle} by ${songArtist}.`
+          `Game Over! You missed 3 songs. The correct answer was: "${songTitle}" by ${songArtist}.`
         );
         setGuessedCorrectly(true); // Show the answer even if game ends
         setGameOver(true); // End the game
       } else {
         setFeedback(
-          `Skipped! The correct answer was: ${songTitle} by ${songArtist}.`
+          `Skipped! The correct answer was: "${songTitle}" by ${songArtist}.`
         );
         setGuessedCorrectly(true); // Show the answer
         setTimeout(() => {
@@ -351,7 +359,7 @@ const PlayGame = () => {
           <div className="feedback-message">
             <p>
               {feedback ||
-                `The correct answer was: ${songTitle} by ${songArtist}.`}
+                `The correct answer was: "${songTitle}" by ${songArtist}.`}
             </p>
           </div>
         )}
@@ -373,6 +381,7 @@ const PlayGame = () => {
         </div>
 
         <input
+          ref={inputRef}
           type="text"
           value={userInput}
           onChange={(e) => setUserInput(e.target.value)}
