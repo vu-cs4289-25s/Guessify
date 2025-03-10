@@ -34,7 +34,7 @@
   /* Guess Overlay */
   .guess-overlay {
     position: relative;
-    margin: 2% auto 0 auto;
+    margin: 2% auto 2% auto;
     background: rgba(255, 255, 255, 0.0);
     backdrop-filter: var(--overlay-backdrop);
     border: var(--color-border);

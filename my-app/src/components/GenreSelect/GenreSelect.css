@@ -22,7 +22,7 @@
     align-items: center;
     justify-content: center;
     text-align: center;
-  
+    flex-direction: column;
     min-height: 200px;
     min-width: 460px;
   
@@ -40,5 +40,11 @@
   /* Hover effect for genre button */
   .genre-button:hover {
     color: var(--color-highlight-text);
+  }
+  
+  .genre-score {
+    font-size: 16px;
+    color: #cccccc;
+    margin-top: 5px;
   }
   
