@@ -6,6 +6,7 @@ import WebPlayback from "../../components/WebPlayback/WebPlayback";
 import BackButton from "../BackButton/BackButton";
 import ConfirmationPopup from "../ConfirmationPopup/ConfirmationPopup";
 import GameOverPopup from "../GameOverPopup/GameOverPopup";
+import HowToPlayOverlay from "../HowToPlayOverlay/HowToPlayOverlay";
 import { useGameContext } from "../../components/GameContext";
 import { useUser } from "../userContext";
 import { isSongTitleCorrect } from "./SongMatching";
@@ -56,9 +57,14 @@ const PlayGame = () => {
 
   // Track when to show the skip button
   const [showSkipButton, setShowSkipButton] = useState(false);
+  const [showHowToPlay, setShowHowToPlay] = useState(false);
 
   // Compute showAnswer flag: true if the player answered correctly OR time ran out.
   const showAnswer = guessedCorrectly || timeRemaining === 0;
+
+  useEffect(() => {
+    console.log("Game Genre in PlayGame:", gameGenre); // 🔄 Check if gameGenre is set
+  }, [gameGenre]);
 
   // Timer effect: countdown runs only when musicStarted is true and gameOver is false
   useEffect(() => {
@@ -196,7 +202,7 @@ const PlayGame = () => {
     fetchSpotifyToken();
   }, [userId]);
 
-  const saveGameData = async (score, correctCount, duration) => {
+  const saveGameData = async (score, correctCount, duration, gameGenre) => {
     try {
       const gameId = uuidv4();
       const gameDataRef = doc(db, "games", gameId);
@@ -205,12 +211,21 @@ const PlayGame = () => {
         userId: userId,
         score: score,
         correctCount: correctCount,
-        totalTimeSurvived: duration, // Save the time survived
-        fastestGuessTime: fastestGuessTime,
-        fastestGuessedSong: fastestGuessedSong,
+        totalTimeSurvived: duration || 0, // Ensure duration has a value
+        fastestGuessTime: fastestGuessTime || null,
+        fastestGuessedSong: fastestGuessedSong || null,
+        genre: gameGenre || "UNKNOWN", // 🔄 Ensure gameGenre is saved, even if null
         timestamp: new Date().toISOString(),
         gameId: gameId,
       };
+
+      console.log("Saving game data:", {
+        userId,
+        score,
+        correctCount,
+        duration,
+        gameGenre, // 🔄 Check if gameGenre is passed
+      });
 
       await setDoc(gameDataRef, gameData);
       console.log("Game data saved successfully with ID:", gameId);
@@ -253,21 +268,6 @@ const PlayGame = () => {
   };
 
   useEffect(() => {
-    if (gameOver) {
-      const saveAndShowPopup = async () => {
-        const gameId = await saveGameData(score, correctCount);
-        if (gameId) {
-          localStorage.setItem("gameId", gameId); // Save gameId to localStorage
-        }
-        setTimeout(() => {
-          setShowGameOverPopup(true); // Show Game Over popup after 3 seconds
-        }, 3000);
-      };
-      saveAndShowPopup();
-    }
-  }, [gameOver, score, correctCount]);
-
-  useEffect(() => {
     if (showAnswer) {
       setShowSkipButton(false); // Hide the skip button when the answer is displayed
     }
@@ -278,7 +278,12 @@ const PlayGame = () => {
       setGameEndTime(Date.now()); // Record the end time
       const saveAndShowPopup = async () => {
         const duration = Math.floor((Date.now() - gameStartTime) / 1000); // Calculate time survived in seconds
-        const gameId = await saveGameData(score, correctCount, duration);
+        const gameId = await saveGameData(
+          score,
+          correctCount,
+          duration,
+          gameGenre
+        );
         if (gameId) {
           localStorage.setItem("gameId", gameId);
         }
@@ -359,7 +364,14 @@ const PlayGame = () => {
 
         <p className="score-missed">Score: {score}</p>
         <p className="score-missed">Missed: {timeoutCount}</p>
-        <div className="question-icon">?</div>
+        <div
+          className="question-icon"
+          onClick={() => setShowHowToPlay((prev) => !prev)} // Toggle overlay
+          style={{ cursor: "pointer" }}
+        >
+          ?
+        </div>
+
         <input
           type="text"
           value={userInput}
@@ -392,6 +404,11 @@ const PlayGame = () => {
       {showGameOverPopup && (
         <GameOverPopup onClose={() => setShowGameOverPopup(false)} />
       )}
+
+      <HowToPlayOverlay
+        isOpen={showHowToPlay}
+        onClose={() => setShowHowToPlay(false)}
+      />
     </div>
   );
 };
