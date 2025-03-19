@@ -15,4 +15,5 @@ Frontend:
 Backend:
 1. `cd server `
 2. `npm install express cors dotenv node-fetch`
-3. `node server.js`
+3. `npm install socket.io-client`
+4. `node server.js`
