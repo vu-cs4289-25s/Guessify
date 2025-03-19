@@ -124,8 +124,46 @@ const Callback = () => {
           obscurity = Math.round(100 - avgPop);
         }
 
-        // Randomized placeholder for songs listened this year
-        songCount = Math.floor(Math.random() * 3000 + 200);
+        // Function to fetch ALL songs listened to today (using pagination)
+        const fetchDailySongs = async () => {
+          let totalSongs = 0;
+          let nextUrl =
+            "https://api.spotify.com/v1/me/player/recently-played?limit=50";
+
+          // Calculate start of the current day (midnight)
+          const now = new Date();
+          now.setHours(0, 0, 0, 0);
+          const startOfDayTime = now.getTime();
+
+          while (nextUrl) {
+            const response = await fetch(nextUrl, {
+              headers: { Authorization: `Bearer ${tokenData.access_token}` },
+            });
+            const data = await response.json();
+
+            if (!response.ok || !data.items) break;
+
+            // Count only songs played since midnight
+            const songsToday = data.items.filter(
+              (track) => new Date(track.played_at).getTime() >= startOfDayTime
+            ).length;
+
+            totalSongs += songsToday;
+
+            // Stop if we reach songs older than the start of the day
+            const oldestTrackDate = new Date(
+              data.items[data.items.length - 1]?.played_at
+            ).getTime();
+            if (oldestTrackDate < startOfDayTime) break;
+
+            nextUrl = data.next; // Get next batch of songs
+          }
+
+          return totalSongs;
+        };
+
+        // Get the actual song count for today
+        songCount = await fetchDailySongs();
 
         // Store in Firestore
         await setDoc(
@@ -137,7 +175,7 @@ const Callback = () => {
             profileImage,
             topGenre,
             obscurity,
-            songCount,
+            songCount, // All songs listened to today
             createdAt,
             // store tokens
             accessToken: tokenData.access_token,
@@ -192,63 +230,3 @@ const Callback = () => {
 };
 
 export default Callback;
-
-// import React, { useEffect, useState } from "react";
-// import axios from "axios";
-// import "../../global.css";
-
-// const Callback = () => {
-//   const [error, setError] = useState("");
-
-//   useEffect(() => {
-//     const queryParams = new URLSearchParams(window.location.search);
-//     const code = queryParams.get("code");
-
-//     if (code) {
-//       const clientId = "3c75e5c902f94501ae14000ce64c5053";
-//       const clientSecret = "7c4ef5e4001841228a21b4c372d92b02";
-//       const redirectUri = "http://localhost:3000/callback";
-
-//       // Exchange authorization code for access token
-//       const authString = btoa(`${clientId}:${clientSecret}`);
-//       axios
-//         .post(
-//           "https://accounts.spotify.com/api/token",
-//           new URLSearchParams({
-//             code: code,
-//             redirect_uri: redirectUri,
-//             grant_type: "authorization_code",
-//           }),
-//           {
-//             headers: {
-//               Authorization: `Basic ${authString}`,
-//               "Content-Type": "application/x-www-form-urlencoded",
-//             },
-//           }
-//         )
-//         .then((response) => {
-//           localStorage.setItem(
-//             "spotify_access_token",
-//             response.data.access_token
-//           );
-//           console.log("Token: ", response.data.access_token);
-//           window.location.href = `/game`;
-//         })
-//         .catch((error) => {
-//           setError("Failed to authenticate with Spotify");
-//         });
-//     }
-//   }, []);
-
-//   return (
-//     <div className="overlay-panel">
-//       {error ? (
-//         <h2 className="overlay-title">{error}</h2>
-//       ) : (
-//         <h2 className="overlay-title">Connecting to Spotify . . .</h2>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default Callback;
