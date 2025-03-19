@@ -16,7 +16,7 @@
     backdrop-filter: var(--overlay-backdrop);
     border: var(--color-border);
     border-radius: var(--overlay-border-radius);
-    padding: 60px 100px 30px 100px;  
+    padding: 60px 100px 60px 100px;  
     text-align: center;
     color: var(--color-text);
     max-width: 1000px;
