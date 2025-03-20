@@ -1,10 +1,10 @@
-// src/components/Multiplayer/CreateRoom.js
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import BackButton from "../BackButton/BackButton";
 import Navbar from "../Navbar/Navbar";
+import BackButton from "../BackButton/BackButton";
 import { useGameContext } from "../GameContext";
-// If you plan to show only the list of genres from your existing GenreSelect:
+import "./MultiplayerRoom.css"; // New shared CSS
+
 const genres = [
   "TODAY'S TOP HITS",
   "POP",
@@ -23,48 +23,54 @@ const genres = [
 const CreateRoom = () => {
   const { setGameGenre } = useGameContext();
   const [selectedGenre, setSelectedGenre] = useState("");
+  const [error, setError] = useState(false); // Error state
   const navigate = useNavigate();
 
-  // Example local function to generate a random code
-  const generateRoomCode = () => {
-    return Math.random().toString(36).substr(2, 5).toUpperCase();
-  };
+  const generateRoomCode = () =>
+    Math.random().toString(36).substr(2, 5).toUpperCase();
 
   const handleCreateRoom = () => {
-    if (!selectedGenre) return alert("Please select a genre");
-    // Save the genre to global context so the game knows which playlist to use
+    if (!selectedGenre) {
+      setError(true); // Show error message
+      return;
+    }
+    setError(false); // Clear error if valid
     setGameGenre(selectedGenre);
-
-    // Generate a code and navigate to Lobby
     const newCode = generateRoomCode();
-    // Optionally, you could do this with a Socket.IO server call like:
-    // socket.emit("createRoom", { genre: selectedGenre }, (roomCode) => { ... });
-
     navigate(`/game/lobby/${newCode}`, { state: { host: true } });
   };
 
   return (
-    <div className="create-room-container">
+    <div className="game-mode-container">
       <Navbar />
       <BackButton to="/game/multiplayer" />
 
-      <h2>Create a Room</h2>
-      <p>Select a genre (multiplayer does NOT show high scores):</p>
-      <select
-        value={selectedGenre}
-        onChange={(e) => setSelectedGenre(e.target.value)}
-      >
-        <option value="">-- Select Genre --</option>
-        {genres.map((genre) => (
-          <option key={genre} value={genre}>
-            {genre}
-          </option>
-        ))}
-      </select>
+      <div className="room-mode-overlay">
+        <h2>CREATE A ROOM</h2>
 
-      <button onClick={handleCreateRoom} style={{ marginTop: "20px" }}>
-        CREATE ROOM
-      </button>
+        <select
+          className="game-genre-select"
+          value={selectedGenre}
+          onChange={(e) => {
+            setSelectedGenre(e.target.value);
+            setError(false); // Remove error when user selects a genre
+          }}
+        >
+          <option value="">-- Select Genre --</option>
+          {genres.map((genre) => (
+            <option key={genre} value={genre}>
+              {genre}
+            </option>
+          ))}
+        </select>
+
+        {/* Error message */}
+        {error && <p className="error-message">Please select a genre</p>}
+
+        <button className="room-game-mode-button" onClick={handleCreateRoom}>
+          CREATE ROOM
+        </button>
+      </div>
     </div>
   );
 };
