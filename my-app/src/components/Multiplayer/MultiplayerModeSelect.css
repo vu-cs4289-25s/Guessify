@@ -11,7 +11,7 @@
 }
 
 /* Game mode overlay */
-.game-mode-overlay {
+.multiplayer-mode-overlay {
     background: rgba(255, 255, 255, 0.0);
     backdrop-filter: var(--overlay-backdrop);
     border: var(--color-border);
