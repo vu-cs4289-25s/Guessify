@@ -1,0 +1,54 @@
+/* COntainer for Game Mode page */
+.game-mode-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    max-height: 85vh;
+    margin-top: 15vh;
+    padding: 0 20px;
+    position: relative;
+}
+
+/* Game mode overlay */
+.multiplayer-mode-overlay {
+    background: rgba(255, 255, 255, 0.0);
+    backdrop-filter: var(--overlay-backdrop);
+    border: var(--color-border);
+    border-radius: var(--overlay-border-radius);
+    padding: 60px 100px 60px 100px;  
+    text-align: center;
+    color: var(--color-text);
+    max-width: 1000px;
+    width: 100%;
+}
+
+/* Single player/multiplayer buttons */
+.game-mode-button {
+    background: none;
+    border: none;
+    outline: none;
+    appearance: none;
+    color: var(--color-text);
+    text-decoration: none;
+    padding: 12px 20px;
+    margin: 10px;
+    border-radius: 10px;
+    font-family: var(--ff);
+    font-size: 28px;
+}
+
+/* Hover effects for button */
+.game-mode-button:hover {
+    color: var(--color-highlight-text);
+}
+
+/* Disabled button styling */
+.game-mode-button.disabled {
+    cursor: not-allowed;
+}
+
+/* Smaller text */
+.game-mode-coming-soon-text {
+    font-size: 16px;
+}  
