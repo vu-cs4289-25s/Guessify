@@ -33,10 +33,25 @@ const Lobby = () => {
       newSocket.emit(
         "joinRoom",
         { roomCode, userId },
-        (updatedPlayers, initialHostId) => {
+        (updatedPlayers, initialHostId, gameAlreadyStarted) => {
           setPlayers(updatedPlayers);
           fetchDisplayNames(updatedPlayers);
           setHostId(initialHostId);
+
+          console.log("JOIN CALLBACK:", {
+            updatedPlayers,
+            initialHostId,
+            gameAlreadyStarted,
+          });
+
+          if (gameAlreadyStarted) {
+            // 👇 Delay navigation to let React finish mounting
+            setTimeout(() => {
+              navigate(`/game/play-multiplayer/${roomCode}`, {
+                state: { hostId: initialHostId },
+              });
+            }, 50); // can try 0, 50, or 100 ms depending on your app
+          }
         }
       );
     });
@@ -50,9 +65,10 @@ const Lobby = () => {
       setHostId(newHostId);
     });
 
-    newSocket.on("gameStarted", () => {
-      //   navigate(`/game/play-multiplayer?roomCode=${roomCode}`);
-      navigate(`/game/play-multiplayer/${roomCode}`);
+    newSocket.on("gameStarted", ({ roomCode, genre, hostId }) => {
+      navigate(`/game/play-multiplayer/${roomCode}`, {
+        state: { hostId }, // 👈 pass hostId along
+      });
     });
 
     return () => {
@@ -83,7 +99,11 @@ const Lobby = () => {
 
   const handleStartGame = () => {
     if (socket) {
-      socket.emit("startGame", { roomCode, genre: gameGenre });
+      socket.emit("startGame", {
+        roomCode,
+        genre: gameGenre,
+        hostId: userId,
+      });
     }
   };
 

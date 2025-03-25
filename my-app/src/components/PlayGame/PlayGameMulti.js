@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import io from "socket.io-client";
 import axios from "axios";
 import WebPlayback from "../../components/WebPlayback/WebPlayback";
@@ -29,6 +29,8 @@ const PlayGameMulti = () => {
 
   // Socket
   const [socket, setSocket] = useState(null);
+  const location = useLocation();
+  const initialHostId = location.state?.hostId || null;
 
   // Spotify
   const [token, setToken] = useState(null);
@@ -40,6 +42,7 @@ const PlayGameMulti = () => {
   const [trackInfo, setTrackInfo] = useState(null);
 
   // Basic states
+  const [hostId, setHostId] = useState(null);
   const [isHost, setIsHost] = useState(false);
   const [userInput, setUserInput] = useState("");
   const [feedback, setFeedback] = useState("");
@@ -52,9 +55,10 @@ const PlayGameMulti = () => {
 
   // Timers
   const [guessedCorrectly, setGuessedCorrectly] = useState(false);
-  const [timeoutCount, setTimeoutCount] = useState(0);
+  //   const [timeoutCount, setTimeoutCount] = useState(0);
   const [musicStarted, setMusicStarted] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(15);
+  const [songCount, setSongCount] = useState(0);
 
   // Overlays
   const [showConfirm, setShowConfirm] = useState(false);
@@ -63,12 +67,25 @@ const PlayGameMulti = () => {
 
   // Bonus points
   const [bonusPopups, setBonusPopups] = useState([]);
+  const bonusAwardedRef = useRef(false);
 
   // Guesses
   const [guesses, setGuesses] = useState([]);
+  const [songTitle, setSongTitle] = useState("");
+  const [songArtist, setSongArtist] = useState("");
+  const hasGuessedRef = useRef(false);
 
   // If user answered or time ran out
   const showAnswer = guessedCorrectly || timeRemaining === 0;
+
+  const addBonusPopup = (points) => {
+    const id = uuidv4();
+    setBonusPopups((prev) => [...prev, { id, points }]);
+
+    setTimeout(() => {
+      setBonusPopups((prev) => prev.filter((popup) => popup.id !== id));
+    }, 3000); // how long the popup stays
+  };
 
   // -----------------------------------
   // Socket Setup / Lifecycle
@@ -78,9 +95,16 @@ const PlayGameMulti = () => {
     setSocket(newSocket);
 
     // Join the room
-    newSocket.emit("joinRoom", { roomCode, userId }, (players, hostId) => {
-      setIsHost(userId === hostId);
-    });
+    // Join the room
+    newSocket.emit(
+      "joinRoom",
+      { roomCode, userId },
+      (players, hostIdFromServer) => {
+        const finalHostId = initialHostId || hostIdFromServer;
+        setHostId(finalHostId);
+        setIsHost(userId === finalHostId);
+      }
+    );
 
     // Listen for host-chosen track
     newSocket.on("playSongUri", (uri) => {
@@ -89,6 +113,15 @@ const PlayGameMulti = () => {
       setGuessedCorrectly(false);
       setTimeRemaining(15);
       setMusicStarted(true);
+      setSongCount((prev) => prev + 1);
+      bonusAwardedRef.current = false;
+      hasGuessedRef.current = false;
+    });
+
+    newSocket.on("gameOver", () => {
+      setGameOver(true);
+      setMusicStarted(false);
+      setShowGameOverPopup(true);
     });
 
     // Listen for guesses from other players
@@ -97,6 +130,11 @@ const PlayGameMulti = () => {
         ...prev.filter((g) => g.userId !== guesserId),
         { userId: guesserId, guess },
       ]);
+    });
+
+    newSocket.on("hostChanged", (newHostId) => {
+      setHostId(newHostId);
+      setIsHost(newHostId === userId);
     });
 
     return () => newSocket.disconnect();
@@ -123,30 +161,24 @@ const PlayGameMulti = () => {
   // -----------------------------------
   useEffect(() => {
     const timer = setInterval(() => {
-      if (musicStarted && !guessedCorrectly && timeRemaining > 0) {
+      if (musicStarted && timeRemaining > 0) {
         setTimeRemaining((prev) => prev - 1);
       }
     }, 1000);
     return () => clearInterval(timer);
-  }, [musicStarted, guessedCorrectly, timeRemaining]);
+  }, [musicStarted, timeRemaining]);
 
   // -----------------------------------
   // If time runs out
   // -----------------------------------
   useEffect(() => {
     if (timeRemaining === 0 && !guessedCorrectly) {
-      setTimeoutCount((prev) => prev + 1);
-      setFeedback("Time's up!");
       setGuessedCorrectly(true);
-
-      // If they've missed 3 times, end game
-      if (timeoutCount + 1 >= 3) {
-        setFeedback("Game Over! Too many missed guesses.");
-        setShowGameOverPopup(true);
-        setMusicStarted(false);
-      }
+      setFeedback(
+        `Time's up! The correct answer was: "${songTitle}" by ${songArtist}.`
+      );
     }
-  }, [timeRemaining, guessedCorrectly, timeoutCount]);
+  }, [timeRemaining, guessedCorrectly, songTitle, songArtist]);
 
   // -----------------------------------
   // Host picks a random track
@@ -227,7 +259,9 @@ const PlayGameMulti = () => {
   // -----------------------------------
   const handleGuessSubmit = (e) => {
     e.preventDefault();
-    if (!userInput.trim() || guessedCorrectly) return;
+    if (!userInput.trim() || guessedCorrectly || hasGuessedRef.current) return;
+
+    hasGuessedRef.current = true;
 
     // Send to server so others see it
     if (socket) {
@@ -245,8 +279,32 @@ const PlayGameMulti = () => {
       gameGenre
     );
     if (isCorrect) {
-      setScore((prev) => prev + 1000);
-      setFeedback("Correct!");
+      let pointsToAdd = 0;
+      let bonusPoints = 0;
+
+      if (timeRemaining > 12) {
+        pointsToAdd = 1000;
+        bonusPoints = 600;
+      } else if (timeRemaining > 9) {
+        pointsToAdd = 800;
+        bonusPoints = 400;
+      } else if (timeRemaining > 6) {
+        pointsToAdd = 600;
+        bonusPoints = 200;
+      } else {
+        pointsToAdd = 400;
+        bonusPoints = 0;
+      }
+
+      setScore((prev) => prev + pointsToAdd);
+      setFeedback(`Correct! The song was: "${songTitle}" by ${songArtist}.`);
+
+      if (pointsToAdd > 0 && !bonusAwardedRef.current) {
+        // TODO - fix bonus popup
+        // addBonusPopup(bonusPoints);
+        bonusAwardedRef.current = true;
+      }
+
       setGuessedCorrectly(true);
     } else if (isClose) {
       setFeedback("Close, try again!");
@@ -285,6 +343,15 @@ const PlayGameMulti = () => {
     );
   };
 
+  const handleEndGame = () => {
+    if (socket) {
+      socket.emit("gameOver", { roomCode }); // 🔥 send to everyone
+    }
+    setGameOver(true);
+    setMusicStarted(false);
+    setShowGameOverPopup(true);
+  };
+
   // -----------------------------------
   // Render
   // -----------------------------------
@@ -304,8 +371,21 @@ const PlayGameMulti = () => {
 
         {/* Host pick button */}
         {isHost && (
-          <button className="skip-song-button" onClick={handleHostPickTrack}>
-            Start Song
+          <button
+            className="skip-song-button"
+            onClick={
+              songCount === 0
+                ? handleHostPickTrack
+                : songCount < 5
+                ? handleHostPickTrack
+                : handleEndGame
+            }
+          >
+            {songCount === 0
+              ? "Start Song"
+              : songCount < 5
+              ? "Next Song"
+              : "End Game"}
           </button>
         )}
 
@@ -320,18 +400,21 @@ const PlayGameMulti = () => {
               setTimeRemaining(15);
             }}
             onTrackChange={(info) => {
-              // Store the actual track name if you want to show it
-              // or compare guesses later
               console.log("Track changed:", info);
               setTrackInfo(info);
+              if (info?.name) setSongTitle(info.name);
+              if (info?.artist) setSongArtist(info.artist);
             }}
           />
         </div>
 
         {/* Feedback */}
-        {feedback && (
+        {(feedback || showAnswer) && (
           <div className="feedback-message">
-            <p>{feedback}</p>
+            <p>
+              {feedback ||
+                `The correct answer was: "${songTitle}" by ${songArtist}.`}
+            </p>
           </div>
         )}
 
@@ -347,7 +430,7 @@ const PlayGameMulti = () => {
         </form>
 
         <p className="score-missed">Score: {score}</p>
-        <p className="score-missed">Missed: {timeoutCount}</p>
+        {/* <p className="score-missed">Missed: {timeoutCount}</p> */}
 
         {/* HowToPlay Toggle */}
         <div

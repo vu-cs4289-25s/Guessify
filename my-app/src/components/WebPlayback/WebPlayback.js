@@ -1,23 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase";
+import { useGameContext } from "../../components/GameContext";
 import { useUser } from "../../components/userContext";
 
 function WebPlayback({
   trackUriFromHost,
+  nextSongTrigger,
   onSongStarted,
   onTrackChange,
   showAnswer,
   onGameOver,
 }) {
+  const { gameGenre } = useGameContext();
+  const { userId } = useUser();
+
   const [token, setToken] = useState(null);
   const [player, setPlayer] = useState(null);
   const [deviceId, setDeviceId] = useState(null);
   const [currentTrack, setCurrentTrack] = useState(null);
   const [playerReady, setPlayerReady] = useState(false);
   const [albumCoverReady, setAlbumCoverReady] = useState(false);
-
-  const { userId } = useUser();
 
   // Fetch token from Firestore
   useEffect(() => {
@@ -33,10 +36,10 @@ function WebPlayback({
     fetchSpotifyToken();
   }, [userId]);
 
+  // Load SDK and initialize player
   useEffect(() => {
     if (!token) return;
 
-    // Load SDK
     const scriptUrl = "https://sdk.scdn.co/spotify-player.js";
     if (!document.querySelector(`script[src="${scriptUrl}"]`)) {
       const script = document.createElement("script");
@@ -46,7 +49,7 @@ function WebPlayback({
     }
 
     window.onSpotifyWebPlaybackSDKReady = () => {
-      if (player) return; // Already initted?
+      if (player) return;
 
       const newPlayer = new window.Spotify.Player({
         name: "Web Playback SDK",
@@ -63,6 +66,8 @@ function WebPlayback({
       });
 
       newPlayer.addListener("not_ready", ({ device_id }) => {
+        console.log("Device ID has gone offline:", device_id);
+        setDeviceId(null);
         setPlayerReady(false);
       });
 
@@ -83,11 +88,11 @@ function WebPlayback({
     };
   }, [token]);
 
-  // Play a given track URI on this device
+  // Play a track by URI (multiplayer mode)
   const playTrack = async (uri) => {
-    if (!player || !deviceId || !token) return;
+    if (!player || !deviceId || !token || !uri) return;
     try {
-      const resp = await fetch(
+      await fetch(
         `https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`,
         {
           method: "PUT",
@@ -98,28 +103,75 @@ function WebPlayback({
           },
         }
       );
-      if (!resp.ok) throw new Error("Failed to play track");
       onSongStarted && onSongStarted();
     } catch (err) {
       console.error("Error playing track:", err);
     }
   };
 
-  // Whenever the parent updates trackUriFromHost, play that track
+  const getPlaylistId = (genre) => {
+    const playlists = {
+      "TODAY'S TOP HITS": "6q4q9SfMy2w3ae4YROBncd",
+      POP: "34NbomaTu7YuOYnky8nLXL",
+      FOLK: "1WXXO8g0zyY9f2OIRsL96X",
+      "HIP-HOP / RAP": "7xjtqlGL5HuIdVF9rj1ADs",
+      JAZZ: "5IbvIjc5HVU7gaiCniQHEC",
+      METAL: "54roY8wSrfInsgbHljU6du",
+      ROCK: "1ti3v0lLrJ4KhSTuxt4loZ",
+      CLASSICAL: "27Zm1P410dPfedsdoO9fqm",
+      INDIE: "22VR7ZV8z45dnbPWj19HHL",
+      COUNTRY: "7APcM0pDgeFCZi1HlrsWCM",
+      BLUES: "2uGtHlsrXprWFdIf7jqYsV",
+      "K-POP": "6tQDMnj0qImEl6AKA1Uv74",
+    };
+    return playlists[genre] || playlists["TODAY'S TOP HITS"];
+  };
+
+  const playRandomTrackFromPlaylist = async () => {
+    if (!token || !deviceId || !playerReady) return;
+    const playlistId = getPlaylistId(gameGenre);
+    try {
+      const res = await fetch(
+        `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await res.json();
+      const tracks = data.items.filter(
+        (item) => item.track?.uri && item.track.is_playable !== false
+      );
+      const rand = tracks[Math.floor(Math.random() * tracks.length)];
+      await playTrack(rand.track.uri);
+    } catch (err) {
+      console.error("Error playing random track:", err);
+    }
+  };
+
+  // Play multiplayer song
   useEffect(() => {
     if (playerReady && trackUriFromHost) {
       playTrack(trackUriFromHost);
     }
   }, [playerReady, trackUriFromHost]);
 
-  // Optionally pause the track if game is over
+  // Play singleplayer song on load
+  useEffect(() => {
+    if (playerReady && !trackUriFromHost && nextSongTrigger >= 0) {
+      playRandomTrackFromPlaylist();
+    }
+  }, [playerReady, nextSongTrigger, trackUriFromHost]);
+
+  // Pause on game over
   useEffect(() => {
     if (onGameOver && player && deviceId) {
       player.pause().catch((err) => console.error("Error pausing track:", err));
     }
   }, [onGameOver, player, deviceId]);
 
-  // Handle album cover loading
+  // Album cover loading
   useEffect(() => {
     if (currentTrack?.album?.images?.[0]?.url) {
       setAlbumCoverReady(false);
