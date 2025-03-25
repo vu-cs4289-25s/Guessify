@@ -1,0 +1,43 @@
+.player-guesses-overlay-container {
+    position: fixed;
+    top: 20%;
+    left: 5%;
+    width: 300px;
+    height: 70vh;
+    background-color: rgba(0, 0, 0, 0.9);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #fff;
+    border-radius: 12px;
+    padding: 10px;
+    overflow-y: auto;
+  }
+  
+  .player-guesses-overlay {
+    width: 100%;
+    color: white;
+    text-align: left;
+  }
+  
+  .guesses-title {
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+  
+  .guesses-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .guesses-list li {
+    margin-bottom: 8px;
+  }
+  
+  .guesses-list li.you {
+    font-weight: bold;
+    color: yellow;
+  }
+  
