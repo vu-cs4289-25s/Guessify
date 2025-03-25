@@ -51,7 +51,8 @@ const Lobby = () => {
     });
 
     newSocket.on("gameStarted", () => {
-      navigate(`/game/play?roomCode=${roomCode}`, { state: { multi: true } });
+      //   navigate(`/game/play-multiplayer?roomCode=${roomCode}`);
+      navigate(`/game/play-multiplayer/${roomCode}`);
     });
 
     return () => {

@@ -10,7 +10,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ------------------ Spotify Token Exchange ------------------ //
+// Spotify Token Exchange
 app.post("/api/spotify/token", async (req, res) => {
   try {
     const { code, redirect_uri, client_id } = req.body;
@@ -42,25 +42,23 @@ app.post("/api/spotify/token", async (req, res) => {
   }
 });
 
-// ------------------ Create Server & Socket.IO ------------------ //
+// Create Server & Socket.IO
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: { origin: "*" },
 });
 
-// ------------------ In-Memory Rooms ------------------ //
-// structure: rooms[roomCode] = { players: [], hostId: 'someUserId' }
+// In-Memory Rooms: rooms[roomCode] = { players: [...], hostId }
 const rooms = {};
 
 io.on("connection", (socket) => {
   console.log("New client connected:", socket.id);
 
-  // Called when a user attempts to join a room
+  // 1) joinRoom
   socket.on("joinRoom", (payload, callback) => {
     const { roomCode, userId } = payload;
     console.log(`User ${userId} joining room: ${roomCode}`);
 
-    // 1. Create room if it doesn't exist, set host to current user
     if (!rooms[roomCode]) {
       rooms[roomCode] = {
         players: [],
@@ -68,13 +66,9 @@ io.on("connection", (socket) => {
       };
     }
 
-    console.log("Room data before forcing host:", rooms[roomCode]);
-
     const room = rooms[roomCode];
 
-    // 2. If for some reason we have no hostId, but the room *does* exist:
-    //    - If there are existing players, pick the first as the new host
-    //    - Otherwise, this user is the host
+    // If no host, assign
     if (!room.hostId) {
       if (room.players.length > 0) {
         room.hostId = room.players[0].userId;
@@ -83,68 +77,83 @@ io.on("connection", (socket) => {
       }
     }
 
-    // 3. Build the player's data
+    // Add user to room
     const playerData = {
       userId,
       displayName: `Player-${userId.slice(0, 5) || "Anon"}`,
       socketId: socket.id,
     };
 
-    // 4. Add them to the room if they're not already in it
     const alreadyInRoom = room.players.some((p) => p.userId === userId);
     if (!alreadyInRoom) {
       room.players.push(playerData);
     }
 
-    // 5. Join the Socket.IO room
     socket.join(roomCode);
 
-    // 6. Send updated info back to *this* client
-    //    The callback signature is (players, hostId)
+    // callback: (players, hostId)
     callback(room.players, room.hostId);
 
-    // 7. Notify everyone else in the room about the updated player list & host
+    // Notify entire room
     io.in(roomCode).emit("roomPlayersUpdate", room.players);
     io.in(roomCode).emit("hostChanged", room.hostId);
   });
 
-  // The host clicks 'Start Game'
+  // 2) startGame
   socket.on("startGame", ({ roomCode, genre }) => {
     console.log(`Game started in room ${roomCode}, genre: ${genre}`);
     io.in(roomCode).emit("gameStarted", { roomCode, genre });
   });
 
-  // Handle a user leaving (disconnecting)
+  // 3) newSong from host
+  socket.on("newSong", ({ roomCode, trackInfo }) => {
+    console.log(`Host in room ${roomCode} playing song:`, trackInfo.name);
+    io.in(roomCode).emit("playSong", trackInfo);
+  });
+
+  // 4) If you want the host to broadcast just a URI (instead of full track info)
+  //    This is an alternative approach if you have `playSongUri` event
+  socket.on("playSongUri", ({ roomCode, uri }) => {
+    console.log(`Host in room ${roomCode} broadcasting trackUri:`, uri);
+    io.in(roomCode).emit("playSongUri", uri);
+  });
+
+  // 5) playerGuessed
+  socket.on("playerGuessed", ({ roomCode, userId, guess }) => {
+    console.log(`User ${userId} guessed: ${guess}`);
+    io.in(roomCode).emit("playerGuessed", { userId, guess });
+  });
+
+  // playerGuessedCorrect
+  socket.on("playerGuessedCorrect", ({ roomCode, userId }) => {
+    io.in(roomCode).emit("playerGuessedCorrect", { userId });
+  });
+
+  // Cleanup on disconnect
   socket.on("disconnect", () => {
     console.log("Client disconnected:", socket.id);
 
-    // Check all rooms to find where this socket was
     for (const code in rooms) {
       const room = rooms[code];
       const idx = room.players.findIndex((p) => p.socketId === socket.id);
-
-      // If found them in this room
       if (idx !== -1) {
         const leavingPlayer = room.players.splice(idx, 1)[0];
         console.log(`User ${leavingPlayer.userId} left room: ${code}`);
 
-        // If they were the host, reassign to someone else in the room
+        // If host left, reassign
         if (leavingPlayer.userId === room.hostId) {
-          const newHost = room.players[0]; // pick the first remaining
+          const newHost = room.players[0];
           room.hostId = newHost?.userId || null;
-
-          // If we found a new host, announce it
           if (newHost) {
             io.in(code).emit("hostChanged", room.hostId);
           }
         }
 
-        // Send updated player list to everyone
         io.in(code).emit("roomPlayersUpdate", room.players);
 
-        // If no one left, delete the room
+        // If room is empty, delete
         if (room.players.length === 0) {
-          console.log(`Room ${code} is now empty. Deleting it...`);
+          console.log(`Room ${code} empty => deleting it`);
           delete rooms[code];
         }
         break;

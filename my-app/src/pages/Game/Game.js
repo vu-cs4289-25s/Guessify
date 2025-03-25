@@ -11,6 +11,7 @@ import MultiplayerModeSelect from "../../components/Multiplayer/MultiplayerModeS
 import CreateRoom from "../../components/Multiplayer/CreateRoom";
 import JoinRoom from "../../components/Multiplayer/JoinRoom";
 import Lobby from "../../components/Multiplayer/Lobby";
+import PlayGameMulti from "../../components/PlayGame/PlayGameMulti";
 
 import "./Game.css";
 
@@ -30,6 +31,10 @@ const Game = () => {
           <Route path="create-room" element={<CreateRoom />} />
           <Route path="join-room" element={<JoinRoom />} />
           <Route path="lobby/:roomCode" element={<Lobby />} />
+          <Route
+            path="play-multiplayer/:roomCode"
+            element={<PlayGameMulti />}
+          />
         </Routes>
       </GameProvider>
     </div>
