@@ -66,6 +66,7 @@ io.on("connection", (socket) => {
         players: [],
         hostId: userId,
         gameStarted: false,
+        score: {},
       };
     }
 
@@ -99,10 +100,13 @@ io.on("connection", (socket) => {
       hostId: room.hostId,
       gameStarted: room.gameStarted,
     });
-    callback(room.players, room.hostId, room.gameStarted);
 
-    // callback: (players, hostId)
-    callback(room.players, room.hostId, room.gameStarted);
+    callback(
+      room.players,
+      room.hostId,
+      room.gameStarted,
+      room.score?.[userId] || 0
+    );
 
     // Notify entire room
     io.in(roomCode).emit("roomPlayersUpdate", room.players);
@@ -150,6 +154,15 @@ io.on("connection", (socket) => {
   // playerGuessedCorrect
   socket.on("playerGuessedCorrect", ({ roomCode, userId }) => {
     io.in(roomCode).emit("playerGuessedCorrect", { userId });
+  });
+
+  socket.on("updateScore", ({ roomCode, userId, score }) => {
+    const room = rooms[roomCode];
+    if (room) {
+      if (!room.score) room.score = {};
+      room.score[userId] = score;
+      console.log(`Updated score for ${userId}: ${score}`);
+    }
   });
 
   // 6) End game (broadcast to everyone in the room)
