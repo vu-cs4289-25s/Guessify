@@ -1,62 +1,64 @@
-// Lobby.js
 import React, { useState, useEffect } from "react";
-import { useLocation, useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "../../firebase"; // adjust import path if needed
-
+import { db } from "../../firebase";
 import { useGameContext } from "../GameContext";
 import Navbar from "../Navbar/Navbar";
 import BackButton from "../BackButton/BackButton";
+import ConfirmationPopup from "../ConfirmationPopup/ConfirmationPopup";
 import { useUser } from "../userContext";
 
 const Lobby = () => {
-  const { state } = useLocation();
   const { roomCode } = useParams();
   const navigate = useNavigate();
-
-  const isHost = state?.host || false;
   const { userId } = useUser();
   const { gameGenre } = useGameContext();
 
   const [players, setPlayers] = useState([]);
-  const [socket, setSocket] = useState(null);
   const [displayNamesMap, setDisplayNamesMap] = useState({});
+  const [socket, setSocket] = useState(null);
+  const [hostId, setHostId] = useState(null);
+
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [pendingNavigation, setPendingNavigation] = useState(null);
+
+  const isHost = userId === hostId;
 
   useEffect(() => {
-    // Initialize socket.io once
-    const newSocket = io("http://localhost:5001"); // adjust if you use a different port
+    const newSocket = io("http://localhost:5001");
     setSocket(newSocket);
 
-    // On connect, join the room
     newSocket.on("connect", () => {
-      console.log("Socket connected with ID:", newSocket.id);
-
-      // Once connected, join the room
-      newSocket.emit("joinRoom", { roomCode, userId }, (updatedPlayers) => {
-        setPlayers(updatedPlayers);
-        fetchDisplayNames(updatedPlayers);
-      });
+      newSocket.emit(
+        "joinRoom",
+        { roomCode, userId },
+        (updatedPlayers, initialHostId) => {
+          setPlayers(updatedPlayers);
+          fetchDisplayNames(updatedPlayers);
+          setHostId(initialHostId);
+        }
+      );
     });
 
-    // Listen for updated player list
     newSocket.on("roomPlayersUpdate", (updatedPlayers) => {
       setPlayers(updatedPlayers);
       fetchDisplayNames(updatedPlayers);
     });
 
-    // Listen for host starting the game
-    newSocket.on("gameStarted", (startData) => {
+    newSocket.on("hostChanged", (newHostId) => {
+      setHostId(newHostId);
+    });
+
+    newSocket.on("gameStarted", () => {
       navigate(`/game/play?roomCode=${roomCode}`, { state: { multi: true } });
     });
 
-    // Cleanup on unmount
     return () => {
       newSocket.disconnect();
     };
   }, [navigate, roomCode, userId]);
 
-  // Fetch each player's real displayName from Firestore
   const fetchDisplayNames = async (playersArray) => {
     try {
       const newMap = {};
@@ -64,10 +66,9 @@ const Lobby = () => {
         const userRef = doc(db, "users", p.userId);
         const snapshot = await getDoc(userRef);
         if (snapshot.exists()) {
-          const data = snapshot.data();
-          // If you only want the first name:
-          const fullName = data.displayName || "No Name";
-          const firstName = fullName.split(" ")[0];
+          const firstName = (snapshot.data().displayName || "No Name").split(
+            " "
+          )[0];
           newMap[p.userId] = firstName;
         } else {
           newMap[p.userId] = "Anon";
@@ -85,35 +86,70 @@ const Lobby = () => {
     }
   };
 
+  const handleLeaveAttempt = (e, path) => {
+    e.preventDefault();
+    setShowConfirm(true);
+    setPendingNavigation(path || "/game/multiplayer");
+  };
+
+  const handleConfirmLeave = () => {
+    if (socket) {
+      socket.disconnect();
+    }
+    window.location.href = pendingNavigation || "/game/multiplayer";
+  };
+
+  const handleCancelLeave = () => {
+    setShowConfirm(false);
+    setPendingNavigation(null);
+  };
+
+  console.log("DEBUG LOBBY:", {
+    userId,
+    isHost,
+    hostId,
+    players,
+    playersLength: players.length,
+  });
+
   return (
     <div className="lobby-container">
-      <Navbar />
-      <BackButton to="/game/multiplayer" />
+      <Navbar onNavClick={handleLeaveAttempt} />
+      <BackButton onClick={handleLeaveAttempt} />
 
       <h2>Lobby for Room: {roomCode}</h2>
       <p>Players in this Room:</p>
       <ul>
         {players.map((p) => {
           const isCurrentUser = p.userId === userId;
+          const isThisHost = p.userId === hostId;
           return (
             <li
               key={p.userId}
               style={{ color: isCurrentUser ? "yellow" : "white" }}
             >
-              {displayNamesMap[p.userId] || "Loading..."}
+              {displayNamesMap[p.userId] || "Loading..."}{" "}
+              {isThisHost && "(Host)"}
             </li>
           );
         })}
       </ul>
 
-      {isHost ? (
-        players.length >= 2 ? (
-          <button onClick={handleStartGame}>START GAME</button>
-        ) : (
-          <p>You need at least 2 players to start!</p>
-        )
-      ) : (
-        <p>Waiting for the host to start the game...</p>
+      {isHost && players.length >= 2 && (
+        <button onClick={handleStartGame}>START GAME</button>
+      )}
+
+      {isHost && players.length < 2 && (
+        <p>You need at least 2 players to start!</p>
+      )}
+
+      {!isHost && <p>Waiting for the host to start the game...</p>}
+
+      {showConfirm && (
+        <ConfirmationPopup
+          onConfirm={handleConfirmLeave}
+          onCancel={handleCancelLeave}
+        />
       )}
     </div>
   );

@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { db } from "../../firebase";
+import { doc, setDoc } from "firebase/firestore";
 import Navbar from "../Navbar/Navbar";
 import BackButton from "../BackButton/BackButton";
 import { useGameContext } from "../GameContext";
-import "./MultiplayerRoom.css"; // New shared CSS
+import "./MultiplayerRoom.css";
 
 const genres = [
   "TODAY'S TOP HITS",
@@ -23,20 +25,32 @@ const genres = [
 const CreateRoom = () => {
   const { setGameGenre } = useGameContext();
   const [selectedGenre, setSelectedGenre] = useState("");
-  const [error, setError] = useState(false); // Error state
+  const [error, setError] = useState(false);
   const navigate = useNavigate();
 
   const generateRoomCode = () =>
     Math.random().toString(36).substr(2, 5).toUpperCase();
 
-  const handleCreateRoom = () => {
+  const handleCreateRoom = async () => {
     if (!selectedGenre) {
-      setError(true); // Show error message
+      setError(true);
       return;
     }
-    setError(false); // Clear error if valid
+
+    setError(false);
     setGameGenre(selectedGenre);
     const newCode = generateRoomCode();
+
+    // ✅ Save the room to Firestore
+    try {
+      await setDoc(doc(db, "rooms", newCode), {
+        genre: selectedGenre,
+        createdAt: Date.now(),
+      });
+    } catch (err) {
+      console.error("Error creating room in Firestore:", err);
+    }
+
     navigate(`/game/lobby/${newCode}`, { state: { host: true } });
   };
 
@@ -53,7 +67,7 @@ const CreateRoom = () => {
           value={selectedGenre}
           onChange={(e) => {
             setSelectedGenre(e.target.value);
-            setError(false); // Remove error when user selects a genre
+            setError(false);
           }}
         >
           <option value="">-- Select Genre --</option>
@@ -64,7 +78,6 @@ const CreateRoom = () => {
           ))}
         </select>
 
-        {/* Error message */}
         {error && <p className="error-message">Please select a genre</p>}
 
         <button className="room-game-mode-button" onClick={handleCreateRoom}>

@@ -5,9 +5,9 @@ import "./BackButton.css";
 const BackButton = ({ to, onClick }) => {
   const navigate = useNavigate();
 
-  const handleClick = () => {
+  const handleClick = (e) => {
     if (onClick) {
-      onClick();
+      onClick(e, to);
     } else {
       navigate(to);
     }
