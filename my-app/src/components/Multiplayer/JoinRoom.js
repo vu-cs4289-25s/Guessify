@@ -17,7 +17,6 @@ const JoinRoom = () => {
       return;
     }
 
-    // ✅ Check Firestore for room existence
     try {
       const roomRef = doc(db, "rooms", roomCode);
       const roomSnap = await getDoc(roomRef);
@@ -27,8 +26,18 @@ const JoinRoom = () => {
         return;
       }
 
+      const roomData = roomSnap.data();
+      const gameStarted = roomData?.gameStarted;
+
       setError(false);
-      navigate(`/game/lobby/${roomCode}`, { state: { host: false } });
+
+      if (gameStarted) {
+        // Go directly to the game if it's already started
+        navigate(`/game/play-multiplayer/${roomCode}`);
+      } else {
+        // Otherwise, go to lobby
+        navigate(`/game/lobby/${roomCode}`, { state: { host: false } });
+      }
     } catch (err) {
       console.error("Error checking room in Firestore:", err);
       setError(true);

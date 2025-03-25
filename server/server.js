@@ -4,6 +4,8 @@ const { Server } = require("socket.io");
 const cors = require("cors");
 const fetch = require("node-fetch");
 const dotenv = require("dotenv");
+const { setDoc, doc } = require("firebase/firestore");
+const { db } = require("./admin");
 
 dotenv.config();
 const app = express();
@@ -63,6 +65,7 @@ io.on("connection", (socket) => {
       rooms[roomCode] = {
         players: [],
         hostId: userId,
+        gameStarted: false,
       };
     }
 
@@ -91,8 +94,15 @@ io.on("connection", (socket) => {
 
     socket.join(roomCode);
 
+    console.log("Returning to client:", {
+      players: room.players,
+      hostId: room.hostId,
+      gameStarted: room.gameStarted,
+    });
+    callback(room.players, room.hostId, room.gameStarted);
+
     // callback: (players, hostId)
-    callback(room.players, room.hostId);
+    callback(room.players, room.hostId, room.gameStarted);
 
     // Notify entire room
     io.in(roomCode).emit("roomPlayersUpdate", room.players);
@@ -100,9 +110,22 @@ io.on("connection", (socket) => {
   });
 
   // 2) startGame
-  socket.on("startGame", ({ roomCode, genre }) => {
+  socket.on("startGame", async ({ roomCode, genre, hostId }) => {
     console.log(`Game started in room ${roomCode}, genre: ${genre}`);
-    io.in(roomCode).emit("gameStarted", { roomCode, genre });
+
+    if (rooms[roomCode]) {
+      rooms[roomCode].gameStarted = true;
+    }
+
+    try {
+      const roomRef = db.collection("rooms").doc(roomCode);
+      await roomRef.set({ gameStarted: true }, { merge: true });
+      console.log("Firestore gameStarted flag updated successfully");
+    } catch (error) {
+      console.error("Failed to update gameStarted in Firestore:", error);
+    }
+
+    io.in(roomCode).emit("gameStarted", { roomCode, genre, hostId });
   });
 
   // 3) newSong from host
@@ -127,6 +150,12 @@ io.on("connection", (socket) => {
   // playerGuessedCorrect
   socket.on("playerGuessedCorrect", ({ roomCode, userId }) => {
     io.in(roomCode).emit("playerGuessedCorrect", { userId });
+  });
+
+  // 6) End game (broadcast to everyone in the room)
+  socket.on("gameOver", ({ roomCode }) => {
+    console.log(`Host ended the game in room ${roomCode}`);
+    io.in(roomCode).emit("gameOver");
   });
 
   // Cleanup on disconnect
@@ -156,6 +185,7 @@ io.on("connection", (socket) => {
           console.log(`Room ${code} empty => deleting it`);
           delete rooms[code];
         }
+
         break;
       }
     }
