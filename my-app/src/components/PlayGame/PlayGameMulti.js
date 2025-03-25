@@ -99,10 +99,14 @@ const PlayGameMulti = () => {
     newSocket.emit(
       "joinRoom",
       { roomCode, userId },
-      (players, hostIdFromServer) => {
-        const finalHostId = initialHostId || hostIdFromServer;
-        setHostId(finalHostId);
-        setIsHost(userId === finalHostId);
+      (players, initialHostId, gameAlreadyStarted, savedScore) => {
+        setIsHost(userId === initialHostId);
+        setHostId(initialHostId);
+
+        // 👇 Restore score
+        if (savedScore !== undefined) {
+          setScore(savedScore);
+        }
       }
     );
 
@@ -296,12 +300,18 @@ const PlayGameMulti = () => {
         bonusPoints = 0;
       }
 
-      setScore((prev) => prev + pointsToAdd);
+      const newScore = score + pointsToAdd;
+      setScore(newScore);
+
+      // ✅ Persist score on server
+      if (socket) {
+        socket.emit("updateScore", { roomCode, userId, score: newScore });
+      }
+
       setFeedback(`Correct! The song was: "${songTitle}" by ${songArtist}.`);
 
       if (pointsToAdd > 0 && !bonusAwardedRef.current) {
-        // TODO - fix bonus popup
-        // addBonusPopup(bonusPoints);
+        // addBonusPopup(bonusPoints); // if you're showing the popup
         bonusAwardedRef.current = true;
       }
 
