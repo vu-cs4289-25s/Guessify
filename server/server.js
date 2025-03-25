@@ -1,8 +1,6 @@
-// server.js - Combined Express + Socket.IO for Spotify tokens & multiplayer
-
 const express = require("express");
-const http = require("http"); // <-- Needed to create HTTP server
-const { Server } = require("socket.io"); // <-- Socket.IO server
+const http = require("http");
+const { Server } = require("socket.io");
 const cors = require("cors");
 const fetch = require("node-fetch");
 const dotenv = require("dotenv");
@@ -12,7 +10,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ------------------ Spotify Token Exchange Endpoint ------------------ //
+// ------------------ Spotify Token Exchange ------------------ //
 app.post("/api/spotify/token", async (req, res) => {
   try {
     const { code, redirect_uri, client_id } = req.body;
@@ -44,93 +42,116 @@ app.post("/api/spotify/token", async (req, res) => {
   }
 });
 
-// ------------------ Create HTTP Server & Attach Socket.IO ------------- //
+// ------------------ Create Server & Socket.IO ------------------ //
 const server = http.createServer(app);
 const io = new Server(server, {
-  cors: {
-    origin: "*", // or your front-end URL
-  },
+  cors: { origin: "*" },
 });
 
-// ------------------ In-Memory Room Storage (Example) ------------------ //
-/*
- rooms = {
-   "ABC123": [
-       { userId: "some-uid", displayName: "Alice", socketId: "xxx" },
-       { userId: "other-uid", displayName: "Bob",   socketId: "yyy" },
-   ],
-   ...
- }
-*/
+// ------------------ In-Memory Rooms ------------------ //
+// structure: rooms[roomCode] = { players: [], hostId: 'someUserId' }
 const rooms = {};
 
-// ------------------ Socket.IO Logic ---------------------------------- //
 io.on("connection", (socket) => {
   console.log("New client connected:", socket.id);
 
-  // Called when a client joins a room
+  // Called when a user attempts to join a room
   socket.on("joinRoom", (payload, callback) => {
     const { roomCode, userId } = payload;
     console.log(`User ${userId} joining room: ${roomCode}`);
 
+    // 1. Create room if it doesn't exist, set host to current user
     if (!rooms[roomCode]) {
-      rooms[roomCode] = [];
+      rooms[roomCode] = {
+        players: [],
+        hostId: userId,
+      };
     }
 
-    // Example displayName (or fetch real name from DB)
+    console.log("Room data before forcing host:", rooms[roomCode]);
+
+    const room = rooms[roomCode];
+
+    // 2. If for some reason we have no hostId, but the room *does* exist:
+    //    - If there are existing players, pick the first as the new host
+    //    - Otherwise, this user is the host
+    if (!room.hostId) {
+      if (room.players.length > 0) {
+        room.hostId = room.players[0].userId;
+      } else {
+        room.hostId = userId;
+      }
+    }
+
+    // 3. Build the player's data
     const playerData = {
       userId,
-      displayName: `Player-${userId?.slice(0, 5) || "Anon"}`,
+      displayName: `Player-${userId.slice(0, 5) || "Anon"}`,
       socketId: socket.id,
     };
 
-    // Avoid duplicates if user rejoins
-    const alreadyInRoom = rooms[roomCode].some((p) => p.userId === userId);
+    // 4. Add them to the room if they're not already in it
+    const alreadyInRoom = room.players.some((p) => p.userId === userId);
     if (!alreadyInRoom) {
-      rooms[roomCode].push(playerData);
+      room.players.push(playerData);
     }
 
-    // Join the Socket.IO room
+    // 5. Join the Socket.IO room
     socket.join(roomCode);
 
-    // Send updated room data to the callback (just for the new user)
-    callback(rooms[roomCode]);
-    // Broadcast to everyone in the room that the players have updated
-    io.in(roomCode).emit("roomPlayersUpdate", rooms[roomCode]);
+    // 6. Send updated info back to *this* client
+    //    The callback signature is (players, hostId)
+    callback(room.players, room.hostId);
+
+    // 7. Notify everyone else in the room about the updated player list & host
+    io.in(roomCode).emit("roomPlayersUpdate", room.players);
+    io.in(roomCode).emit("hostChanged", room.hostId);
   });
 
-  // Called when host clicks "START GAME" button
-  socket.on("startGame", (payload) => {
-    const { roomCode, genre } = payload;
+  // The host clicks 'Start Game'
+  socket.on("startGame", ({ roomCode, genre }) => {
     console.log(`Game started in room ${roomCode}, genre: ${genre}`);
-
-    // Emitting to everyone in the room that the game has started
     io.in(roomCode).emit("gameStarted", { roomCode, genre });
   });
 
-  // Cleanup on disconnect
+  // Handle a user leaving (disconnecting)
   socket.on("disconnect", () => {
     console.log("Client disconnected:", socket.id);
 
-    // Remove the socket from any rooms it was in
+    // Check all rooms to find where this socket was
     for (const code in rooms) {
-      const players = rooms[code];
-      const updatedPlayers = players.filter((p) => p.socketId !== socket.id);
+      const room = rooms[code];
+      const idx = room.players.findIndex((p) => p.socketId === socket.id);
 
-      // If the array changed, broadcast updates
-      if (updatedPlayers.length !== players.length) {
-        rooms[code] = updatedPlayers;
-        io.in(code).emit("roomPlayersUpdate", updatedPlayers);
-      }
+      // If found them in this room
+      if (idx !== -1) {
+        const leavingPlayer = room.players.splice(idx, 1)[0];
+        console.log(`User ${leavingPlayer.userId} left room: ${code}`);
 
-      // If no players left in room, optionally delete the room
-      if (rooms[code].length === 0) {
-        delete rooms[code];
+        // If they were the host, reassign to someone else in the room
+        if (leavingPlayer.userId === room.hostId) {
+          const newHost = room.players[0]; // pick the first remaining
+          room.hostId = newHost?.userId || null;
+
+          // If we found a new host, announce it
+          if (newHost) {
+            io.in(code).emit("hostChanged", room.hostId);
+          }
+        }
+
+        // Send updated player list to everyone
+        io.in(code).emit("roomPlayersUpdate", room.players);
+
+        // If no one left, delete the room
+        if (room.players.length === 0) {
+          console.log(`Room ${code} is now empty. Deleting it...`);
+          delete rooms[code];
+        }
+        break;
       }
     }
   });
 });
 
-// ------------------ Start the Server --------------------------------- //
 const PORT = 5001;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
