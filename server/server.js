@@ -108,8 +108,11 @@ io.on("connection", (socket) => {
       room.score?.[userId] || 0
     );
 
-    // Notify entire room
-    io.in(roomCode).emit("roomPlayersUpdate", room.players);
+    // Notify everyone except the newly joined socket
+    socket.to(roomCode).emit("roomPlayersUpdate", room.players);
+
+    // Also send the latest player list directly to the new socket
+    socket.emit("roomPlayersUpdate", room.players);
     io.in(roomCode).emit("hostChanged", room.hostId);
   });
 

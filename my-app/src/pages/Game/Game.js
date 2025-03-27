@@ -14,6 +14,7 @@ import Lobby from "../../components/Multiplayer/Lobby";
 import PlayGameMulti from "../../components/PlayGame/PlayGameMulti";
 
 import "./Game.css";
+import GameOverMulti from "./GameOverMulti";
 
 const Game = () => {
   return (
@@ -35,6 +36,7 @@ const Game = () => {
             path="play-multiplayer/:roomCode"
             element={<PlayGameMulti />}
           />
+          <Route path="/gameover-multi/:roomCode" element={<GameOverMulti />} />
         </Routes>
       </GameProvider>
     </div>

@@ -12,7 +12,7 @@ import BonusPointsPopup from "../BonusPointsPopup/BonusPointsPopup";
 import GuessesOverlay from "../GuessesOverlay/GuessesOverlay";
 import { useGameContext } from "../../components/GameContext";
 import { useUser } from "../userContext";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../../firebase";
 import { isSongTitleCorrect } from "./SongMatching";
 import { v4 as uuidv4 } from "uuid";
@@ -47,6 +47,7 @@ const PlayGameMulti = () => {
   const [userInput, setUserInput] = useState("");
   const [feedback, setFeedback] = useState("");
   const [volume, setVolume] = useState(50);
+  const [displayNamesMap, setDisplayNamesMap] = useState({});
 
   // Score & GameOver
   const [score, setScore] = useState(0);
@@ -74,6 +75,7 @@ const PlayGameMulti = () => {
   const [songTitle, setSongTitle] = useState("");
   const [songArtist, setSongArtist] = useState("");
   const hasGuessedRef = useRef(false);
+  const [players, setPlayers] = useState([]);
 
   // If user answered or time ran out
   const showAnswer = guessedCorrectly || timeRemaining === 0;
@@ -87,6 +89,23 @@ const PlayGameMulti = () => {
     }, 3000); // how long the popup stays
   };
 
+  const fetchDisplayNames = async (playersArray) => {
+    const newMap = {};
+    for (const p of playersArray) {
+      const userRef = doc(db, "users", p.userId);
+      const snapshot = await getDoc(userRef);
+      if (snapshot.exists()) {
+        const firstName = (snapshot.data().displayName || "No Name").split(
+          " "
+        )[0];
+        newMap[p.userId] = firstName;
+      } else {
+        newMap[p.userId] = "Anon";
+      }
+    }
+    setDisplayNamesMap(newMap);
+  };
+
   // -----------------------------------
   // Socket Setup / Lifecycle
   // -----------------------------------
@@ -94,7 +113,6 @@ const PlayGameMulti = () => {
     const newSocket = io("http://localhost:5001");
     setSocket(newSocket);
 
-    // Join the room
     // Join the room
     newSocket.emit(
       "joinRoom",
@@ -107,6 +125,10 @@ const PlayGameMulti = () => {
         if (savedScore !== undefined) {
           setScore(savedScore);
         }
+
+        // 👇 Fetch display names
+        fetchDisplayNames(players);
+        setPlayers(players);
       }
     );
 
@@ -118,28 +140,76 @@ const PlayGameMulti = () => {
       setTimeRemaining(15);
       setMusicStarted(true);
       setSongCount((prev) => prev + 1);
+      setGuesses([]);
       bonusAwardedRef.current = false;
       hasGuessedRef.current = false;
     });
 
-    newSocket.on("gameOver", () => {
-      setGameOver(true);
-      setMusicStarted(false);
-      setShowGameOverPopup(true);
-    });
-
-    // Listen for guesses from other players
-    newSocket.on("playerGuessed", ({ userId: guesserId, guess }) => {
-      setGuesses((prev) => [
-        ...prev.filter((g) => g.userId !== guesserId),
-        { userId: guesserId, guess },
-      ]);
+    newSocket.on("roomPlayersUpdate", (updatedPlayers) => {
+      setPlayers(updatedPlayers);
+      fetchDisplayNames(updatedPlayers);
     });
 
     newSocket.on("hostChanged", (newHostId) => {
       setHostId(newHostId);
       setIsHost(newHostId === userId);
     });
+
+    newSocket.on("gameOver", async () => {
+      setGameOver(true);
+      setMusicStarted(false);
+      setShowGameOverPopup(true);
+
+      try {
+        const gameRef = doc(db, "gamesMulti", roomCode);
+        const snapshot = await getDoc(gameRef);
+
+        if (!snapshot.exists()) {
+          console.error("No game document found for room:", roomCode);
+          return;
+        }
+
+        const gameData = snapshot.data();
+        const originalPlayers = gameData.players || [];
+
+        // Build updated player list with new score/fastestGuess
+        const updatedPlayers = originalPlayers.map((p) => {
+          const guess = guesses.find((g) => g.userId === p.userId);
+          return {
+            ...p,
+            score: p.userId === userId ? score : p.score,
+            fastestGuess: guess?.fastestGuess || p.fastestGuess || null,
+          };
+        });
+
+        await setDoc(
+          gameRef,
+          {
+            players: updatedPlayers,
+            status: "completed",
+            endedAt: Date.now(),
+          },
+          { merge: true }
+        );
+
+        console.log("✅ Game players updated:", updatedPlayers);
+      } catch (err) {
+        console.error("❌ Error saving game results:", err);
+      }
+
+      localStorage.setItem("roomCode", roomCode);
+    });
+
+    // Listen for guesses from other players
+    newSocket.on(
+      "playerGuessed",
+      ({ userId: guesserId, guess, isCorrect, isClose }) => {
+        setGuesses((prev) => [
+          ...prev.filter((g) => g.userId !== guesserId),
+          { userId: guesserId, guess, isCorrect, isClose }, // ✅ include both
+        ]);
+      }
+    );
 
     return () => newSocket.disconnect();
   }, [roomCode, userId]);
@@ -263,25 +333,29 @@ const PlayGameMulti = () => {
   // -----------------------------------
   const handleGuessSubmit = (e) => {
     e.preventDefault();
-    if (!userInput.trim() || guessedCorrectly || hasGuessedRef.current) return;
+    if (!userInput.trim() || guessedCorrectly || timeRemaining === 0) return;
 
-    hasGuessedRef.current = true;
+    const { isCorrect, isClose } = isSongTitleCorrect(
+      userInput,
+      trackInfo?.name || "",
+      gameGenre
+    );
 
     // Send to server so others see it
     if (socket) {
       socket.emit("playerGuessed", {
         roomCode,
         userId,
-        guess: userInput,
+        guess: isCorrect
+          ? "got it correct!"
+          : isClose
+          ? "was close!"
+          : userInput,
+        isCorrect,
+        isClose,
       });
     }
 
-    // Evaluate guess locally
-    const { isCorrect, isClose } = isSongTitleCorrect(
-      userInput,
-      trackInfo?.name || "",
-      gameGenre
-    );
     if (isCorrect) {
       let pointsToAdd = 0;
       let bonusPoints = 0;
@@ -485,11 +559,20 @@ const PlayGameMulti = () => {
 
       {/* GameOver Popup */}
       {showGameOverPopup && (
-        <GameOverPopup onClose={() => setShowGameOverPopup(false)} />
+        <GameOverPopup
+          mode="multi"
+          roomCode={roomCode}
+          onClose={() => setShowGameOverPopup(false)}
+        />
       )}
 
       {/* Show Player Guesses */}
-      <GuessesOverlay guesses={guesses} currentUserId={userId} />
+      <GuessesOverlay
+        players={players}
+        guesses={guesses}
+        currentUserId={userId}
+        displayNamesMap={displayNamesMap}
+      />
 
       {/* HowToPlay Overlay */}
       <HowToPlayOverlay
