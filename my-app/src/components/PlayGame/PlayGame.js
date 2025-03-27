@@ -481,7 +481,10 @@ const PlayGame = () => {
       )}
 
       {showGameOverPopup && (
-        <GameOverPopup onClose={() => setShowGameOverPopup(false)} />
+        <GameOverPopup
+          mode="single"
+          onClose={() => setShowGameOverPopup(false)}
+        />
       )}
 
       <HowToPlayOverlay

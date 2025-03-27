@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../../firebase";
 import { useGameContext } from "../GameContext";
 import Navbar from "../Navbar/Navbar";
@@ -97,13 +97,47 @@ const Lobby = () => {
     }
   };
 
-  const handleStartGame = () => {
+  const handleStartGame = async () => {
     if (socket) {
       socket.emit("startGame", {
         roomCode,
         genre: gameGenre,
         hostId: userId,
       });
+    }
+
+    // Ensure the host is in the players array
+    const playerIds = players.map((p) => p.userId);
+    const enrichedPlayers = [...players];
+
+    if (!playerIds.includes(userId)) {
+      enrichedPlayers.push({ userId }); // fallback just in case
+    }
+
+    // Add display names
+    const finalPlayerList = enrichedPlayers.map((p) => ({
+      userId: p.userId,
+      firstName: displayNamesMap[p.userId] || "Anon",
+      score: null, // Init to null
+      fastestGuess: null, // Init to null
+    }));
+
+    try {
+      const gameRef = doc(db, "gamesMulti", roomCode);
+      await setDoc(
+        gameRef,
+        {
+          roomCode,
+          genre: gameGenre,
+          players: finalPlayerList,
+          timestamp: Date.now(),
+          status: "in-progress",
+        },
+        { merge: true }
+      );
+      console.log("✅ Game start data saved:", finalPlayerList);
+    } catch (error) {
+      console.error("❌ Error saving game start data:", error);
     }
   };
 
@@ -147,7 +181,7 @@ const Lobby = () => {
           return (
             <li
               key={p.userId}
-              style={{ color: isCurrentUser ? "yellow" : "white" }}
+              style={{ color: isCurrentUser ? "#ffe283" : "#f3f3f3" }}
             >
               {displayNamesMap[p.userId] || "Loading..."}{" "}
               {isThisHost && "(Host)"}
