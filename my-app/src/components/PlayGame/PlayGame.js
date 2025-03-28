@@ -373,6 +373,7 @@ const PlayGame = () => {
         <h2 className="subtitle">{gameGenre}</h2>
         <div className="overlay-panel">
           <WebPlayback
+            isMultiplayer={false}
             nextSongTrigger={nextSongTrigger}
             onSongStarted={() => {
               setTimeRemaining(15);
@@ -380,20 +381,17 @@ const PlayGame = () => {
               setMusicStarted(true);
               setFeedback("");
               setShowSkipButton(true);
-
               if (!gameStartTime) {
-                setGameStartTime(Date.now()); // Record the start time
+                setGameStartTime(Date.now());
               }
             }}
             onTrackChange={(trackInfo) => {
-              setIsSwitchingSong(true); // Pause popups when song is switching
-              setBonusPopups([]); // Clear all bonus popups immediately
-
+              setIsSwitchingSong(true);
+              setBonusPopups([]);
               setTimeout(() => {
-                if (typeof trackInfo === "object") {
+                if (trackInfo && typeof trackInfo === "object") {
                   setSongTitle(trackInfo.name);
                   setSongArtist(trackInfo.artist);
-
                   if (trackInfo.albumCover) {
                     const img = new Image();
                     img.src = trackInfo.albumCover;
@@ -404,14 +402,13 @@ const PlayGame = () => {
                     setAlbumCoverReady(false);
                   }
                 } else {
-                  setSongTitle(trackInfo.name);
-                  setSongArtist(trackInfo.artist);
+                  setSongTitle("");
+                  setSongArtist("");
                   setAlbumCover(null);
                   setAlbumCoverReady(false);
                 }
-
-                setIsSwitchingSong(false); // Resume popups after switching
-              }, 500); // Delay to ensure smooth transition
+                setIsSwitchingSong(false);
+              }, 500);
             }}
             showAnswer={showAnswer}
             onGameOver={showGameOverPopup}
@@ -484,7 +481,10 @@ const PlayGame = () => {
       )}
 
       {showGameOverPopup && (
-        <GameOverPopup onClose={() => setShowGameOverPopup(false)} />
+        <GameOverPopup
+          mode="single"
+          onClose={() => setShowGameOverPopup(false)}
+        />
       )}
 
       <HowToPlayOverlay

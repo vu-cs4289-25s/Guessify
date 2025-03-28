@@ -5,50 +5,40 @@ import { useGameContext } from "../../components/GameContext";
 import { useUser } from "../../components/userContext";
 
 function WebPlayback({
+  trackUriFromHost,
   nextSongTrigger,
   onSongStarted,
   onTrackChange,
   showAnswer,
   onGameOver,
 }) {
+  const { gameGenre } = useGameContext();
+  const { userId } = useUser();
+
   const [token, setToken] = useState(null);
   const [player, setPlayer] = useState(null);
   const [deviceId, setDeviceId] = useState(null);
   const [currentTrack, setCurrentTrack] = useState(null);
   const [playerReady, setPlayerReady] = useState(false);
   const [albumCoverReady, setAlbumCoverReady] = useState(false);
-  const { gameGenre } = useGameContext();
-  const { userId } = useUser();
-
-  // Load token and SDK script
-  // useEffect(() => {
-  //   const accessToken = localStorage.getItem("spotify_access_token");
-  //   if (!accessToken) {
-  //     console.error("No access token available.");
-  //     return;
-  //   }
-  //   setToken(accessToken);
-  // });
 
   // Fetch token from Firestore
   useEffect(() => {
-    console.log(userId);
     if (!userId) return;
     const fetchSpotifyToken = async () => {
       const userRef = doc(db, "users", userId);
       const snapshot = await getDoc(userRef);
       if (snapshot.exists()) {
         const userData = snapshot.data();
-        setToken(userData.accessToken); // store in state
+        setToken(userData.accessToken);
       }
     };
     fetchSpotifyToken();
   }, [userId]);
 
-  // Load Web Playback SDK script and initialize the player once we have a token
+  // Load SDK and initialize player
   useEffect(() => {
     if (!token) return;
-    console.log(token);
 
     const scriptUrl = "https://sdk.scdn.co/spotify-player.js";
     if (!document.querySelector(`script[src="${scriptUrl}"]`)) {
@@ -59,7 +49,7 @@ function WebPlayback({
     }
 
     window.onSpotifyWebPlaybackSDKReady = () => {
-      if (player) return; // Prevent re-initialization
+      if (player) return;
 
       const newPlayer = new window.Spotify.Player({
         name: "Web Playback SDK",
@@ -69,9 +59,7 @@ function WebPlayback({
 
       setPlayer(newPlayer);
 
-      // Called when the player is ready
       newPlayer.addListener("ready", ({ device_id }) => {
-        console.log("Ready with Device ID:", device_id);
         setDeviceId(device_id);
         localStorage.setItem("device_id", device_id);
         setPlayerReady(true);
@@ -83,25 +71,43 @@ function WebPlayback({
         setPlayerReady(false);
       });
 
-      // Called when the player state changes
       newPlayer.addListener("player_state_changed", (state) => {
         if (!state) return;
-        setCurrentTrack(state.track_window.current_track);
-        if (onTrackChange && state.track_window.current_track) {
-          const trackInfo = {
-            name: state.track_window.current_track.name,
-            artist: state.track_window.current_track.artists
-              .map((artist) => artist.name)
-              .join(", "),
-            albumCover: state.track_window.current_track.album.images[0].url,
-          };
-          onTrackChange(trackInfo);
+        const track = state.track_window.current_track;
+        setCurrentTrack(track);
+        if (onTrackChange && track) {
+          onTrackChange({
+            name: track.name,
+            artist: track.artists.map((a) => a.name).join(", "),
+            albumCover: track.album.images?.[0]?.url || "",
+          });
         }
       });
 
       newPlayer.connect();
     };
   }, [token]);
+
+  // Play a track by URI (multiplayer mode)
+  const playTrack = async (uri) => {
+    if (!player || !deviceId || !token || !uri) return;
+    try {
+      await fetch(
+        `https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`,
+        {
+          method: "PUT",
+          body: JSON.stringify({ uris: [uri] }),
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      onSongStarted && onSongStarted();
+    } catch (err) {
+      console.error("Error playing track:", err);
+    }
+  };
 
   const getPlaylistId = (genre) => {
     const playlists = {
@@ -121,119 +127,59 @@ function WebPlayback({
     return playlists[genre] || playlists["TODAY'S TOP HITS"];
   };
 
-  // Fetch playlist tracks and play a random track.
   const playRandomTrackFromPlaylist = async () => {
-    if (!token || !deviceId || !playerReady) {
-      console.error("Token, device ID, or player is not ready.");
-
-      return;
-    }
-
+    if (!token || !deviceId || !playerReady) return;
     const playlistId = getPlaylistId(gameGenre);
-
     try {
-      const response = await fetch(
+      const res = await fetch(
         `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
           },
         }
       );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch playlist tracks");
-      }
-
-      const data = await response.json();
-
-      if (!data.items || data.items.length === 0) {
-        console.error("No tracks found in the playlist");
-        return;
-      }
-
-      const validTracks = data.items.filter((item) => {
-        const track = item.track;
-        if (!track || !track.uri) return false;
-        if (track.is_playable === false) return false;
-        return true;
-      });
-
-      if (validTracks.length === 0) {
-        console.error("No valid tracks found in the playlist");
-        return;
-      }
-
-      console.log("Number of valid tracks:", validTracks.length);
-      const randomIndex = Math.floor(Math.random() * validTracks.length);
-      const randomTrackUri = validTracks[randomIndex].track.uri;
-
-      const playResponse = await fetch(
-        `https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`,
-        {
-          method: "PUT",
-          body: JSON.stringify({ uris: [randomTrackUri] }),
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
+      const data = await res.json();
+      const tracks = data.items.filter(
+        (item) => item.track?.uri && item.track.is_playable !== false
       );
-
-      if (!playResponse.ok) {
-        throw new Error("Failed to play the track");
-      }
-
-      console.log("Random track playing:", randomTrackUri);
-      if (onSongStarted) {
-        onSongStarted();
-      }
-    } catch (error) {
-      console.error("Error playing random track:", error);
+      const rand = tracks[Math.floor(Math.random() * tracks.length)];
+      await playTrack(rand.track.uri);
+    } catch (err) {
+      console.error("Error playing random track:", err);
     }
   };
 
+  // Play multiplayer song
   useEffect(() => {
-    if (currentTrack && currentTrack.album.images[0].url) {
-      setAlbumCoverReady(false); // Start loading
+    if (playerReady && trackUriFromHost) {
+      playTrack(trackUriFromHost);
+    }
+  }, [playerReady, trackUriFromHost]);
+
+  // Play singleplayer song on load
+  useEffect(() => {
+    if (playerReady && !trackUriFromHost && nextSongTrigger >= 0) {
+      playRandomTrackFromPlaylist();
+    }
+  }, [playerReady, nextSongTrigger, trackUriFromHost]);
+
+  // Pause on game over
+  useEffect(() => {
+    if (onGameOver && player && deviceId) {
+      player.pause().catch((err) => console.error("Error pausing track:", err));
+    }
+  }, [onGameOver, player, deviceId]);
+
+  // Album cover loading
+  useEffect(() => {
+    if (currentTrack?.album?.images?.[0]?.url) {
+      setAlbumCoverReady(false);
       const img = new Image();
       img.src = currentTrack.album.images[0].url;
-      img.onload = () => setAlbumCoverReady(true); // Set ready when loaded
+      img.onload = () => setAlbumCoverReady(true);
     }
   }, [currentTrack]);
-
-  // Pause the current track
-  const pauseTrack = async () => {
-    if (player && deviceId) {
-      try {
-        await player.pause();
-        console.log("Track paused.");
-      } catch (error) {
-        console.error("Error pausing track:", error);
-      }
-    } else {
-      console.log("Player not initialized or device ID not ready.");
-    }
-  };
-
-  useEffect(() => {
-    if (onGameOver) {
-      pauseTrack(); // Pause music when game is over
-    }
-  }, [onGameOver]);
-
-  useEffect(() => {
-    if (nextSongTrigger > 0) {
-      playRandomTrackFromPlaylist();
-    }
-  }, [nextSongTrigger]);
-
-  useEffect(() => {
-    if (playerReady) {
-      playRandomTrackFromPlaylist();
-    }
-  }, [playerReady]);
 
   return (
     <div>
@@ -247,19 +193,15 @@ function WebPlayback({
               height: 150,
               margin: 15,
               filter: showAnswer ? "none" : "blur(10px)",
-              transition: "filter 0.3s ease-in-out", // Smooth transition for blur
+              transition: "filter 0.3s ease-in-out",
             }}
           />
         ) : (
-          <div className="loading-message">Loading song...</div> // Show "Loading..." while loading
+          <div>Loading song...</div>
         )
       ) : (
-        <div className="loading-message">Loading song...</div> // Show "Loading..." if no track yet
-      )}{" "}
-      {/* <button onClick={playRandomTrackFromPlaylist} disabled={!playerReady}>
-        Play Random Song
-      </button>
-      <button onClick={pauseTrack}>Pause</button> */}
+        <div>Loading song...</div>
+      )}
     </div>
   );
 }

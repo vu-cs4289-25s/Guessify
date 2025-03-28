@@ -9,7 +9,6 @@ import { useUser } from "../../components/userContext";
 const Profile = () => {
   const [searchParams] = useSearchParams();
   const userId = searchParams.get("userId");
-  const currentYear = new Date().getFullYear();
   const [profile, setProfile] = useState(null);
   const [daysSinceJoined, setDaysSinceJoined] = useState(null);
   const { setUserId, setUserProfile } = useUser();
@@ -85,9 +84,7 @@ const Profile = () => {
                   <p className="info-title">OBSCURITY RATING:</p>
                   <p>{profile.obscurity}%</p>
 
-                  <p className="info-title">
-                    # SONGS LISTENED TO {currentYear}:
-                  </p>
+                  <p className="info-title"># SONGS LISTENED TODAY:</p>
                   <p>{profile.songCount}</p>
 
                   <p className="info-title">DAYS SINCE JOINED:</p>

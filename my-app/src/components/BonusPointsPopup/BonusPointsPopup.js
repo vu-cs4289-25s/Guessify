@@ -20,7 +20,7 @@ const BonusPointsPopup = ({ points, onRemove }) => {
     // Automatically remove the popup after 5 seconds
     const timer = setTimeout(() => {
       onRemove();
-    }, 5000); // Extended duration to 5 seconds
+    }, 8000); // Extended duration to 8 seconds
 
     return () => clearTimeout(timer);
   }, [onRemove]);
