@@ -160,44 +160,43 @@ const PlayGameMulti = () => {
       setMusicStarted(false);
       setShowGameOverPopup(true);
 
-      try {
-        const gameRef = doc(db, "gamesMulti", roomCode);
-        const snapshot = await getDoc(gameRef);
+      // try {
+      //   const gameRef = doc(db, "gamesMulti", roomCode);
+      //   const snapshot = await getDoc(gameRef);
 
-        if (!snapshot.exists()) {
-          console.error("No game document found for room:", roomCode);
-          return;
-        }
+      //   if (!snapshot.exists()) return;
 
-        const gameData = snapshot.data();
-        const originalPlayers = gameData.players || [];
+      //   const gameData = snapshot.data();
+      //   const originalPlayers = gameData.players || [];
 
-        // Build updated player list with new score/fastestGuess
-        const updatedPlayers = originalPlayers.map((p) => {
-          const guess = guesses.find((g) => g.userId === p.userId);
-          return {
-            ...p,
-            score: p.userId === userId ? score : p.score,
-            fastestGuess: guess?.fastestGuess || p.fastestGuess || null,
-          };
-        });
+      //   const finalScoresMap = {};
+      //   players.forEach((p) => {
+      //     const guess = guesses.find((g) => g.userId === p.userId);
+      //     finalScoresMap[p.userId] = {
+      //       score: p.userId === userId ? score : 0,
+      //       fastestGuess: guess?.fastestGuess || null,
+      //     };
+      //   });
 
-        await setDoc(
-          gameRef,
-          {
-            players: updatedPlayers,
-            status: "completed",
-            endedAt: Date.now(),
-          },
-          { merge: true }
-        );
+      //   const updatedPlayers = originalPlayers.map((p) => {
+      //     const updates = finalScoresMap[p.userId];
+      //     return updates ? { ...p, ...updates } : p;
+      //   });
 
-        console.log("✅ Game players updated:", updatedPlayers);
-      } catch (err) {
-        console.error("❌ Error saving game results:", err);
-      }
+      //   await setDoc(
+      //     gameRef,
+      //     {
+      //       players: updatedPlayers,
+      //       status: "completed",
+      //       endedAt: Date.now(),
+      //     },
+      //     { merge: true }
+      //   );
+      // } catch (err) {
+      //   console.error("❌ Error saving game results:", err);
+      // }
 
-      localStorage.setItem("roomCode", roomCode);
+      // localStorage.setItem("roomCode", roomCode);
     });
 
     // Listen for guesses from other players
@@ -428,8 +427,8 @@ const PlayGameMulti = () => {
   };
 
   const handleEndGame = () => {
-    if (socket) {
-      socket.emit("gameOver", { roomCode }); // 🔥 send to everyone
+    if (socket && isHost) {
+      socket.emit("gameOver", { roomCode });
     }
     setGameOver(true);
     setMusicStarted(false);

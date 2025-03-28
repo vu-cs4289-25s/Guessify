@@ -169,8 +169,47 @@ io.on("connection", (socket) => {
   });
 
   // 6) End game (broadcast to everyone in the room)
-  socket.on("gameOver", ({ roomCode }) => {
-    console.log(`Host ended the game in room ${roomCode}`);
+  socket.on("gameOver", async ({ roomCode }) => {
+    console.log(`Game over in room ${roomCode}`);
+
+    const room = rooms[roomCode];
+    if (!room) return;
+
+    try {
+      // Fetch Firestore game doc
+      const gameRef = db.collection("gamesMulti").doc(roomCode);
+      const snapshot = await gameRef.get();
+
+      if (!snapshot.exists) {
+        console.error(`No Firestore game found for room ${roomCode}`);
+        return;
+      }
+
+      const gameData = snapshot.data();
+      const originalPlayers = gameData.players || [];
+
+      // Apply scores to each player
+      const updatedPlayers = originalPlayers.map((p) => ({
+        ...p,
+        score: room.score?.[p.userId] || 0,
+        // You can extend this to include fastestGuess if you want to send it from clients
+      }));
+
+      // Save back to Firestore
+      await gameRef.set(
+        {
+          players: updatedPlayers,
+          status: "completed",
+          endedAt: Date.now(),
+        },
+        { merge: true }
+      );
+
+      console.log(`✅ Final scores saved for room ${roomCode}`);
+    } catch (err) {
+      console.error("❌ Error saving final scores:", err);
+    }
+
     io.in(roomCode).emit("gameOver");
   });
 

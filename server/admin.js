@@ -1,13 +1,6 @@
 // server/admin.js
 const admin = require("firebase-admin");
-let serviceAccount;
-try {
-  serviceAccount = require("./serviceAccountKey.json");
-} catch (error) {
-  console.warn(
-    "⚠️ No serviceAccountKey.json found. Using env variable instead."
-  );
-}
+const serviceAccount = require("./serviceAccountKey.json");
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
