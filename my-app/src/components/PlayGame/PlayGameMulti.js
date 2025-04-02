@@ -76,6 +76,9 @@ const PlayGameMulti = () => {
   const [songArtist, setSongArtist] = useState("");
   const hasGuessedRef = useRef(false);
   const [players, setPlayers] = useState([]);
+  const [missedCount, setMissedCount] = useState(0);
+  const [fastestGuessTime, setFastestGuessTime] = useState(null);
+  const [fastestGuessedSong, setFastestGuessedSong] = useState(null);
 
   // If user answered or time ran out
   const showAnswer = guessedCorrectly || timeRemaining === 0;
@@ -104,6 +107,18 @@ const PlayGameMulti = () => {
       }
     }
     setDisplayNamesMap(newMap);
+  };
+
+  const emitMissedPlayers = () => {
+    if (isHost && socket) {
+      const missedUserIds = players
+        .filter(
+          (p) => !guesses.find((g) => g.userId === p.userId && g.isCorrect)
+        )
+        .map((p) => p.userId);
+
+      socket.emit("roundEnded", { roomCode, missedUserIds });
+    }
   };
 
   // -----------------------------------
@@ -241,17 +256,35 @@ const PlayGameMulti = () => {
     return () => clearInterval(timer);
   }, [musicStarted, timeRemaining]);
 
+  useEffect(() => {
+    if (timeRemaining === 0 && isHost) {
+      emitMissedPlayers();
+    }
+  }, [timeRemaining, isHost, guesses, players]);
+
   // -----------------------------------
   // If time runs out
   // -----------------------------------
   useEffect(() => {
     if (timeRemaining === 0 && !guessedCorrectly) {
+      setMissedCount((prev) => prev + 1);
       setGuessedCorrectly(true);
       setFeedback(
         `Time's up! The correct answer was: "${songTitle}" by ${songArtist}.`
       );
+
+      emitMissedPlayers();
     }
-  }, [timeRemaining, guessedCorrectly, songTitle, songArtist]);
+  }, [
+    timeRemaining,
+    guessedCorrectly,
+    songTitle,
+    songArtist,
+    isHost,
+    socket,
+    players,
+    guesses,
+  ]);
 
   // -----------------------------------
   // Host picks a random track
@@ -324,6 +357,7 @@ const PlayGameMulti = () => {
     const chosenUri = await pickRandomTrackUri();
     if (!chosenUri) return;
     // Broadcast this URI to everyone
+    emitMissedPlayers();
     socket.emit("playSongUri", { roomCode, uri: chosenUri });
   };
 
@@ -389,6 +423,13 @@ const PlayGameMulti = () => {
       }
 
       setGuessedCorrectly(true);
+      const guessTime = 15 - timeRemaining;
+      if (fastestGuessTime === null || guessTime < fastestGuessTime) {
+        setFastestGuessTime(guessTime);
+      }
+      if (!fastestGuessedSong || guessTime < fastestGuessTime) {
+        setFastestGuessedSong(`${songTitle} by ${songArtist}`);
+      }
     } else if (isClose) {
       setFeedback("Close, try again!");
     } else {
@@ -427,8 +468,21 @@ const PlayGameMulti = () => {
   };
 
   const handleEndGame = () => {
+    emitMissedPlayers();
+
     if (socket && isHost) {
-      socket.emit("gameOver", { roomCode });
+      socket.emit("gameOver", {
+        roomCode,
+        missedCounts: players.map((p) => ({
+          userId: p.userId,
+          missedCount: p.userId === userId ? missedCount : 0, // or however you count
+        })),
+        fastestGuesses: players.map((p) => ({
+          userId: p.userId,
+          fastestGuess: p.userId === userId ? fastestGuessTime : null, // you need to store this
+        })),
+        fastestGuessedSong,
+      });
     }
     setGameOver(true);
     setMusicStarted(false);

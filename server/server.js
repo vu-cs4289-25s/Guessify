@@ -169,48 +169,122 @@ io.on("connection", (socket) => {
   });
 
   // 6) End game (broadcast to everyone in the room)
-  socket.on("gameOver", async ({ roomCode }) => {
-    console.log(`Game over in room ${roomCode}`);
+  socket.on(
+    "gameOver",
+    async ({ roomCode, fastestGuesses, fastestGuessedSong }) => {
+      console.log(`🎮 Game over in room ${roomCode}`);
 
+      const room = rooms[roomCode];
+      if (!room) return;
+
+      try {
+        const gameRef = db.collection("gamesMulti").doc(roomCode);
+        const snapshot = await gameRef.get();
+
+        if (!snapshot.exists) {
+          console.error(`❌ No Firestore game found for room ${roomCode}`);
+          return;
+        }
+
+        const gameData = snapshot.data();
+        const originalPlayers = gameData.players || [];
+
+        // --- Maps ---
+        const missedMap = room.missedMap || {};
+        const fastestMap = {};
+        fastestGuesses.forEach((f) => {
+          fastestMap[f.userId] = f.fastestGuess;
+        });
+
+        // --- Compute updated players ---
+        let maxMisses = 0;
+        let missedTheMostNames = [];
+        let quickestTime = null;
+        let quickestPlayer = "";
+
+        const updatedPlayers = originalPlayers.map((p) => {
+          const playerScore = room.score?.[p.userId] || 0;
+          const missed = missedMap[p.userId] || 0;
+          const fastestGuess = fastestMap[p.userId] ?? null;
+
+          // Track missed the most
+          if (missed > maxMisses) {
+            maxMisses = missed;
+            missedTheMostNames = [p.firstName];
+          } else if (missed === maxMisses && missed !== 0) {
+            missedTheMostNames.push(p.firstName);
+          }
+
+          // Track quickest guesser
+          if (fastestGuess != null) {
+            if (quickestTime === null || fastestGuess < quickestTime) {
+              quickestTime = fastestGuess;
+              quickestPlayer = p.firstName;
+            }
+          }
+
+          return {
+            ...p,
+            score: playerScore,
+            missedCount: missed,
+            fastestGuess,
+          };
+        });
+
+        // --- Format missedTheMost display ---
+        // let missedDisplay = "";
+        // if (missedTheMostNames.length === 1) {
+        //   missedDisplay = missedTheMostNames[0];
+        // } else if (missedTheMostNames.length === 2) {
+        //   missedDisplay = `${missedTheMostNames[0]} and ${missedTheMostNames[1]}`;
+        // } else if (missedTheMostNames.length > 2) {
+        //   const last = missedTheMostNames.pop();
+        //   missedDisplay = `${missedTheMostNames.join(", ")} and ${last}`;
+        // }
+        // --- Format missedTheMost display with count ---
+        let missedDisplay = "";
+        if (missedTheMostNames.length > 0) {
+          const names = missedTheMostNames.join(", ");
+          missedDisplay = `${names} (${maxMisses} misses)`;
+        }
+
+        // --- Update Firestore ---
+        await gameRef.set(
+          {
+            players: updatedPlayers,
+            status: "completed",
+            endedAt: Date.now(),
+            missedTheMost: missedDisplay || "",
+            quickestGuesser: quickestPlayer || "",
+            fastestGuessedSong: fastestGuessedSong || "",
+          },
+          { merge: true }
+        );
+
+        console.log(`✅ Final scores & stats saved for room ${roomCode}`);
+      } catch (err) {
+        console.error("❌ Error saving final scores:", err);
+      }
+
+      io.in(roomCode).emit("gameOver");
+    }
+  );
+
+  socket.on("roundEnded", ({ roomCode, missedUserIds }) => {
     const room = rooms[roomCode];
     if (!room) return;
 
-    try {
-      // Fetch Firestore game doc
-      const gameRef = db.collection("gamesMulti").doc(roomCode);
-      const snapshot = await gameRef.get();
+    if (!room.missedMap) room.missedMap = {};
 
-      if (!snapshot.exists) {
-        console.error(`No Firestore game found for room ${roomCode}`);
-        return;
+    missedUserIds.forEach((userId) => {
+      if (!room.missedMap[userId]) {
+        room.missedMap[userId] = 1;
+      } else {
+        room.missedMap[userId]++;
       }
+    });
 
-      const gameData = snapshot.data();
-      const originalPlayers = gameData.players || [];
-
-      // Apply scores to each player
-      const updatedPlayers = originalPlayers.map((p) => ({
-        ...p,
-        score: room.score?.[p.userId] || 0,
-        // You can extend this to include fastestGuess if you want to send it from clients
-      }));
-
-      // Save back to Firestore
-      await gameRef.set(
-        {
-          players: updatedPlayers,
-          status: "completed",
-          endedAt: Date.now(),
-        },
-        { merge: true }
-      );
-
-      console.log(`✅ Final scores saved for room ${roomCode}`);
-    } catch (err) {
-      console.error("❌ Error saving final scores:", err);
-    }
-
-    io.in(roomCode).emit("gameOver");
+    console.log(`Missed counts updated for room ${roomCode}:`, room.missedMap);
   });
 
   // Cleanup on disconnect

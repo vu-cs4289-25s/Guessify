@@ -119,7 +119,6 @@ const Lobby = () => {
       userId: p.userId,
       firstName: displayNamesMap[p.userId] || "Anon",
       score: null, // Init to null
-      fastestGuess: null, // Init to null
     }));
 
     try {
@@ -132,6 +131,8 @@ const Lobby = () => {
           players: finalPlayerList,
           timestamp: Date.now(),
           status: "in-progress",
+          missedTheMost: null, // will be updated at game over
+          quickestGuesser: null, // will be updated at game over
         },
         { merge: true }
       );
