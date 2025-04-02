@@ -14,6 +14,7 @@ import "./PlayGame.css";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../../firebase";
 import { v4 as uuidv4 } from "uuid";
+import { useRef } from "react";
 
 const PlayGame = () => {
   const { userId } = useUser();
@@ -61,6 +62,13 @@ const PlayGame = () => {
 
   // Compute showAnswer flag: true if the player answered correctly OR time ran out.
   const showAnswer = guessedCorrectly || timeRemaining === 0;
+
+  const inputRef = useRef(null);
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, []);
 
   useEffect(() => {
     console.log("Game Genre in PlayGame:", gameGenre); // 🔄 Check if gameGenre is set
@@ -390,6 +398,7 @@ const PlayGame = () => {
         </div>
 
         <input
+          ref={inputRef}
           type="text"
           value={userInput}
           onChange={(e) => setUserInput(e.target.value)}

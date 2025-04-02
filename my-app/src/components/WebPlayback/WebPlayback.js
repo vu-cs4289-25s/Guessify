@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../../firebase";
 import { useGameContext } from "../../components/GameContext";
 import { useUser } from "../../components/userContext";
+import { refreshAccessToken } from "../Refresh";
 
 function WebPlayback({
   nextSongTrigger,
@@ -30,25 +31,62 @@ function WebPlayback({
   //   setToken(accessToken);
   // });
 
+  const getValidSpotifyToken = async (userData) => {
+    const { accessToken, refreshToken, expiresAt } = userData;
+    console.log(userData);
+    const clientId = "3c75e5c902f94501ae14000ce64c5053";
+
+    if (!accessToken || !refreshToken) {
+      console.error("Missing Spotify tokens");
+      return null;
+    }
+
+    // If token is about to expire in <60s
+    if (Date.now() >= expiresAt - 60000) {
+      console.log("Refreshing token...");
+      const newTokens = await refreshAccessToken(refreshToken, clientId);
+      if (!newTokens) return null;
+
+      // Save updated token in Firestore
+      const userRef = doc(db, "users", userId);
+      await setDoc(
+        userRef,
+        {
+          accessToken: newTokens.accessToken,
+          refreshToken: newTokens.refreshToken,
+          expiresAt: newTokens.expiresAt,
+        },
+        { merge: true }
+      );
+
+      return newTokens.accessToken;
+    }
+
+    return accessToken;
+  };
+
   // Fetch token from Firestore
   useEffect(() => {
-    console.log(userId);
     if (!userId) return;
+
     const fetchSpotifyToken = async () => {
       const userRef = doc(db, "users", userId);
       const snapshot = await getDoc(userRef);
       if (snapshot.exists()) {
         const userData = snapshot.data();
-        setToken(userData.accessToken); // store in state
+        const validToken = await getValidSpotifyToken(userData);
+        if (validToken) {
+          setToken(validToken);
+        }
       }
     };
+
     fetchSpotifyToken();
   }, [userId]);
 
   // Load Web Playback SDK script and initialize the player once we have a token
   useEffect(() => {
     if (!token) return;
-    console.log(token);
 
     const scriptUrl = "https://sdk.scdn.co/spotify-player.js";
     if (!document.querySelector(`script[src="${scriptUrl}"]`)) {
@@ -59,6 +97,7 @@ function WebPlayback({
     }
 
     window.onSpotifyWebPlaybackSDKReady = () => {
+      console.log(token);
       if (player) return; // Prevent re-initialization
 
       const newPlayer = new window.Spotify.Player({
