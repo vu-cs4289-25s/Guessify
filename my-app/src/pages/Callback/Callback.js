@@ -164,6 +164,22 @@ const Callback = () => {
 
         // Get the actual song count for today
         songCount = await fetchDailySongs();
+        // Fetch top tracks (to get top songs)
+        const topTracksRes = await fetch(
+          "https://api.spotify.com/v1/me/top/tracks?limit=5",
+          {
+            headers: {
+              Authorization: `Bearer ${tokenData.access_token}`,
+            },
+          }
+        );
+        const topTracksData = await topTracksRes.json();
+        const topSongs = topTracksRes.ok
+          ? topTracksData.items.map((track) => track.name).slice(0, 5)
+          : [];
+
+        // Determine top artist name (most listened)
+        const topArtist = topArtistsData.items?.[0]?.name || "Unknown";
 
         // Store in Firestore
         await setDoc(
@@ -175,15 +191,17 @@ const Callback = () => {
             profileImage,
             topGenre,
             obscurity,
-            songCount, // All songs listened to today
+            songCount,
             createdAt,
-            // store tokens
+            topArtist,  
+            topSongs,  
             accessToken: tokenData.access_token,
             refreshToken: tokenData.refresh_token,
             expiresAt: Date.now() + tokenData.expires_in * 1000,
           },
           { merge: true }
         );
+        
 
         // Store in Context & LocalStorage to persist session
         setUserId(userData.id);
@@ -193,8 +211,10 @@ const Callback = () => {
           topGenre,
           obscurity,
           songCount,
+          topArtist,
+          topSongs,
         });
-
+        
         localStorage.setItem("userId", userData.id);
         localStorage.setItem(
           "userProfile",
@@ -204,9 +224,11 @@ const Callback = () => {
             topGenre,
             obscurity,
             songCount,
+            topArtist,
+            topSongs,
           })
         );
-
+        
         // Navigate in-app (instead of full page reload)
         navigate(`/${nextPage}?userId=${userData.id}`, { replace: true });
       } catch (err) {
