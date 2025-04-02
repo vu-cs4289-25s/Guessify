@@ -5,6 +5,7 @@ import { db } from "../../firebase";
 import Navbar from "../../components/Navbar/Navbar";
 import "./Profile.css";
 import { useUser } from "../../components/userContext";
+import { generateConcertPoster } from "./generatePoster";
 
 const Profile = () => {
   const [searchParams] = useSearchParams();
@@ -14,12 +15,14 @@ const Profile = () => {
   const { setUserId, setUserProfile } = useUser();
   const [isClicked, setIsClicked] = useState(false);
   const [isDownloadClicked, setIsDownloadClicked] = useState(false);
+  const [isGenerateClicked, setIsGenerateClicked] = useState(false);
+  const [posterUrl, setPosterUrl] = useState(null);
+  const [posterLoading, setPosterLoading] = useState(false);
+  const [posterError, setPosterError] = useState(null);
 
   useEffect(() => {
-    if (!userId) {
-      console.log("No userId => not logged in");
-      return;
-    }
+    if (!userId) return;
+
     const fetchProfile = async () => {
       const userRef = doc(db, "users", userId);
       const snapshot = await getDoc(userRef);
@@ -28,12 +31,12 @@ const Profile = () => {
         setProfile(data);
 
         if (data.createdAt) {
-          const diffMs = Date.now() - data.createdAt;
-          const dayCount = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+          const dayCount = Math.floor((Date.now() - data.createdAt) / (1000 * 60 * 60 * 24));
           setDaysSinceJoined(dayCount);
         }
       }
     };
+
     fetchProfile();
   }, [userId]);
 
@@ -49,12 +52,38 @@ const Profile = () => {
     }, 120);
   };
 
+  const handleGenerate = async () => {
+    if (!profile?.topArtist || !profile?.topSongs) {
+      setPosterError("Missing artist or song data.");
+      return;
+    }
+
+    setIsGenerateClicked(true);
+    setPosterLoading(true);
+    setPosterError(null);
+
+    try {
+      const url = await generateConcertPoster(profile.topArtist, profile.topSongs);
+      setPosterUrl(url);
+    } catch (err) {
+      console.error(err);
+      setPosterError("Failed to generate poster.");
+    } finally {
+      setPosterLoading(false);
+      setTimeout(() => setIsGenerateClicked(false), 150);
+    }
+  };
+
   const handleDownload = () => {
     setIsDownloadClicked(true);
     setTimeout(() => {
       setIsDownloadClicked(false);
-      alert("Downloading Poster...");
-      // TODO: Implement actual download logic here
+      if (posterUrl) {
+        const link = document.createElement("a");
+        link.href = posterUrl;
+        link.download = "concert-poster.png";
+        link.click();
+      }
     }, 120);
   };
 
@@ -62,6 +91,7 @@ const Profile = () => {
     <div className="profile-container">
       <Navbar />
       <div className="profile-overlays-wrapper">
+
         {/* Profile Panel */}
         <div className="profile-panel">
           <div className="profile-overlay-panel">
@@ -70,11 +100,7 @@ const Profile = () => {
               {profile ? (
                 <>
                   {profile.profileImage && (
-                    <img
-                      src={profile.profileImage}
-                      alt="Profile"
-                      className="profile-pic"
-                    />
+                    <img src={profile.profileImage} alt="Profile" className="profile-pic" />
                   )}
                   <h3>{profile.displayName}</h3>
 
@@ -88,43 +114,25 @@ const Profile = () => {
                   <p>{profile.songCount}</p>
 
                   <p className="info-title">DAYS SINCE JOINED:</p>
-                  <p>
-                    {daysSinceJoined !== null
-                      ? `${daysSinceJoined} days`
-                      : "N/A"}
-                  </p>
+                  <p>{daysSinceJoined !== null ? `${daysSinceJoined} days` : "N/A"}</p>
                 </>
               ) : (
                 <p>Loading...</p>
               )}
             </div>
           </div>
-          {/* Centered Logout Button */}
+
+          {/* Logout Button */}
           <div className="profile-button-wrapper">
             <div className="profile-button-container">
-              <button
-                className={`profile-button ${isClicked ? "clicked" : ""}`}
-                onClick={handleLogout}
-              >
+              <button className={`profile-button ${isClicked ? "clicked" : ""}`} onClick={handleLogout}>
                 {!isClicked ? (
                   <>
-                    <img
-                      className="default"
-                      src="/buttons/button_rectangle_default.png"
-                      alt="Logout"
-                    />
-                    <img
-                      className="hover"
-                      src="/buttons/button_rectangle_hover.png"
-                      alt="Logout Hover"
-                    />
+                    <img className="default" src="/buttons/button_rectangle_default.png" alt="Logout" />
+                    <img className="hover" src="/buttons/button_rectangle_hover.png" alt="Logout Hover" />
                   </>
                 ) : (
-                  <img
-                    className="clicked"
-                    src="/buttons/button_rectangle_onClick.png"
-                    alt="Logout Click"
-                  />
+                  <img className="clicked" src="/buttons/button_rectangle_onClick.png" alt="Logout Click" />
                 )}
                 <span className={isClicked ? "clicked-text" : ""}>LOGOUT</span>
               </button>
@@ -132,43 +140,79 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* Generate Poster Panel */}
+        {/* Poster Generator Panel */}
         <div className="profile-panel">
           <div className="profile-overlay-panel">
             <h2 className="profile-generate-poster">GENERATE POSTER</h2>
+            {posterLoading && <p>Generating poster...</p>}
+            {posterError && <p style={{ color: "red" }}>{posterError}</p>}
+            {posterUrl && (
+              <img
+                src={posterUrl}
+                alt="Generated Concert Poster"
+                style={{ marginTop: "20px", width: "300px", borderRadius: "12px" }}
+              />
+            )}
           </div>
-          {/* Centered Download Button */}
+
+         {/* Generate + Download Buttons */}
           <div className="profile-button-wrapper">
+            {/* Generate Button */}
             <div className="profile-button-container">
               <button
-                className={`profile-button ${
-                  isDownloadClicked ? "clicked" : ""
-                }`}
-                onClick={handleDownload}
+                className={`profile-button ${isGenerateClicked ? "clicked" : ""}`}
+                onClick={handleGenerate}
               >
-                {!isDownloadClicked ? (
-                  <>
-                    <img
-                      className="default"
-                      src="/buttons/button_rectangle_default.png"
-                      alt="Download"
-                    />
-                    <img
-                      className="hover"
-                      src="/buttons/button_rectangle_hover.png"
-                      alt="Download Hover"
-                    />
-                  </>
-                ) : (
+                <img
+                  className="default"
+                  src="/buttons/button_rectangle_default.png"
+                  alt="Generate"
+                  style={{ display: isGenerateClicked ? "none" : "block" }}
+                />
+                <img
+                  className="hover"
+                  src="/buttons/button_rectangle_hover.png"
+                  alt="Generate Hover"
+                  style={{ display: isGenerateClicked ? "none" : "block" }}
+                />
+                {isGenerateClicked && (
+                  <img
+                    className="clicked"
+                    src="/buttons/button_rectangle_onClick.png"
+                    alt="Generate Click"
+                  />
+                )}
+                <span className={isGenerateClicked ? "clicked-text" : ""}>GENERATE</span>
+              </button>
+            </div>
+
+            {/* Download Button */}
+            <div className="profile-button-container">
+              <button
+                className={`profile-button ${isDownloadClicked ? "clicked" : ""}`}
+                onClick={handleDownload}
+                disabled={!posterUrl}
+              >
+                <img
+                  className="default"
+                  src="/buttons/button_rectangle_default.png"
+                  alt="Download"
+                  style={{ display: isDownloadClicked ? "none" : "block" }}
+                />
+                <img
+                  className="hover"
+                  src="/buttons/button_rectangle_hover.png"
+                  alt="Download Hover"
+                  style={{ display: isDownloadClicked ? "none" : "block" }}
+                />
+                {isDownloadClicked && (
                   <img
                     className="clicked"
                     src="/buttons/button_rectangle_onClick.png"
                     alt="Download Click"
                   />
                 )}
-                <span className={isDownloadClicked ? "clicked-text" : ""}>
-                  DOWNLOAD
-                </span>
+                <span className={isDownloadClicked ? "clicked-text" : ""}>DOWNLOAD</span>
               </button>
             </div>
           </div>

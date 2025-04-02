@@ -72,24 +72,21 @@
     justify-content: center;
 }
 
-/* Wrapper to center the buttons below their respective panels */
 .profile-button-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items:center;
-    width: 100%;
-    margin-top: 2vh;
-}
-
-/* Universal button container for Logout & Download */
-.profile-button-container {
     display: flex;
     justify-content: center;
     align-items: center;
     width: 100%;
-    margin-top: 20px;
-    position: relative;
-}
+    margin-top: 2vh;
+    column-gap: 2rem; /* 👈 spacing between buttons */
+    flex-wrap: wrap;  /* allows wrapping on mobile */
+  }
+  
+  .profile-button-container {
+    width: auto; /* 👈 override to keep buttons side-by-side */
+    margin-top: 0; /* remove stacking spacing */
+  }
+  
 
 /* Button style matching the home page play button */
 .profile-button,
