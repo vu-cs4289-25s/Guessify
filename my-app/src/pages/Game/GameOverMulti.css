@@ -125,14 +125,15 @@
     font-size: 18px;
     margin: 0;
   }  
-
-  .current-user-name {
-    color: #ffe283;
-    font-weight: bold;
+  
+  .equal-width-cols {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 6%;
+    gap: 1.5rem;
   }
   
-  .current-user-score {
-    color: #ffe283;
-    font-weight: bold;
+  .equal-width-cols .game-over-multi-summary-col {
+    flex: 1;
+    max-width: 300px;
   }
-  

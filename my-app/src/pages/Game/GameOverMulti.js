@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { db } from "../../firebase";
 import { doc, getDoc } from "firebase/firestore";
 import Navbar from "../../components/Navbar/Navbar";
+import "../../global.css";
 import "./GameOverMulti.css";
 
 const GameOverMulti = () => {
@@ -13,6 +14,8 @@ const GameOverMulti = () => {
   const [missedTheMost, setMissedTheMost] = useState("");
   const [quickestGuesser, setQuickestGuesser] = useState("");
   const [fastestGuessedSong, setFastestGuessedSong] = useState("");
+
+  const currentUserId = localStorage.getItem("userId");
 
   useEffect(() => {
     const fetchScores = async () => {
@@ -51,15 +54,26 @@ const GameOverMulti = () => {
   }, [roomCode]);
 
   const sortedScores = [...players].sort((a, b) => b.score - a.score);
+  const currentUserRank = sortedScores.findIndex((p) => p.userId === currentUserId);
+
+  const getTitleByRank = () => {
+    switch (currentUserRank) {
+      case 0:
+        return `YOU WON ${genre.toUpperCase()}!`;
+      case 1:
+        return `YOU CAME SECOND FOR ${genre.toUpperCase()}!`;
+      case 2:
+        return `YOU CAME THIRD FOR ${genre.toUpperCase()}!`;
+      default:
+        return `WIN ${genre.toUpperCase()} NEXT TIME!`;
+    }
+  };
 
   return (
     <div className="game-over-multi-container">
       <Navbar />
       <div className="game-over-multi-overlay">
-        <h1 className="game-over-multi-title">GAME OVER</h1>
-        <h2 className="game-over-multi-sub-title">
-          {genre || "Final Rankings"}
-        </h2>
+        <h1 className="game-over-multi-title">{getTitleByRank()}</h1>
 
         {/* MAIN COLUMNS */}
         <div className="game-over-multi-columns">
@@ -67,8 +81,13 @@ const GameOverMulti = () => {
           <div className="game-over-multi-col-left">
             <p className="game-over-multi-col-title">RANK</p>
             <br />
-            {sortedScores.map((_, i) => (
-              <p key={i}>{i + 1}</p>
+            {sortedScores.map((entry, i) => (
+              <p
+                key={entry.userId}
+                className={entry.userId === currentUserId ? "current-user-name" : ""}
+              >
+                {i + 1}
+              </p>
             ))}
           </div>
 
@@ -77,7 +96,12 @@ const GameOverMulti = () => {
             <p className="game-over-multi-col-title">NAME</p>
             <br />
             {sortedScores.map((entry) => (
-              <p key={entry.userId}>{usernamesMap[entry.userId] || "---"}</p>
+              <p
+                key={entry.userId}
+                className={entry.userId === currentUserId ? "current-user-name" : ""}
+              >
+                {usernamesMap[entry.userId] || "---"}
+              </p>
             ))}
           </div>
 
@@ -86,13 +110,18 @@ const GameOverMulti = () => {
             <p className="game-over-multi-col-title">SCORE</p>
             <br />
             {sortedScores.map((entry) => (
-              <p key={entry.userId}>{entry.score}</p>
+              <p
+                key={entry.userId}
+                className={entry.userId === currentUserId ? "current-user-score" : ""}
+              >
+                {entry.score}
+              </p>
             ))}
           </div>
         </div>
 
         {/* STATS ROW */}
-        <div className="game-over-multi-summary-row">
+        <div className="game-over-multi-summary-row equal-width-cols">
           <div className="game-over-multi-summary-col">
             <p className="game-over-multi-col-title">MOST MISSED</p>
             <p>{missedTheMost || "N/A"}</p>

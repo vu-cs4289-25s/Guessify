@@ -13,6 +13,7 @@ import { db } from "../../firebase";
 import { useUser } from "../../components/userContext";
 import Navbar from "../../components/Navbar/Navbar";
 import "./Leaderboard.css";
+import "../../global.css";
 
 const Leaderboard = () => {
   const { userId } = useUser();
