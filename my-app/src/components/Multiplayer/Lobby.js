@@ -22,6 +22,10 @@ const Lobby = () => {
 
   const [showConfirm, setShowConfirm] = useState(false);
   const [pendingNavigation, setPendingNavigation] = useState(null);
+  const [profilePicsMap, setProfilePicsMap] = useState({});
+  const [startClicked, setStartClicked] = useState(false);
+
+
 
   const isHost = userId === hostId;
 
@@ -78,24 +82,30 @@ const Lobby = () => {
 
   const fetchDisplayNames = async (playersArray) => {
     try {
-      const newMap = {};
+      const nameMap = {};
+      const picMap = {};
+  
       for (const p of playersArray) {
         const userRef = doc(db, "users", p.userId);
         const snapshot = await getDoc(userRef);
         if (snapshot.exists()) {
-          const firstName = (snapshot.data().displayName || "No Name").split(
-            " "
-          )[0];
-          newMap[p.userId] = firstName;
+          const data = snapshot.data();
+          const firstName = (data.displayName || "No Name").split(" ")[0];
+          nameMap[p.userId] = firstName;
+          picMap[p.userId] = data.profileImage || "/default-avatar.png";
         } else {
-          newMap[p.userId] = "Anon";
+          nameMap[p.userId] = "Anon";
+          picMap[p.userId] = "/default-avatar.png";
         }
       }
-      setDisplayNamesMap(newMap);
+  
+      setDisplayNamesMap(nameMap);
+      setProfilePicsMap(picMap);
     } catch (error) {
-      console.error("Error fetching display names:", error);
+      console.error("Error fetching display names and images:", error);
     }
   };
+  
 
   const handleStartGame = async () => {
     if (socket) {
@@ -175,25 +185,72 @@ const Lobby = () => {
 
       <h2>Lobby for Room: {roomCode}</h2>
       <p>Players in this Room:</p>
-      <ul>
-        {players.map((p) => {
-          const isCurrentUser = p.userId === userId;
-          const isThisHost = p.userId === hostId;
+      <div className="lobby-panel-wrapper">
+      <div className="player-slot-container">
+        {[...Array(6)].map((_, index) => {
+          const player = players[index];
+          const name = player ? displayNamesMap[player.userId] || "..." : "???";
+          const imgSrc = player ? profilePicsMap[player.userId] || "/default-avatar.png" : null;
+
           return (
-            <li
-              key={p.userId}
-              style={{ color: isCurrentUser ? "#ffe283" : "#f3f3f3" }}
-            >
-              {displayNamesMap[p.userId] || "Loading..."}{" "}
-              {isThisHost && "(Host)"}
-            </li>
+            <div key={index} className="player-slot">
+              <div className={`avatar-square ${player ? "filled" : "empty"}`}>
+                {player ? (
+                  <img
+                    src={imgSrc}
+                    alt={name}
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = "/default-avatar.png";
+                    }}
+                  />
+                ) : (
+                  <span className="placeholder-text">???</span>
+                )}
+              </div>
+              <p className="player-label">{name}</p>
+            </div>
           );
         })}
-      </ul>
+      </div>
 
       {isHost && players.length >= 2 && (
-        <button onClick={handleStartGame}>START GAME</button>
+        <div className="start-button-container">
+          <button
+            className={`start-button ${startClicked ? "clicked" : ""}`}
+            onClick={() => {
+              setStartClicked(true);
+              setTimeout(() => {
+                handleStartGame();
+                setStartClicked(false);
+              }, 120);
+            }}
+          >
+            {!startClicked ? (
+              <>
+                <img
+                  className="default"
+                  src="/buttons/button_rectangle_default.png"
+                  alt="Start"
+                />
+                <img
+                  className="hover"
+                  src="/buttons/button_rectangle_hover.png"
+                  alt="Start Hover"
+                />
+              </>
+            ) : (
+              <img
+                className="clicked"
+                src="/buttons/button_rectangle_onClick.png"
+                alt="Start Click"
+              />
+            )}
+            <span className={startClicked ? "clicked-text" : ""}>START</span>
+          </button>
+        </div>
       )}
+    </div>
 
       {isHost && players.length < 2 && (
         <p>You need at least 2 players to start!</p>
