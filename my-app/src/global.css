@@ -71,3 +71,13 @@ p {
   font-size: var(--p-size);
   font-family: var(--ff);
 }
+
+.current-user-name {
+  color: #ffe283;
+  font-weight: bold;
+}
+
+.current-user-score {
+  color: #ffe283;
+  font-weight: bold;
+}

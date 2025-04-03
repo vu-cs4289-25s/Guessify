@@ -104,13 +104,3 @@
   font-family: var(--ff);
   font-size: 28px;
 }
-
-.current-user-name {
-  color: #ffe283;
-  font-weight: bold;
-}
-
-.current-user-score {
-  color: #ffe283;
-  font-weight: bold;
-}
