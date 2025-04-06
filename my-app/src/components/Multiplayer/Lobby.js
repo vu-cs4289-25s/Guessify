@@ -49,12 +49,12 @@ const Lobby = () => {
           });
 
           if (gameAlreadyStarted) {
-            // 👇 Delay navigation to let React finish mounting
+            // Delay navigation to let React finish mounting
             setTimeout(() => {
               navigate(`/game/play-multiplayer/${roomCode}`, {
                 state: { hostId: initialHostId },
               });
-            }, 50); // can try 0, 50, or 100 ms depending on your app
+            }, 50); 
           }
         }
       );
@@ -71,7 +71,7 @@ const Lobby = () => {
 
     newSocket.on("gameStarted", ({ roomCode, genre, hostId }) => {
       navigate(`/game/play-multiplayer/${roomCode}`, {
-        state: { hostId }, // 👈 pass hostId along
+        state: { hostId }, // pass hostId along
       });
     });
 
@@ -92,10 +92,10 @@ const Lobby = () => {
           const data = snapshot.data();
           const firstName = (data.displayName || "No Name").split(" ")[0];
           nameMap[p.userId] = firstName;
-          picMap[p.userId] = data.profileImage || "/default-avatar.png";
+          picMap[p.userId] = data.profileImage || null;
         } else {
           nameMap[p.userId] = "Anon";
-          picMap[p.userId] = "/default-avatar.png";
+          picMap[p.userId] = null;
         }
       }
   
@@ -146,9 +146,9 @@ const Lobby = () => {
         },
         { merge: true }
       );
-      console.log("✅ Game start data saved:", finalPlayerList);
+      console.log("Game start data saved:", finalPlayerList);
     } catch (error) {
-      console.error("❌ Error saving game start data:", error);
+      console.error("Error saving game start data:", error);
     }
   };
 
@@ -190,7 +190,7 @@ const Lobby = () => {
         {[...Array(6)].map((_, index) => {
           const player = players[index];
           const name = player ? displayNamesMap[player.userId] || "..." : "???";
-          const imgSrc = player ? profilePicsMap[player.userId] || "/default-avatar.png" : null;
+          const imgSrc = player ? profilePicsMap[player.userId] : null;
 
           return (
             <div key={index} className="player-slot">
@@ -201,7 +201,7 @@ const Lobby = () => {
                     alt={name}
                     onError={(e) => {
                       e.target.onerror = null;
-                      e.target.src = "/default-avatar.png";
+                      e.target.src = null;
                     }}
                   />
                 ) : (
