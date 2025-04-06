@@ -159,20 +159,43 @@ io.on("connection", (socket) => {
     io.in(roomCode).emit("gameStarted", { roomCode, genre, hostId });
   });
 
-  // 3) newSong from host
+  // 3) updateGenre - Handle genre updates from host
+  socket.on("updateGenre", ({ roomCode, genre }) => {
+    console.log(`Genre updated in room ${roomCode} to: ${genre}`);
+    
+    // Update the genre in the room object
+    if (rooms[roomCode]) {
+      rooms[roomCode].genre = genre;
+    }
+    
+    // Broadcast the genre update to all players in the room
+    io.in(roomCode).emit("genreUpdated", genre);
+    
+    // Also update Firestore
+    try {
+      const gameRef = db.collection("gamesMulti").doc(roomCode);
+      gameRef.set({ genre }, { merge: true })
+        .then(() => console.log(`Firestore genre updated to: ${genre}`))
+        .catch(err => console.error("Error updating genre in Firestore:", err));
+    } catch (error) {
+      console.error("Failed to update genre in Firestore:", error);
+    }
+  });
+
+  // 4) newSong from host
   socket.on("newSong", ({ roomCode, trackInfo }) => {
     console.log(`Host in room ${roomCode} playing song:`, trackInfo.name);
     io.in(roomCode).emit("playSong", trackInfo);
   });
 
-  // 4) If you want the host to broadcast just a URI (instead of full track info)
+  // 5) If you want the host to broadcast just a URI (instead of full track info)
   //    This is an alternative approach if you have `playSongUri` event
   socket.on("playSongUri", ({ roomCode, uri }) => {
     console.log(`Host in room ${roomCode} broadcasting trackUri:`, uri);
     io.in(roomCode).emit("playSongUri", uri);
   });
 
-  // 5) playerGuessed
+  // 6) playerGuessed
   socket.on("playerGuessed", ({ roomCode, userId, guess }) => {
     console.log(`User ${userId} guessed: ${guess}`);
     io.in(roomCode).emit("playerGuessed", { userId, guess });
@@ -192,7 +215,7 @@ io.on("connection", (socket) => {
     }
   });
 
-  // 6) End game (broadcast to everyone in the room)
+  // 7) End game (broadcast to everyone in the room)
   socket.on(
     "gameOver",
     async ({ roomCode, fastestGuesses, fastestGuessedSong }) => {

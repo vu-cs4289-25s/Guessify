@@ -117,4 +117,7 @@
     font-family: var(--ff);
     margin-top: 3px;
     color: var(--color-text);
+    display: block;
+    text-align: center;
+    width: 100%;
 } 

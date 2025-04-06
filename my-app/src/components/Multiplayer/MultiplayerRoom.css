@@ -97,17 +97,6 @@
     appearance: none;
 }
 
-/* Ensure button styling matches the input */
-.room-game-mode-button {
-    background: rgba(255, 255, 255, 0.2);
-    cursor: pointer;
-    transition: 0.3s ease-in-out;
-}
-
-.room-game-mode-button:hover {
-    background: rgba(255, 255, 255, 0.3);
-}
-
 /* Error message under dropdown */
 .error-message {
     color: var(--color-text);

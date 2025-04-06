@@ -96,6 +96,11 @@ const Lobby = () => {
       setHostId(newHostId);
     });
 
+    newSocket.on("genreUpdated", (newGenre) => {
+      console.log("Received genre update from socket:", newGenre);
+      setCurrentGenre(newGenre);
+    });
+
     newSocket.on("gameStarted", ({ roomCode: gameRoomCode, genre, hostId: gameHostId }) => {
       navigate(`/game/play-multiplayer/${gameRoomCode}`, {
         state: { hostId: gameHostId },
@@ -107,13 +112,14 @@ const Lobby = () => {
     };
   }, [navigate, roomCode, userId, fetchDisplayNames]);
 
+  // Fetch the genre from Firestore when the component mounts
   useEffect(() => {
-    // Get the genre from the game document when component mounts
     const fetchGameGenre = async () => {
       try {
         const gameRef = doc(db, "gamesMulti", roomCode);
         const gameDoc = await getDoc(gameRef);
         if (gameDoc.exists() && gameDoc.data().genre) {
+          console.log("Fetched genre from Firestore:", gameDoc.data().genre);
           setCurrentGenre(gameDoc.data().genre);
         }
       } catch (error) {
@@ -122,6 +128,33 @@ const Lobby = () => {
     };
     fetchGameGenre();
   }, [roomCode]);
+
+  // Update currentGenre when gameGenre changes (only for host)
+  useEffect(() => {
+    if (isHost && socket) {
+      console.log("Host updating genre to:", gameGenre);
+      setCurrentGenre(gameGenre);
+      // Emit genre update to all players
+      socket.emit("updateGenre", { roomCode, genre: gameGenre });
+      
+      // Also update Firestore directly
+      const updateFirestore = async () => {
+        try {
+          const gameRef = doc(db, "gamesMulti", roomCode);
+          await setDoc(gameRef, { genre: gameGenre }, { merge: true });
+          console.log("Genre updated in Firestore:", gameGenre);
+        } catch (error) {
+          console.error("Error updating genre in Firestore:", error);
+        }
+      };
+      updateFirestore();
+    }
+  }, [gameGenre, isHost, socket, roomCode]);
+
+  // Log the current genre for debugging
+  useEffect(() => {
+    console.log("Current genre in Lobby:", currentGenre);
+  }, [currentGenre]);
 
   const handleStartGame = async () => {
     if (socket) {

@@ -181,5 +181,6 @@
 }
 
 .host-start-button .clicked-text {
+    bottom: 130px;
     color: var(--color-text);
 } 
