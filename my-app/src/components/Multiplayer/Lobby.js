@@ -8,6 +8,8 @@ import Navbar from "../Navbar/Navbar";
 import BackButton from "../BackButton/BackButton";
 import ConfirmationPopup from "../ConfirmationPopup/ConfirmationPopup";
 import { useUser } from "../userContext";
+import HostLobby from "./HostLobby";
+import PlayerLobby from "./PlayerLobby";
 
 const Lobby = () => {
   const { roomCode } = useParams();
@@ -192,89 +194,38 @@ const Lobby = () => {
     playersLength: players.length,
   });
 
+  const handleStartClick = () => {
+    setStartClicked(true);
+    setTimeout(() => {
+      handleStartGame();
+      setStartClicked(false);
+    }, 120);
+  };
+
   return (
     <div className="lobby-container">
       <Navbar onNavClick={handleLeaveAttempt} />
       <BackButton onClick={handleLeaveAttempt} />
 
-      <div className="lobby-panel-wrapper">
-        <div className="room-info-panel">
-          <div className="room-code">{roomCode}</div>
-          <div className="player-count">{players.length}/6 PLAYERS JOINED</div>
-          <div className="music-genre">{currentGenre.toUpperCase()}</div>
-        </div>
-
-        <div className="player-slot-container">
-          {[...Array(6)].map((_, index) => {
-            const player = players[index];
-            const name = player ? displayNamesMap[player.userId] || "..." : "???";
-            const imgSrc = player ? profilePicsMap[player.userId] : null;
-
-            return (
-              <div key={index} className="player-slot">
-                <div className={`avatar-square ${player ? "filled" : "empty"}`}>
-                  {player ? (
-                    <img
-                      src={imgSrc}
-                      alt={name}
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = null;
-                      }}
-                    />
-                  ) : (
-                    <span className="placeholder-text">???</span>
-                  )}
-                </div>
-                <p className="player-label">{name}</p>
-              </div>
-            );
-          })}
-        </div>
-
-        {isHost && players.length >= 2 && (
-          <div className="start-button-container">
-            <button
-              className={`start-button ${startClicked ? "clicked" : ""}`}
-              onClick={() => {
-                setStartClicked(true);
-                setTimeout(() => {
-                  handleStartGame();
-                  setStartClicked(false);
-                }, 120);
-              }}
-            >
-              {!startClicked ? (
-                <>
-                  <img
-                    className="default"
-                    src="/buttons/button_rectangle_default.png"
-                    alt="Start"
-                  />
-                  <img
-                    className="hover"
-                    src="/buttons/button_rectangle_hover.png"
-                    alt="Start Hover"
-                  />
-                </>
-              ) : (
-                <img
-                  className="clicked"
-                  src="/buttons/button_rectangle_onClick.png"
-                  alt="Start Click"
-                />
-              )}
-              <span className={startClicked ? "clicked-text" : ""}>START</span>
-            </button>
-          </div>
-        )}
-      </div>
-
-      {isHost && players.length < 2 && (
-        <p>You need at least 2 players to start!</p>
+      {isHost ? (
+        <HostLobby
+          roomCode={roomCode}
+          players={players}
+          currentGenre={currentGenre}
+          displayNamesMap={displayNamesMap}
+          profilePicsMap={profilePicsMap}
+          startClicked={startClicked}
+          onStartGame={handleStartClick}
+        />
+      ) : (
+        <PlayerLobby
+          roomCode={roomCode}
+          players={players}
+          currentGenre={currentGenre}
+          displayNamesMap={displayNamesMap}
+          profilePicsMap={profilePicsMap}
+        />
       )}
-
-      {!isHost && <p>Waiting for the host to start the game...</p>}
 
       {showConfirm && (
         <ConfirmationPopup
