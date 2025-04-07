@@ -16,5 +16,5 @@ Frontend:
 
 Backend:
 1. `cd server `
-2. `npm install express cors dotenv node-fetch`
+2. `npm install express cors dotenv node-fetch openai`
 3. `node server.js`
