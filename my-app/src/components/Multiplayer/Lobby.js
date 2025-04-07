@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import { doc, getDoc, setDoc } from "firebase/firestore";
@@ -8,6 +8,8 @@ import Navbar from "../Navbar/Navbar";
 import BackButton from "../BackButton/BackButton";
 import ConfirmationPopup from "../ConfirmationPopup/ConfirmationPopup";
 import { useUser } from "../userContext";
+import HostLobby from "./HostLobby";
+import PlayerLobby from "./PlayerLobby";
 
 const Lobby = () => {
   const { roomCode } = useParams();
@@ -19,11 +21,40 @@ const Lobby = () => {
   const [displayNamesMap, setDisplayNamesMap] = useState({});
   const [socket, setSocket] = useState(null);
   const [hostId, setHostId] = useState(null);
+  const [currentGenre, setCurrentGenre] = useState("TODAY'S TOP HITS");
 
   const [showConfirm, setShowConfirm] = useState(false);
   const [pendingNavigation, setPendingNavigation] = useState(null);
+  const [profilePicsMap, setProfilePicsMap] = useState({});
+  const [startClicked, setStartClicked] = useState(false);
 
   const isHost = userId === hostId;
+
+  const fetchDisplayNames = useCallback(async (playersArray) => {
+    try {
+      const nameMap = {};
+      const picMap = {};
+  
+      for (const p of playersArray) {
+        const userRef = doc(db, "users", p.userId);
+        const snapshot = await getDoc(userRef);
+        if (snapshot.exists()) {
+          const data = snapshot.data();
+          const firstName = (data.displayName || "No Name").split(" ")[0];
+          nameMap[p.userId] = firstName;
+          picMap[p.userId] = data.profileImage || null;
+        } else {
+          nameMap[p.userId] = "Anon";
+          picMap[p.userId] = null;
+        }
+      }
+  
+      setDisplayNamesMap(nameMap);
+      setProfilePicsMap(picMap);
+    } catch (error) {
+      console.error("Error fetching display names and images:", error);
+    }
+  }, []);
 
   useEffect(() => {
     const newSocket = io("http://localhost:5001");
@@ -45,12 +76,12 @@ const Lobby = () => {
           });
 
           if (gameAlreadyStarted) {
-            // 👇 Delay navigation to let React finish mounting
+            // Delay navigation to let React finish mounting
             setTimeout(() => {
               navigate(`/game/play-multiplayer/${roomCode}`, {
                 state: { hostId: initialHostId },
               });
-            }, 50); // can try 0, 50, or 100 ms depending on your app
+            }, 50); 
           }
         }
       );
@@ -65,37 +96,65 @@ const Lobby = () => {
       setHostId(newHostId);
     });
 
-    newSocket.on("gameStarted", ({ roomCode, genre, hostId }) => {
-      navigate(`/game/play-multiplayer/${roomCode}`, {
-        state: { hostId }, // 👈 pass hostId along
+    newSocket.on("genreUpdated", (newGenre) => {
+      console.log("Received genre update from socket:", newGenre);
+      setCurrentGenre(newGenre);
+    });
+
+    newSocket.on("gameStarted", ({ roomCode: gameRoomCode, genre, hostId: gameHostId }) => {
+      navigate(`/game/play-multiplayer/${gameRoomCode}`, {
+        state: { hostId: gameHostId },
       });
     });
 
     return () => {
       newSocket.disconnect();
     };
-  }, [navigate, roomCode, userId]);
+  }, [navigate, roomCode, userId, fetchDisplayNames]);
 
-  const fetchDisplayNames = async (playersArray) => {
-    try {
-      const newMap = {};
-      for (const p of playersArray) {
-        const userRef = doc(db, "users", p.userId);
-        const snapshot = await getDoc(userRef);
-        if (snapshot.exists()) {
-          const firstName = (snapshot.data().displayName || "No Name").split(
-            " "
-          )[0];
-          newMap[p.userId] = firstName;
-        } else {
-          newMap[p.userId] = "Anon";
+  // Fetch the genre from Firestore when the component mounts
+  useEffect(() => {
+    const fetchGameGenre = async () => {
+      try {
+        const gameRef = doc(db, "gamesMulti", roomCode);
+        const gameDoc = await getDoc(gameRef);
+        if (gameDoc.exists() && gameDoc.data().genre) {
+          console.log("Fetched genre from Firestore:", gameDoc.data().genre);
+          setCurrentGenre(gameDoc.data().genre);
         }
+      } catch (error) {
+        console.error("Error fetching game genre:", error);
       }
-      setDisplayNamesMap(newMap);
-    } catch (error) {
-      console.error("Error fetching display names:", error);
+    };
+    fetchGameGenre();
+  }, [roomCode]);
+
+  // Update currentGenre when gameGenre changes (only for host)
+  useEffect(() => {
+    if (isHost && socket) {
+      console.log("Host updating genre to:", gameGenre);
+      setCurrentGenre(gameGenre);
+      // Emit genre update to all players
+      socket.emit("updateGenre", { roomCode, genre: gameGenre });
+      
+      // Also update Firestore directly
+      const updateFirestore = async () => {
+        try {
+          const gameRef = doc(db, "gamesMulti", roomCode);
+          await setDoc(gameRef, { genre: gameGenre }, { merge: true });
+          console.log("Genre updated in Firestore:", gameGenre);
+        } catch (error) {
+          console.error("Error updating genre in Firestore:", error);
+        }
+      };
+      updateFirestore();
     }
-  };
+  }, [gameGenre, isHost, socket, roomCode]);
+
+  // Log the current genre for debugging
+  useEffect(() => {
+    console.log("Current genre in Lobby:", currentGenre);
+  }, [currentGenre]);
 
   const handleStartGame = async () => {
     if (socket) {
@@ -136,9 +195,9 @@ const Lobby = () => {
         },
         { merge: true }
       );
-      console.log("✅ Game start data saved:", finalPlayerList);
+      console.log("Game start data saved:", finalPlayerList);
     } catch (error) {
-      console.error("❌ Error saving game start data:", error);
+      console.error("Error saving game start data:", error);
     }
   };
 
@@ -168,38 +227,38 @@ const Lobby = () => {
     playersLength: players.length,
   });
 
+  const handleStartClick = () => {
+    setStartClicked(true);
+    setTimeout(() => {
+      handleStartGame();
+      setStartClicked(false);
+    }, 120);
+  };
+
   return (
     <div className="lobby-container">
       <Navbar onNavClick={handleLeaveAttempt} />
       <BackButton onClick={handleLeaveAttempt} />
 
-      <h2>Lobby for Room: {roomCode}</h2>
-      <p>Players in this Room:</p>
-      <ul>
-        {players.map((p) => {
-          const isCurrentUser = p.userId === userId;
-          const isThisHost = p.userId === hostId;
-          return (
-            <li
-              key={p.userId}
-              style={{ color: isCurrentUser ? "#ffe283" : "#f3f3f3" }}
-            >
-              {displayNamesMap[p.userId] || "Loading..."}{" "}
-              {isThisHost && "(Host)"}
-            </li>
-          );
-        })}
-      </ul>
-
-      {isHost && players.length >= 2 && (
-        <button onClick={handleStartGame}>START GAME</button>
+      {isHost ? (
+        <HostLobby
+          roomCode={roomCode}
+          players={players}
+          currentGenre={currentGenre}
+          displayNamesMap={displayNamesMap}
+          profilePicsMap={profilePicsMap}
+          startClicked={startClicked}
+          onStartGame={handleStartClick}
+        />
+      ) : (
+        <PlayerLobby
+          roomCode={roomCode}
+          players={players}
+          currentGenre={currentGenre}
+          displayNamesMap={displayNamesMap}
+          profilePicsMap={profilePicsMap}
+        />
       )}
-
-      {isHost && players.length < 2 && (
-        <p>You need at least 2 players to start!</p>
-      )}
-
-      {!isHost && <p>Waiting for the host to start the game...</p>}
 
       {showConfirm && (
         <ConfirmationPopup
