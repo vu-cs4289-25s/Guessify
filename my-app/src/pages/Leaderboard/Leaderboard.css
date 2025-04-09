@@ -63,20 +63,25 @@
 }
 
 /* Rank icons */
-/* TODO - change width after importing icon */
-.rank-one-icon {
-  width: 10px;
+.leaderboard-container .rank-one-icon {
+  width: 45px;
   height: auto;
+  image-rendering: pixelated;
+  display: inline-block;
 }
 
-.rank-two-icon {
-  width: 9px;
+.leaderboard-container .rank-two-icon {
+  width: 35px;
   height: auto;
+  image-rendering: pixelated;
+  display: inline-block;
 }
 
-.rank-three-icon {
-  width: 8px;
+.leaderboard-container .rank-three-icon {
+  width: 30px;
   height: auto;
+  image-rendering: pixelated;
+  display: inline-block;
 }
 
 /* Blurred overlay for points */

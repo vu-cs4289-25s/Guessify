@@ -104,13 +104,13 @@ const Leaderboard = () => {
             <p className="leaderboard-col-title">RANK</p>
             <br />
             <p>
-              <img src="/icons/rank1.png" alt="1" className="rank-one-icon" />
+              <img src="/leaderboardIcons/leaderboard_first.png" alt="1" className="rank-one-icon" />
             </p>
             <p>
-              <img src="/icons/rank2.png" alt="2" className="rank-two-icon" />
+              <img src="/leaderboardIcons/leaderboard_second.png" alt="2" className="rank-two-icon" />
             </p>
             <p>
-              <img src="/icons/rank3.png" alt="3" className="rank-three-icon" />
+              <img src="/leaderboardIcons/leaderboard_third.png" alt="3" className="rank-three-icon" />
             </p>
             <p>4</p>
             <p>5</p>
