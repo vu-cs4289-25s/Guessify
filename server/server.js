@@ -4,9 +4,10 @@ const { Server } = require("socket.io");
 const cors = require("cors");
 const fetch = require("node-fetch");
 const dotenv = require("dotenv");
-const { OpenAI } = require("openai"); 
+const { OpenAI } = require("openai");
 const { setDoc, doc } = require("firebase/firestore");
 const { db } = require("./admin");
+const axios = require("axios");
 
 dotenv.config();
 const app = express();
@@ -47,6 +48,43 @@ app.post("/api/spotify/token", async (req, res) => {
   }
 });
 
+app.post("/api/spotify/refresh-token", async (req, res) => {
+  const { refresh_token } = req.body;
+
+  const clientId = "3c75e5c902f94501ae14000ce64c5053";
+  const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
+
+  const authHeader = Buffer.from(`${clientId}:${clientSecret}`).toString(
+    "base64"
+  );
+
+  const params = new URLSearchParams({
+    grant_type: "refresh_token",
+    refresh_token,
+  });
+
+  try {
+    const response = await axios.post(
+      "https://accounts.spotify.com/api/token",
+      params,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          Authorization: `Basic ${authHeader}`,
+        },
+      }
+    );
+
+    res.json(response.data);
+  } catch (err) {
+    console.error(
+      "Failed to refresh token:",
+      err.response?.data || err.message
+    );
+    res.status(400).json({ error: "Token refresh failed" });
+  }
+});
+
 app.post("/api/generate-poster", async (req, res) => {
   const { prompt } = req.body;
   console.log("Received prompt:", prompt);
@@ -62,10 +100,12 @@ app.post("/api/generate-poster", async (req, res) => {
     const imageUrl = response.data[0].url;
     res.json({ imageUrl });
   } catch (err) {
-    console.error("OpenAI image generation error:", err?.response?.data || err.message || err);
+    console.error(
+      "OpenAI image generation error:",
+      err?.response?.data || err.message || err
+    );
     res.status(500).json({ error: "Failed to generate poster" });
   }
-  
 });
 
 // Create Server & Socket.IO
@@ -162,21 +202,24 @@ io.on("connection", (socket) => {
   // 3) updateGenre - Handle genre updates from host
   socket.on("updateGenre", ({ roomCode, genre }) => {
     console.log(`Genre updated in room ${roomCode} to: ${genre}`);
-    
+
     // Update the genre in the room object
     if (rooms[roomCode]) {
       rooms[roomCode].genre = genre;
     }
-    
+
     // Broadcast the genre update to all players in the room
     io.in(roomCode).emit("genreUpdated", genre);
-    
+
     // Also update Firestore
     try {
       const gameRef = db.collection("gamesMulti").doc(roomCode);
-      gameRef.set({ genre }, { merge: true })
+      gameRef
+        .set({ genre }, { merge: true })
         .then(() => console.log(`Firestore genre updated to: ${genre}`))
-        .catch(err => console.error("Error updating genre in Firestore:", err));
+        .catch((err) =>
+          console.error("Error updating genre in Firestore:", err)
+        );
     } catch (error) {
       console.error("Failed to update genre in Firestore:", error);
     }
