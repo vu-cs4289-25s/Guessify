@@ -62,23 +62,6 @@
     text-decoration: underline;
   }
   
-  /* Rank icons */
-  /* TODO - change width after importing icon */
-  .rank-one-icon {
-    width: 10px;
-    height: auto;
-  }
-  
-  .rank-two-icon {
-    width: 9px;
-    height: auto;
-  }
-  
-  .rank-three-icon {
-    width: 8px;
-    height: auto;
-  }
-  
   /* Blurred overlay for points */
   .game-over-multi-points-overlay {
     background: rgba(255, 255, 255, 0);
@@ -136,4 +119,24 @@
   .equal-width-cols .game-over-multi-summary-col {
     flex: 1;
     max-width: 300px;
+  }
+
+  /* Return Home Button */
+  .play-again-button {
+    background-color: var(--color-error-secondary);
+    border: 2px solid var(--color-error-primary);
+    border-radius: 60px;
+    padding: 10px 20px;
+    color: var(--color-error-primary);
+    font-size: 16px;
+    cursor: pointer;
+    font-family: inherit;
+    margin-top: 40px;
+    margin-bottom: 10px;
+    text-decoration: none;
+    display: inline-block;
+  }
+  
+  .play-again-button:hover {
+    filter: brightness(90%);
   }
