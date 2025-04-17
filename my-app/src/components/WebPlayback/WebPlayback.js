@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../../firebase";
 import { useGameContext } from "../../components/GameContext";
 import { useUser } from "../../components/userContext";
+import { refreshAccessToken } from "../Refresh";
 
 function WebPlayback({
   trackUriFromHost,
@@ -22,6 +23,40 @@ function WebPlayback({
   const [playerReady, setPlayerReady] = useState(false);
   const [albumCoverReady, setAlbumCoverReady] = useState(false);
 
+  // Get token and refresh token if needed
+  const getValidSpotifyToken = async (userData) => {
+    const { accessToken, refreshToken, expiresAt } = userData;
+    const clientId = "3c75e5c902f94501ae14000ce64c5053";
+
+    if (!accessToken || !refreshToken) {
+      console.error("Missing Spotify tokens");
+      return null;
+    }
+
+    // If token is about to expire in <60s
+    if (Date.now() >= expiresAt - 60000) {
+      console.log("Refreshing token...");
+      const newTokens = await refreshAccessToken(refreshToken, clientId);
+      if (!newTokens) return null;
+
+      // Save updated token in Firestore
+      const userRef = doc(db, "users", userId);
+      await setDoc(
+        userRef,
+        {
+          accessToken: newTokens.accessToken,
+          refreshToken: newTokens.refreshToken,
+          expiresAt: newTokens.expiresAt,
+        },
+        { merge: true }
+      );
+
+      return newTokens.accessToken;
+    }
+
+    return accessToken;
+  };
+
   // Fetch token from Firestore
   useEffect(() => {
     if (!userId) return;
@@ -31,6 +66,10 @@ function WebPlayback({
       if (snapshot.exists()) {
         const userData = snapshot.data();
         setToken(userData.accessToken);
+        const validToken = await getValidSpotifyToken(userData);
+        if (validToken) {
+          setToken(validToken);
+        }
       }
     };
     fetchSpotifyToken();
