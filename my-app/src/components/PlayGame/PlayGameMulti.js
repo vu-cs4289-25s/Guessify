@@ -149,6 +149,7 @@ const PlayGameMulti = () => {
 
     // Listen for host-chosen track
     newSocket.on("playSongUri", (uri) => {
+      console.log("Received song URI from host:", uri);
       setTrackUriFromHost(uri);
       setFeedback("");
       setGuessedCorrectly(false);
@@ -354,9 +355,14 @@ const PlayGameMulti = () => {
 
   const handleHostPickTrack = async () => {
     if (!isHost || !socket) return;
+    
     const chosenUri = await pickRandomTrackUri();
-    if (!chosenUri) return;
-    // Broadcast this URI to everyone
+    if (!chosenUri) {
+      console.error("Failed to get track URI");
+      return;
+    }
+    
+    console.log("Host picked track:", chosenUri);
     emitMissedPlayers();
     socket.emit("playSongUri", { roomCode, uri: chosenUri });
   };

@@ -147,11 +147,17 @@ const Profile = () => {
             {posterLoading && <p>Generating poster...</p>}
             {posterError && <p style={{ color: "red" }}>{posterError}</p>}
             {posterUrl && (
-              <img
-                src={posterUrl}
-                alt="Generated Concert Poster"
-                style={{ marginTop: "20px", width: "300px", borderRadius: "12px" }}
-              />
+              <div className="poster-container">
+                <img
+                  src={posterUrl}
+                  alt="Generated Concert Poster"
+                  style={{ marginTop: "20px", width: "300px", borderRadius: "12px" }}
+                />
+                <div className="poster-text-overlay">
+                  <div className="poster-artist">{profile.topArtist}</div>
+                  <div className="poster-song">{profile.topSongs[0]}</div>
+                </div>
+              </div>
             )}
           </div>
 

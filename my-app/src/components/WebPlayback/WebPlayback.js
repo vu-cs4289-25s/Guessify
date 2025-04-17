@@ -60,24 +60,29 @@ function WebPlayback({
   // Fetch token from Firestore
   useEffect(() => {
     if (!userId) return;
-    const fetchSpotifyToken = async () => {
+    
+    const fetchAndSetupSpotifyToken = async () => {
       const userRef = doc(db, "users", userId);
       const snapshot = await getDoc(userRef);
+      
       if (snapshot.exists()) {
         const userData = snapshot.data();
-        setToken(userData.accessToken);
         const validToken = await getValidSpotifyToken(userData);
+        
         if (validToken) {
           setToken(validToken);
+          // Initialize player here after getting valid token
+          initializePlayer(validToken);
         }
       }
     };
-    fetchSpotifyToken();
+    
+    fetchAndSetupSpotifyToken();
   }, [userId]);
 
-  // Load SDK and initialize player
-  useEffect(() => {
-    if (!token) return;
+  // Separate player initialization into its own function
+  const initializePlayer = (validToken) => {
+    if (!validToken) return;
 
     const scriptUrl = "https://sdk.scdn.co/spotify-player.js";
     if (!document.querySelector(`script[src="${scriptUrl}"]`)) {
@@ -88,17 +93,16 @@ function WebPlayback({
     }
 
     window.onSpotifyWebPlaybackSDKReady = () => {
-      if (player) return;
-
       const newPlayer = new window.Spotify.Player({
-        name: "Web Playback SDK",
-        getOAuthToken: (cb) => cb(token),
+        name: "Guessify Web Player",
+        getOAuthToken: (cb) => cb(validToken),
         volume: 0.5,
       });
 
       setPlayer(newPlayer);
 
       newPlayer.addListener("ready", ({ device_id }) => {
+        console.log("Player ready with device ID:", device_id);
         setDeviceId(device_id);
         localStorage.setItem("device_id", device_id);
         setPlayerReady(true);
@@ -123,15 +127,28 @@ function WebPlayback({
         }
       });
 
-      newPlayer.connect();
+      newPlayer.connect().then(success => {
+        if (success) {
+          console.log("Player connected successfully");
+        }
+      });
     };
-  }, [token]);
+  };
 
-  // Play a track by URI (multiplayer mode)
+  // Modify the playTrack function to be more robust
   const playTrack = async (uri) => {
-    if (!player || !deviceId || !token || !uri) return;
+    if (!player || !deviceId || !token || !uri) {
+      console.log("Missing requirements for playTrack:", {
+        hasPlayer: !!player,
+        hasDeviceId: !!deviceId,
+        hasToken: !!token,
+        hasUri: !!uri
+      });
+      return;
+    }
+
     try {
-      await fetch(
+      const response = await fetch(
         `https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`,
         {
           method: "PUT",
@@ -142,6 +159,14 @@ function WebPlayback({
           },
         }
       );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Error playing track:", errorData);
+        return;
+      }
+
+      console.log("Track playing successfully");
       onSongStarted && onSongStarted();
     } catch (err) {
       console.error("Error playing track:", err);
@@ -189,9 +214,10 @@ function WebPlayback({
     }
   };
 
-  // Play multiplayer song
+  // Modify the multiplayer song effect to be more robust
   useEffect(() => {
     if (playerReady && trackUriFromHost) {
+      console.log("Attempting to play track:", trackUriFromHost);
       playTrack(trackUriFromHost);
     }
   }, [playerReady, trackUriFromHost]);

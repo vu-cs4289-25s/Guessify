@@ -91,9 +91,11 @@ app.post("/api/generate-poster", async (req, res) => {
 
   try {
     const response = await openai.images.generate({
-      model: "dall-e-2",
+      model: "dall-e-3",
       prompt,
-      size: "1024x1024",
+      size: "1024x1792",
+      quality: "standard",
+      n: 1
     });
 
     console.log("OpenAI response:", response);
