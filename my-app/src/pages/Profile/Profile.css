@@ -78,13 +78,13 @@
     align-items: center;
     width: 100%;
     margin-top: 2vh;
-    column-gap: 2rem; /* 👈 spacing between buttons */
-    flex-wrap: wrap;  /* allows wrapping on mobile */
+    column-gap: 2rem;
+    flex-wrap: wrap;  
   }
   
   .profile-button-container {
-    width: auto; /* 👈 override to keep buttons side-by-side */
-    margin-top: 0; /* remove stacking spacing */
+    width: auto; 
+    margin-top: 0; 
   }
   
 
@@ -167,4 +167,32 @@
     font-size: 40px;
     text-align: center;
     justify-content: center;
+}
+
+/* Add these new styles for the poster container and text overlay */
+.poster-container {
+  position: relative;
+  display: inline-block;
+}
+
+.poster-text-overlay {
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  padding: 10px;
+  z-index: 1;
+}
+
+.poster-artist {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.poster-song {
+  font-size: 18px;
 }
