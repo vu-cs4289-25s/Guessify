@@ -1,0 +1,299 @@
+/* Custom Select Box - Styled to match the Room Code Input */
+.game-genre-select {
+    width: 100%;
+    padding: 12px;
+    font-size: 18px;
+    margin: 15px 0;
+    border-radius: 8px;
+    border: 1px solid var(--color-text);
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--color-text);
+    text-align: center;
+    appearance: none;
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+}
+
+/* Add a dropdown arrow */
+.game-genre-select::after {
+    content: "▼";
+    font-size: 14px;
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* Hover and Focus Effects */
+.game-genre-select:hover,
+.game-genre-select:focus {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: var(--color-highlight-text);
+}
+
+/* Custom Input Box */
+.room-input {
+    width: 100%;
+    padding: 12px;
+    font-size: 18px;
+    margin: 15px 0;
+    border-radius: 8px;
+    border: 1px solid var(--color-text);
+    text-align: center;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--color-text);
+    text-align: center;
+    appearance: none;
+}
+
+/* Consistent Button Styling */
+.room-game-mode-button {
+    display: block;
+    width: 100%;
+    text-align: center;
+    padding: 12px;
+    font-size: 18px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--color-text);
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+}
+
+.room-game-mode-button:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Ensure the container is centered */
+.room-mode-overlay {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.0);
+    backdrop-filter: var(--overlay-backdrop);
+    border: var(--color-border);
+    border-radius: var(--overlay-border-radius);
+    padding: 40px;
+    color: var(--color-text);
+    max-width: 1000px;
+    width: 100%;
+}
+
+/* Center and match width for input and button */
+.room-input,
+.room-game-mode-button {
+    width: 80%; /* Adjust as needed */
+    max-width: 300px; /* Keep them consistent */
+    padding: 12px;
+    font-size: 18px;
+    margin: 10px 0; /* Adds spacing between elements */
+    border-radius: 8px;
+    border: 1px solid var(--color-text);
+    text-align: center;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--color-text);
+    appearance: none;
+}
+
+/* Error message under dropdown */
+.error-message {
+    color: var(--color-text);
+    font-family: var(--ff);
+    font-size: 14px;
+    margin-top: 5px;
+    text-align: center;
+}
+
+.player-slot-container {
+    display: flex;
+    justify-content: center;         /* center the child items horizontally */
+    align-items: center;             /* vertical alignment (if needed) */
+    gap: 50px;
+    padding: 20px 20px;
+    max-width: 1000px;
+    margin: 0 auto;              
+    flex-wrap: nowrap;
+  
+    background: rgba(255, 255, 255, 0.0);
+    backdrop-filter: var(--overlay-backdrop);
+    -webkit-backdrop-filter: var(--overlay-backdrop);
+    border-radius: 30px;
+    border: var(--color-border);
+    color: var(--color-text);
+  }
+  
+
+  @media (max-width: 600px) {
+    .player-slot-container {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  }
+  
+  .player-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 117px;
+  }
+  
+  .avatar-square {
+    width: 117px;
+    height: 122px;
+    border-radius: 27px;
+    background: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin-bottom: 4px;
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
+  }
+  
+  .avatar-square img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 16px; /* match your rounded square */
+  }  
+  
+  .placeholder-text {
+    font-size: 18px;
+    color: #bbb;
+    font-weight: bold;
+  }
+  
+  .player-label {
+    font-size: 15px;
+    color: white;
+    letter-spacing: 1px;
+    text-align: center;
+    margin-top: 0px;
+    margin-bottom: 0px;
+  }
+
+    
+  .lobby-panel-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 40px;
+  }
+
+  .start-button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin-top: 40px;
+  }
+
+  .start-button {
+    position: relative;
+    width: 200px;
+    height: 80px; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+  }
+  
+  
+  .start-button img {
+    image-rendering: pixelated;
+    width: 200px;
+    height: auto;
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  
+  .start-button img.default {
+    opacity: 1;
+  }
+  
+  .start-button img.hover {
+    opacity: 0;
+  }
+  
+  .start-button:hover img.default {
+    opacity: 0;
+  }
+  
+  .start-button:hover img.hover {
+    opacity: 1;
+  }
+  
+  .start-button.clicked img.default,
+  .start-button.clicked img.hover {
+    opacity: 0;
+  }
+  
+  .start-button.clicked img.clicked {
+    opacity: 1;
+  }
+  
+  .start-button span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -68%);
+    font-family: var(--ff);
+    font-size: 34px;
+    color: black;
+    z-index: 2;
+    pointer-events: none;
+  }
+  
+  .start-button:hover span {
+    color: var(--color-text);
+  }
+  
+  .start-button .clicked-text {
+    bottom: 130px;
+    color: var(--color-text);
+  }
+
+.room-info-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    max-width: 1000px;
+    margin: 0 auto 20px;
+    background: rgba(255, 255, 255, 0.0);
+    backdrop-filter: var(--overlay-backdrop);
+    -webkit-backdrop-filter: var(--overlay-backdrop);
+    border-radius: 30px;
+    border: var(--color-border);
+    color: var(--color-text);
+  }
+
+  .room-code {
+    font-size: 80px;
+    font-weight: bold;
+    font-family: var(--ff);
+  }
+
+  .player-count {
+    font-size: 18px;
+    font-family: var(--ff);
+  }
+
+  .music-genre {
+    font-size: 18px;
+    opacity: 1;
+    font-family: var(--ff);
+    margin-top: 10px;
+    margin-bottom: 8px;
+    color: var(--color-text);
+  }
+  
+  

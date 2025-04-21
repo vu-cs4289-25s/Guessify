@@ -1,0 +1,65 @@
+.back-button {
+    position: fixed;
+    top: 16%;
+    left: 8%;
+    z-index: 9999;
+    
+    background: rgba(255, 255, 255, 0.0);
+    backdrop-filter: var(--overlay-backdrop);
+    border: var(--color-border);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    padding: 0;
+    
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+
+    padding-top: 0px;
+    padding-left: 12px;
+
+    font-family: var(--ff);
+    font-size: 34px;
+    color: var(--color-text);
+}
+  
+.back-button:hover {
+    text-shadow: 2px 2px 2px #000;
+    font-weight: bold;
+    cursor: pointer;
+}
+  
+.back-button img {
+    width: 24px;
+    height: auto;
+}
+
+/* Tooltip appear to the right using ::after */
+.back-button::after {
+    content: "BACK";
+    position: absolute;
+    top: 50%;
+    left: 60px;
+    transform: translateY(-50%);
+  
+    /* Tooltip styling */
+    background: var(--overlay-background);
+    color: var(--color-text);
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-size: 23px;
+    font-family: var(--ff);
+    white-space: nowrap;
+  
+    /* Start hidden */
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+  
+  /* Show the tooltip text on hover */
+  .back-button:hover::after {
+    opacity: 1;
+  }
+  

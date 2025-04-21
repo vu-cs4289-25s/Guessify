@@ -1,0 +1,67 @@
+/* Container for the How To Play page */
+.how-to-play-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    max-height: var(--page-height);
+    margin-top: var(--page-margin-top);
+    padding: 0 20px;
+    position: relative;
+    overflow-y: auto;
+}
+  
+/* Blurred overlay */
+.how-to-overlay {
+    background: rgba(255, 255, 255, 0.0);
+    backdrop-filter: var(--overlay-backdrop);
+    padding: 50px 60px;
+    border-radius: var(--overlay-border-radius);
+    width: 90%;
+    max-width: 80%;
+    text-align: center;
+    color: var(--color-text);
+    border: var(--color-border);
+    margin-bottom: 5vh;
+}
+  
+/* Title */
+.how-to-title {
+    font-family: var(--ff);
+    font-size: 40px;
+    margin-bottom: 30px;
+}
+  
+/* Icons container */
+.how-to-icons-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 40px;
+}
+
+/* Individual icon box */
+.how-to-icon-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 200px;
+}
+
+/* Icon images */
+.how-to-icon {
+    image-rendering: pixelated;
+    width: 120px;
+    height: 150px;
+    object-fit: contain;
+}
+
+/* Icon description */
+.how-to-description {
+    font-family: var(--ff);
+    font-size: 22px;
+    text-align: center;
+    line-height: 1.5;
+    min-height: 60px;
+}

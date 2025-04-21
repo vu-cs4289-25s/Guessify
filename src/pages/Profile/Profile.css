@@ -1,0 +1,198 @@
+/* Container for Profile Section */
+.profile-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    max-height: var(--page-height);
+    margin-top: 16vh;
+    /* margin-top: var(--page-margin-top); */
+    width: 100vw;
+    padding: 0 20px;
+    position: relative;
+    overflow-y: auto;
+}
+  
+/* Wrapper for Profile Overlays */
+.profile-overlays-wrapper {
+    margin-top: 0;
+    display: flex;
+    flex-wrap: wrap;
+    row-gap: 0;
+    column-gap: 2rem;    
+    /* height: 70vh; */
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 5vh;
+}
+  
+/* Overlay panels */
+.profile-overlay-panel {
+    background: rgba(255, 255, 255, 0.0);
+    backdrop-filter: var(--overlay-backdrop);
+    padding: 30px 80px 60px;
+    border-radius: var(--overlay-border-radius);
+    max-width: 90vw;
+    text-align: center;
+    color: var(--color-text);
+    border: var(--color-border);
+}
+  
+/* Overlay titles */
+.profile-title {
+    font-family: var(--ff);
+    font-size: 40px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.profile-pic {
+    width: 220px;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 45px;
+}  
+
+/* Profile panel paragraph element */
+.profile-content p {
+    margin: 0.5rem 0;
+    font-family: var(--ff); 
+    font-size: 18px;
+    text-align: center;
+}
+
+.info-title {
+    font-weight: bold;
+}
+
+.profile-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-button-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin-top: 2vh;
+    column-gap: 2rem;
+    flex-wrap: wrap;  
+  }
+  
+  .profile-button-container {
+    width: auto; 
+    margin-top: 0; 
+  }
+  
+
+/* Button style matching the home page play button */
+.profile-button,
+.download-button {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    min-width: 220px; /* Adjusted for longer text */
+    height: auto;
+}
+
+/* Button images */
+.profile-button img {
+    image-rendering: pixelated;
+    width: 100%;
+    height: auto;
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+/* Default state */
+.profile-button img.default {
+    opacity: 1;
+}
+
+/* Hover state */
+.profile-button img.hover {
+    opacity: 0;
+}
+
+.profile-button:hover img.default {
+    opacity: 0;
+}
+
+.profile-button:hover img.hover {
+    opacity: 1;
+}
+
+/* Clicked effect */
+.profile-button.clicked img.default,
+.profile-button.clicked img.hover {
+    opacity: 0;
+}
+
+.profile-button.clicked img.clicked {
+    opacity: 1;
+}
+
+/* Button text */
+.profile-button span {
+    position: absolute;
+    font-family: var(--ff);
+    font-size: 28px;
+    top: 18px;
+    color: black;
+    white-space: nowrap; /* Prevent text from wrapping */
+}
+
+.profile-button:hover span {
+    color: var(--color-text);
+}
+
+.profile-button .clicked-text {
+    color: var(--color-text);
+    top: 40px;
+}
+
+/* Update Generate Poster title */
+.profile-generate-poster {
+    font-family: var(--ff);
+    font-size: 40px;
+    text-align: center;
+    justify-content: center;
+}
+
+/* Add these new styles for the poster container and text overlay */
+.poster-container {
+  position: relative;
+  display: inline-block;
+}
+
+.poster-text-overlay {
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  padding: 10px;
+  z-index: 1;
+}
+
+.poster-artist {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.poster-song {
+  font-size: 18px;
+}

@@ -1,0 +1,129 @@
+/* Container for game play */
+.play-game-container {
+    position: relative;
+    max-height: 85vh;
+    margin-top: 15vh;
+    width: 100vw;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  
+  /* Countdown circle */
+  .countdown-circle {
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%); /* center horizontally */
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    border: var(--color-border);
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  
+    font-family: var(--ff);
+    font-weight: bolder;
+    font-size: 80px;
+    color: var(--color-text);
+    background: rgba(255, 255, 255, 0.0);
+    backdrop-filter: var(--overlay-backdrop);
+  }
+  
+  /* Guess Overlay */
+  .guess-overlay {
+    position: relative;
+    margin: 2% auto 2% auto;
+    background: rgba(255, 255, 255, 0.0);
+    backdrop-filter: var(--overlay-backdrop);
+    border: var(--color-border);
+    border-radius: var(--overlay-border-radius);
+    
+    width: 40%;
+    max-width: 1600px;
+    padding: 20px 80px;
+    text-align: center;
+    color: var(--color-text);
+  }
+  
+  /* Title */
+  .guess-title {
+    font-family: var(--ff);
+    font-size: 40px;
+    margin-bottom: 20px;
+  }
+  
+  /* Score / Missed lines */
+  .score-missed {
+    font-family: var(--ff);
+    font-size: 20px;
+    margin: 5px 0;
+  }
+  
+  /* Question icon */
+  .question-icon {
+    margin: 20px auto;
+    font-size: 40px;
+    width: 60px; 
+    height: 60px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    font-family: var(--ff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Guess input */
+  .guess-input {
+    margin-top: 10px;
+    margin-bottom: 40px;
+    font-family: var(--ff);
+    background-color: transparent;
+    color: var(--color-text);
+    font-size: 16px;
+    padding: 10px 10px;
+    border: var(--color-border);
+    border-radius: 4px;
+  }
+  
+  /* Audio Controls */
+  .audio-controls {
+    position: fixed;
+    bottom: 5%;
+    left: 8%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 9999;
+  }
+  
+  .audio-controls button {
+    background: none;
+    border: none;
+    font-size: 50px;
+    cursor: pointer;
+    color: var(--color-text);
+  }
+  
+  .audio-controls input[type="range"] {
+    width: 160px;
+  }
+  
+  .skip-song-button {
+    background-color: var(--color-warning-secondary);
+    border: 2px solid var(--color-warning-primary);
+    border-radius: 30px;
+    padding: 5px 15px;
+    color: var(--color-warning-primary);
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .skip-song-button:hover {
+    filter: brightness(90%);
+  }
+  

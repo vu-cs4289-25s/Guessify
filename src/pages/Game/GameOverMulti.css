@@ -1,0 +1,142 @@
+/* Container for the Leaderboard page */
+.game-over-multi-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    max-height: var(--page-height);
+    margin-top: var(--page-margin-top);
+    width: 100vw;
+    padding: 0 20px;
+    position: relative;
+    overflow-y: auto;
+  }
+  
+  /* Blurred overlay for leaderboard */
+  .game-over-multi-overlay {
+    background: rgba(255, 255, 255, 0);
+    backdrop-filter: var(--overlay-backdrop);
+    padding: 60px 100px;
+    border-radius: var(--overlay-border-radius);
+    width: 90%;
+    max-width: 50vw;
+    text-align: center;
+    color: var(--color-text);
+    border: var(--color-border);
+    margin-bottom: 5%;
+  }
+  
+  /* Title */
+  .game-over-multi-title {
+    font-family: var(--ff);
+    font-size: 40px;
+    margin-top: 10px;
+    margin-bottom: 30px;
+  }
+  
+  /* Subtitle */
+  .game-over-multi-sub-title {
+    font-family: var(--ff);
+    font-size: 28px;
+    margin-bottom: 10px;
+  }
+  
+  /* Team panel: 3-column layout for names/roles */
+  .game-over-multi-columns {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    column-gap: 3rem;
+    row-gap: 1.5rem;
+    margin-top: 1rem;
+  }
+  
+  .game-over-multi-col-left p,
+  .game-over-multi-col-mid p,
+  .game-over-multi-col-right p {
+    font-family: var(--ff);
+    font-size: 23px;
+    margin: 0;
+  }
+  
+  .game-over-multi-col-title {
+    text-decoration: underline;
+  }
+  
+  /* Blurred overlay for points */
+  .game-over-multi-points-overlay {
+    background: rgba(255, 255, 255, 0);
+    backdrop-filter: var(--overlay-backdrop);
+    padding: 0px 40px;
+    border-radius: var(--overlay-border-radius);
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    color: var(--color-text);
+    border: var(--color-border);
+  
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100px;
+    margin-bottom: 5vh;
+  }
+  
+  /* Text for points */
+  .game-over-multi-points-text {
+    font-family: var(--ff);
+    font-size: 28px;
+  }
+
+  .game-over-multi-summary-row {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 6%;
+  }
+  
+  .game-over-multi-summary-col {
+    text-align: center;
+  }
+  
+  .game-over-multi-col-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+
+  .game-over-multi-summary-col p {
+    font-family: var(--ff);
+    font-size: 18px;
+    margin: 0;
+  }  
+  
+  .equal-width-cols {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 6%;
+    gap: 1.5rem;
+  }
+  
+  .equal-width-cols .game-over-multi-summary-col {
+    flex: 1;
+    max-width: 300px;
+  }
+
+  /* Return Home Button */
+  .play-again-button {
+    background-color: var(--color-error-secondary);
+    border: 2px solid var(--color-error-primary);
+    border-radius: 60px;
+    padding: 10px 20px;
+    color: var(--color-error-primary);
+    font-size: 16px;
+    cursor: pointer;
+    font-family: inherit;
+    margin-top: 40px;
+    margin-bottom: 10px;
+    text-decoration: none;
+    display: inline-block;
+  }
+  
+  .play-again-button:hover {
+    filter: brightness(90%);
+  }

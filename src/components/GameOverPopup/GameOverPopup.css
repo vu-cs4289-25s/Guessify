@@ -1,0 +1,51 @@
+/* Dark/transparent backdrop covering screen */
+.game-over-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* The actual popup box */
+.game-over-content {
+    background: rgba(255, 255, 255, 0.0);
+    backdrop-filter: var(--overlay-backdrop);
+    border: var(--color-border);
+    border-radius: 30px;
+    padding: 40px 100px;
+    text-align: center;
+    color: var(--color-text);
+    cursor: default;
+    
+    font-family: var(--ff);
+  }
+  
+  .game-over-content h1 {
+    font-size: 40px;
+    margin-bottom: 20px;
+  }
+  
+  /* Game over page button */
+  .view-results-button {
+    background-color: var(--color-error-secondary);
+    border: 2px solid var(--color-error-primary);
+    border-radius: 60px;
+    padding: 10px 20px;
+    color: var(--color-error-primary);
+    font-size: 16px;
+    cursor: pointer;
+    font-family: inherit;
+    margin: 20px 0;
+  }
+  
+  /* On hover */
+  .view-results-button:hover {
+    filter: brightness(90%);
+  }
+  

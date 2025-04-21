@@ -1,0 +1,186 @@
+.host-lobby-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 40px;
+}
+
+.host-room-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 23px;
+    width: 358px;
+    height: 176px;
+    margin-bottom: 20px;
+    background: rgba(255, 255, 255, 0.0);
+    backdrop-filter: var(--overlay-backdrop);
+    -webkit-backdrop-filter: var(--overlay-backdrop);
+    border-radius: 30px;
+    border: var(--color-border);
+    color: var(--color-text);
+}
+
+.host-player-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 50px;
+    padding: 15px 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+    flex-wrap: nowrap;
+    background: rgba(255, 255, 255, 0.0);
+    backdrop-filter: var(--overlay-backdrop);
+    -webkit-backdrop-filter: var(--overlay-backdrop);
+    border-radius: 30px;
+    border: var(--color-border);
+    color: var(--color-text);
+}
+
+.host-player-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 117px;
+}
+
+.host-avatar-square {
+    width: 117px;
+    height: 122px;
+    border-radius: 27px;
+    background: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin-bottom: 6px;
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
+}
+
+.host-avatar-square img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 27px;
+}
+
+.host-placeholder-text {
+    font-size: 18px;
+    color: #bbb;
+    font-weight: bold;
+}
+
+.host-player-label {
+    font-size: 18px;
+    color: white;
+    text-align: center;
+    margin-top: 8px;
+    margin-bottom: 4px;
+}
+
+.host-room-code {
+    font-size: 80px;
+    font-weight: bold;
+    margin-top: -10px;
+    margin-bottom: 8px;
+    font-family: var(--ff);
+}
+
+.host-player-count {
+    font-size: 18px;
+    margin-bottom: 4px;
+    font-family: var(--ff);
+}
+
+.host-music-genre {
+    font-size: 18px;
+    opacity: 1;
+    font-family: var(--ff);
+    margin-top: 4px;
+    color: var(--color-text);
+}
+
+.host-start-container {
+    margin-top: 40px;
+    display: flex;
+    justify-content: center;
+}
+
+.host-message {
+    text-align: center;
+    margin-top: 20px;
+    font-family: var(--ff);
+    color: var(--color-text);
+}
+
+/* Start button styles */
+.host-start-button {
+    position: relative;
+    width: 200px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+.host-start-button img {
+    image-rendering: pixelated;
+    width: 200px;
+    height: auto;
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.host-start-button img.default {
+    opacity: 1;
+}
+
+.host-start-button img.hover {
+    opacity: 0;
+}
+
+.host-start-button:hover img.default {
+    opacity: 0;
+}
+
+.host-start-button:hover img.hover {
+    opacity: 1;
+}
+
+.host-start-button.clicked img.default,
+.host-start-button.clicked img.hover {
+    opacity: 0;
+}
+
+.host-start-button.clicked img.clicked {
+    opacity: 1;
+}
+
+.host-start-button span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -68%);
+    font-family: var(--ff);
+    font-size: 34px;
+    color: black;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.host-start-button:hover span {
+    color: var(--color-text);
+}
+
+.host-start-button .clicked-text {
+    bottom: 130px;
+    color: var(--color-text);
+} 

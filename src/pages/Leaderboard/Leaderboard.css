@@ -1,0 +1,111 @@
+/* Container for the Leaderboard page */
+.leaderboard-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  max-height: var(--page-height);
+  margin-top: var(--page-margin-top);
+  width: 100vw;
+  padding: 0 20px;
+  position: relative;
+  overflow-y: auto;
+}
+
+/* Blurred overlay for leaderboard */
+.leaderboard-overlay {
+  background: rgba(255, 255, 255, 0);
+  backdrop-filter: var(--overlay-backdrop);
+  padding: 60px 100px;
+  border-radius: var(--overlay-border-radius);
+  width: 90%;
+  max-width: 50vw;
+  text-align: center;
+  color: var(--color-text);
+  border: var(--color-border);
+  margin-bottom: 5%;
+}
+
+/* Title */
+.leaderboard-title {
+  font-family: var(--ff);
+  font-size: 40px;
+  margin-top: 10px;
+  margin-bottom: 30px;
+}
+
+/* Subtitle */
+.leaderboard-sub-title {
+  font-family: var(--ff);
+  font-size: 28px;
+  margin-bottom: 10px;
+}
+
+/* Team panel: 3-column layout for names/roles */
+.leaderboard-columns {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  column-gap: 3rem;
+  row-gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.leaderboard-col-left p,
+.leaderboard-col-mid p,
+.leaderboard-col-right p {
+  font-family: var(--ff);
+  font-size: 23px;
+  margin: 0;
+}
+
+.leaderboard-col-title {
+  text-decoration: underline;
+}
+
+/* Rank icons */
+.leaderboard-container .rank-one-icon {
+  width: 45px;
+  height: auto;
+  image-rendering: pixelated;
+  display: inline-block;
+}
+
+.leaderboard-container .rank-two-icon {
+  width: 35px;
+  height: auto;
+  image-rendering: pixelated;
+  display: inline-block;
+}
+
+.leaderboard-container .rank-three-icon {
+  width: 30px;
+  height: auto;
+  image-rendering: pixelated;
+  display: inline-block;
+}
+
+/* Blurred overlay for points */
+.leaderboard-points-overlay {
+  background: rgba(255, 255, 255, 0);
+  backdrop-filter: var(--overlay-backdrop);
+  padding: 0px 40px;
+  border-radius: var(--overlay-border-radius);
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  color: var(--color-text);
+  border: var(--color-border);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100px;
+  margin-bottom: 5vh;
+}
+
+/* Text for points */
+.leaderboard-points-text {
+  font-family: var(--ff);
+  font-size: 28px;
+}

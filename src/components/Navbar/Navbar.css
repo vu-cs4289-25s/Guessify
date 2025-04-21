@@ -1,0 +1,91 @@
+/* Navbar container */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 15vh;
+  background-color: transparent;
+  padding: 2% 5%;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  box-sizing: border-box;
+  transition: padding 0.3s ease;
+}
+
+/* Navbar without the logo */
+.navbar.no-logo {
+  padding: 3.63% 5%;
+}
+
+/* Logo link */
+.nav-logo {
+  margin-right: 20px;
+  text-decoration: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Logo image */
+.logo {
+  height: 80px;
+  width: auto;
+}
+
+/* Container for the links */
+.nav-links-container {
+  display: flex;
+  align-items: center;
+  transition: margin-left 0.3s ease;
+}
+
+/* Move links to the left when the logo is hidden */
+.navbar.no-logo .nav-links-container {
+  margin-left: 0;
+}
+
+.nav-links-container {
+  margin-left: 120px;
+}
+
+/* Navbar links */
+.nav-link {
+  color: var(--color-text);
+  text-decoration: none;
+  margin: 0 20px;
+  font-size: 24px;
+  font-family: var(--ff);
+  font-weight: normal;
+  letter-spacing: 1px;
+  transition: color 0.3s ease;
+}
+
+/* Align the Profile link to the right */
+.profile-link {
+  margin-left: auto;
+  margin-right: 60px;
+}
+
+/* Hover effect */
+.nav-link:hover {
+  text-shadow: 3px 3px 3px #000;
+  font-weight: bold;
+}
+
+/* Border to indicate current page */
+.nav-link-border {
+  background: rgba(255, 255, 255, 0.0);
+  backdrop-filter: var(--overlay-backdrop);
+  border: var(--color-border);
+  padding: 6px 10px;
+  border-radius: 30px;
+}
+
+/* For the user's profile pic in the navbar */
+.nav-profile-pic {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 50%;
+}
